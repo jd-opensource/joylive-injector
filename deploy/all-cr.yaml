@@ -375,7 +375,9 @@ kind: Deployment
 metadata:
   name: joylive-webhook
   namespace: joylive
-  labels:
+  labels: 
+    app.kubernetes.io/name: joylive-webhook
+    app.kubernetes.io/instance: joylive-webhook
     app: joylive-webhook
 spec:
   replicas: 1
@@ -445,30 +447,30 @@ spec:
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
-  name: "joylive-webhook"
+  name: joylive-webhook
   namespace: joylive
 webhooks:
   - name: "joylive-webhook-deployment.joylive.io"
     rules:
-      - apiGroups:   ["apps"]
-        apiVersions: ["v1","v1beta1"]
-        operations:  ["CREATE","UPDATE","DELETE"]
-        resources:   ["deployments"]
+      - apiGroups: [ "apps" ]
+        apiVersions: [ "v1","v1beta1" ]
+        operations: [ "CREATE","UPDATE","DELETE" ]
+        resources: [ "deployments" ]
         #scope:       "Namespaced"
         #scope:       "Cluster"
     clientConfig:
       service:
-        name: "joylive-webhook"
+        name: joylive-webhook
         namespace: joylive
         path: /mutating/injection-deploy
         port: 443
       caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUdKRENDQkF5Z0F3SUJBZ0lVUSthU1B5YWphcjd4UUJEOTVvYVNOZTE5Z0k0d0RRWUpLb1pJaHZjTkFRRU4KQlFBd2dha3hDekFKQmdOVkJBWVRBa05PTVJBd0RnWURWUVFJRXdkQ1pXbHFhVzVuTVJBd0RnWURWUVFIRXdkQwpaV2xxYVc1bk1TSXdJQVlEVlFRS0V4bEVlVzVoYldsaklFRmtiV2x6YzJsdmJpQkRiMjUwY205c01Tc3dLUVlEClZRUUxFeUpFZVc1aGJXbGpJRUZrYldsemMybHZiaUJEYjI1MGNtOXNJRk5sWTNWeWFYUjVNU1V3SXdZRFZRUUQKRXh4RWVXNWhiV2xqSUVGa2JXbHpjMmx2YmlCRGIyNTBjbTlzSUVOQk1CNFhEVEkwTURReU5qQXdOVGt3TUZvWApEVE0wTURReU5EQXdOVGt3TUZvd2dha3hDekFKQmdOVkJBWVRBa05PTVJBd0RnWURWUVFJRXdkQ1pXbHFhVzVuCk1SQXdEZ1lEVlFRSEV3ZENaV2xxYVc1bk1TSXdJQVlEVlFRS0V4bEVlVzVoYldsaklFRmtiV2x6YzJsdmJpQkQKYjI1MGNtOXNNU3N3S1FZRFZRUUxFeUpFZVc1aGJXbGpJRUZrYldsemMybHZiaUJEYjI1MGNtOXNJRk5sWTNWeQphWFI1TVNVd0l3WURWUVFERXh4RWVXNWhiV2xqSUVGa2JXbHpjMmx2YmlCRGIyNTBjbTlzSUVOQk1JSUNJakFOCkJna3Foa2lHOXcwQkFRRUZBQU9DQWc4QU1JSUNDZ0tDQWdFQXBSQUNia0doQTNHMytrWVdhcUN6UFhSZkVCODkKRHRFc0ZlTW9Wa0pQOHdMamZJT1g0aUE0enhaVmp4cTVvOSt4ZGdKQnRheXcwNk5SbEtkVUFyRkRLY3FLQkwwNgo3eVlhTXdXTk5ybE5PYnJOeE5MVFJ1VFB2VzdySHN5NUNzbm9uNFI2dTFkK0ZLckgzdytrT0xUa3A4c0xxRlR4CnBUMElNSmN6STMzUjhsaGU1S2hzbEFkOThld2Z1RWlrOFJHZ0ZlSFdtcit5YmE5WCt0VXBYMHVSWFVFeXZNdFIKZjh6Ujk1dy9tbDN6TTBCbWJmUWlWNmdtY0J0azFWYnBvcVJndjlqTThMYS81MVpGaElwVVJOaWloMDc4QXJNMgovWXpndWNMWGtXcHJGSU5Ta1ZSNWg4cE9TR2VPTjJRZjk0ZlBIZXRySG51U1B1OGJvazRtSTdRd3ZTWVJMV21JClB1YzVhNDRSempnYlRLOGVRcTNrTFlESTZNQVA5R0Y0SE1tZVhxNmpFTmo0YXB1RW42V0l0THpnbmtnWCtwUmwKcWdQMVh0UXlOS01PcWtUNjFVbC9wUFhQdTUwbS82SDhJaldYemlRQXZDbnE1elhQOHkzZEM2dkhYWU15NUNEZApDTXZRVUJPa2tzV1pyZVRKWEMwcDB5N292amN5ZkRsVzRkcUZNMjR5T25xUHA5QnEwSHV5MHFZaUtEdVFRUG9pCjBVbFdsb1VyMDFINXdXdk5IZy9QcjJvMWJjMDVpMzBKc1ZtZk5DbmNRR0UvL09WODNvdS92YlM2TGhyUExwMmYKS21xclNTKzFITXo1V0t3bW5XNE5BSEdjaG01UzE3U2dKbXdkK3lqRzlGbzlrRmlYeC9kcnZaWG90c05ybUg5aApjdFdkMk1GSk9XZE9wS2NDQXdFQUFhTkNNRUF3RGdZRFZSMFBBUUgvQkFRREFnRUdNQThHQTFVZEV3RUIvd1FGCk1BTUJBZjh3SFFZRFZSME9CQllFRkErVXdYbU16YzVWMlNqdmxPZGZIYkNKSEtpOE1BMEdDU3FHU0liM0RRRUIKRFFVQUE0SUNBUUJEU3ZqRStJdEwyWURINE1nelNxQ0llVnVNUVp6eWhWQmkyNzlOSisvaUVmMVZiQ0NRV1AxdApIVmNkMFZlYlA5cllsNms1NUZvK25tanllVkpNQ25zTnN4dDF3cWh0dkxlZWRMcTFCbkVXY2NZbWRRc3M3Tmk2CkQ4Tmc0SisrOENObktXR096L21xZStEdkxqZGltSWpmRy9TQWtWbEVnNGFabmdaUENTL0Q0R3N3bkRpb3dFQWMKcmVHVnIzemJRKzFPOTZWOHlzRDdIckdVWmhTcEZXeUVMRlUrNHBLdDRqdm9WdmcyTlZJcTNEdEp0eTFrZktRNwp5WVB6dXFQd0tIdlE2YmVodkkvRDVoMkw4NzR1WmNmeU5HSzY2YWg2YTY3Z09tUitzQmtqblZUUkgwVmlXRmxkCkhOeWg3N1FUdGsxcEdjVnJBRHk0MmhBZHh1cEp0RmlEZVQvZ0N2WXM2Q0YyRG1Gbmx4VTBCa2RnbWRMOERnZ3cKRXIxV1o4SjZ6Mzl6YmM3STRMY2tWZm9MZzltVWUya1ZhN0lMcklBOVVWL2srMWkycm9xemxJcWlUUTJiNEtaawpkRmd5REYwUVh5Sk1NSFVhNDczVjI0SHRPUW41MDFWUFZ0Ym5lL2lyYjFTeFJwTUt5MTBlcmlBR3R3V21mUFc5CmVBVmo4YkhjZ0x0bzVqZVpwTmx6Y3dDcEpLaHh1T2VPUFR0bUZOTC9mOGlrTjFoTVRwWHVxVllJejMxQWVPeDUKZ1ZzaG81QTZ4NFpIcnZuRGwzYVNKVlFNVlJUOXRwQ3NLS2lON0FiYUkwMXRyZnIyaktqZlA1dHJTM2pab2VrbQp6S3ZCajhUaUc2VXBVSTFnQ3RKQjcrME9aSjU3dkFXT3RJb01wRXFtZXRYUC94bGg0RXIxY1E9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
-    admissionReviewVersions: ["v1", "v1beta1"]
+    admissionReviewVersions: [ "v1", "v1beta1" ]
     sideEffects: None
     timeoutSeconds: 5
     failurePolicy: Ignore
     objectSelector:
-      matchLabels:
+      matchLabels: 
         x-live-enabled : "true"
   - name: "joylive-webhook-pod.joylive.io"
     rules:
@@ -476,11 +478,11 @@ webhooks:
         apiVersions: [ "v1","v1beta1" ]
         operations: [ "CREATE" ]
         resources: [ "pods" ]
-        scope:       "*"
+        scope: "*"
         #scope:       "Cluster"
     clientConfig:
       service:
-        name: "joylive-webhook"
+        name: joylive-webhook
         namespace: joylive
         path: /mutating/injection-pod
         port: 443
@@ -490,5 +492,5 @@ webhooks:
     timeoutSeconds: 5
     failurePolicy: Ignore
     objectSelector:
-      matchLabels:
+      matchLabels: 
         x-live-enabled : "true"

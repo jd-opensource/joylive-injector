@@ -1,42 +1,41 @@
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
-  name: "joylive-webhook"
+  name: {{ include "joylive-webhook.name" . }}
   namespace: {{ .Values.namespace }}
 webhooks:
   - name: "joylive-webhook-deployment.joylive.io"
     rules:
-      - apiGroups:   ["apps"]
-        apiVersions: ["v1","v1beta1"]
-        operations:  ["CREATE","UPDATE","DELETE"]
-        resources:   ["deployments"]
+      - apiGroups: [ "apps" ]
+        apiVersions: [ "v1","v1beta1" ]
+        operations: [ "CREATE","UPDATE","DELETE" ]
+        resources: [ "deployments" ]
         #scope:       "Namespaced"
         #scope:       "Cluster"
     clientConfig:
       service:
-        name: "joylive-webhook"
+        name: {{ include "joylive-webhook.name" . }}
         namespace: {{ .Values.namespace }}
         path: /mutating/injection-deploy
         port: 443
       caBundle: {{ .Values.caBundle }}
-    admissionReviewVersions: ["v1", "v1beta1"]
+    admissionReviewVersions: [ "v1", "v1beta1" ]
     sideEffects: None
     timeoutSeconds: 5
     failurePolicy: Ignore
     objectSelector:
-      matchLabels:
-        {{ .Values.matchLabels.matchKey}} : {{ .Values.matchLabels.matchValue }}
+      matchLabels: {{ include "joylive-webhook.matchLabels" . | nindent 8 }}
   - name: "joylive-webhook-pod.joylive.io"
     rules:
       - apiGroups: [ "" ]
         apiVersions: [ "v1","v1beta1" ]
         operations: [ "CREATE" ]
         resources: [ "pods" ]
-        scope:       "*"
+        scope: "*"
         #scope:       "Cluster"
     clientConfig:
       service:
-        name: "joylive-webhook"
+        name: {{ include "joylive-webhook.name" . }}
         namespace: {{ .Values.namespace }}
         path: /mutating/injection-pod
         port: 443
@@ -46,5 +45,4 @@ webhooks:
     timeoutSeconds: 5
     failurePolicy: Ignore
     objectSelector:
-      matchLabels:
-        {{ .Values.matchLabels.matchKey}} : {{ .Values.matchLabels.matchValue }}
+      matchLabels: {{ include "joylive-webhook.matchLabels" . | nindent 8 }}

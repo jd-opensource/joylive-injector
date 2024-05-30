@@ -48,6 +48,14 @@ Selector labels
 {{- define "joylive-webhook.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "joylive-webhook.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+app: {{ .Chart.Name }}
+{{- end }}
+
+{{/*
+Match labels
+*/}}
+{{- define "joylive-webhook.matchLabels" -}}
+{{ .Values.matchLabels.matchKey}} : {{ .Values.matchLabels.matchValue }}
 {{- end }}
 
 {{/*

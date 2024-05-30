@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: joylive-webhook
+  name: {{ include "joylive-webhook.name" . }}
 rules:
   - apiGroups:
       - ""
@@ -31,19 +31,19 @@ rules:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: joylive-webhook
+  name: {{ include "joylive-webhook.name" . }}
   namespace: {{ .Values.namespace }}
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: joylive-webhook
+  name: {{ include "joylive-webhook.name" . }}
   namespace:  {{ .Values.namespace }}
 subjects:
   - kind: ServiceAccount
-    name: joylive-webhook
+    name: {{ include "joylive-webhook.name" . }}
     namespace:  {{ .Values.namespace }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: joylive-webhook
+  name: {{ include "joylive-webhook.name" . }}

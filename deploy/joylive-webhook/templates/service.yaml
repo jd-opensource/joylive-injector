@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: joylive-webhook
+  name: {{ include "joylive-webhook.name" . }}
   namespace: {{ .Values.namespace }}
   labels:
-    svc: joylive-webhook
+    svc: {{ include "joylive-webhook.name" . }}
 spec:
   ports:
     - port: 443
       targetPort: 443
   selector:
-    app: joylive-webhook
+    app: {{ include "joylive-webhook.name" . }}
