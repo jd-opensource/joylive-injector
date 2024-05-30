@@ -1,0 +1,10 @@
+Thank you for installing {{ .Chart.Name }}. {{ .Chart.Name }} has been installed successfully.
+For usage, please visit: https://github.com/jd-opensource/joylive-injector
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }}
+  $ helm get all {{ .Release.Name }}
+

@@ -1,0 +1,50 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: "joylive-webhook"
+  namespace: {{ .Values.namespace }}
+webhooks:
+  - name: "joylive-webhook-deployment.joylive.io"
+    rules:
+      - apiGroups:   ["apps"]
+        apiVersions: ["v1","v1beta1"]
+        operations:  ["CREATE","UPDATE","DELETE"]
+        resources:   ["deployments"]
+        #scope:       "Namespaced"
+        #scope:       "Cluster"
+    clientConfig:
+      service:
+        name: "joylive-webhook"
+        namespace: {{ .Values.namespace }}
+        path: /mutating/injection-deploy
+        port: 443
+      caBundle: {{ .Values.caBundle }}
+    admissionReviewVersions: ["v1", "v1beta1"]
+    sideEffects: None
+    timeoutSeconds: 5
+    failurePolicy: Ignore
+    objectSelector:
+      matchLabels:
+        {{ .Values.matchLabels.matchKey}} : {{ .Values.matchLabels.matchValue }}
+  - name: "joylive-webhook-pod.joylive.io"
+    rules:
+      - apiGroups: [ "" ]
+        apiVersions: [ "v1","v1beta1" ]
+        operations: [ "CREATE" ]
+        resources: [ "pods" ]
+        scope:       "*"
+        #scope:       "Cluster"
+    clientConfig:
+      service:
+        name: "joylive-webhook"
+        namespace: {{ .Values.namespace }}
+        path: /mutating/injection-pod
+        port: 443
+      caBundle: {{ .Values.caBundle }}
+    admissionReviewVersions: [ "v1", "v1beta1" ]
+    sideEffects: None
+    timeoutSeconds: 5
+    failurePolicy: Ignore
+    objectSelector:
+      matchLabels:
+        {{ .Values.matchLabels.matchKey}} : {{ .Values.matchLabels.matchValue }}

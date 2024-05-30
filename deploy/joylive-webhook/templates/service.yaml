@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: joylive-webhook
+  namespace: {{ .Values.namespace }}
+  labels:
+    svc: joylive-webhook
+spec:
+  ports:
+    - port: 443
+      targetPort: 443
+  selector:
+    app: joylive-webhook
