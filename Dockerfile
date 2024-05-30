@@ -1,6 +1,6 @@
 FROM golang:alpine AS builder
 
-ENV SRC_PATH ${GOPATH}/src/joylive-webhook
+ENV SRC_PATH ${GOPATH}/src/joylive-injector
 
 WORKDIR ${SRC_PATH}
 
@@ -33,7 +33,7 @@ RUN set -ex \
     && echo ${TZ} > /etc/timezone \
     && rm -rf /var/cache/apk/*
 
-COPY --from=builder /root/go/bin/joylive-webhook /joylive-injector
+COPY --from=builder /go/bin/joylive-injector /joylive-injector
 
 ENTRYPOINT ["/joylive-injector"]
 
