@@ -12,16 +12,16 @@ matchLabels:
 
 image:
   repository: ghcr.io/jd-opensource/joylive-injector
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.0.0"
+  tag: latest
 
 logLevel: debug
 
 containerArgs:
   - --cert=/etc/kubernetes/ssl/dac.pem
   - --key=/etc/kubernetes/ssl/dac-key.pem
-  - --init-container-image=ghcr.io/jd-opensource/joylive-agent:1.0.0
+  - --init-container-image=ghcr.io/jd-opensource/joylive-agent:latest
 
 imagePullSecrets: []
 nameOverride: ""

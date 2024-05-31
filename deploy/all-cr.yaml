@@ -395,12 +395,12 @@ spec:
             - name: log.level
               value: debug
           name: joylive-injector
-          image: ghcr.io/jd-opensource/joylive-injector:1.0.0
-          imagePullPolicy: IfNotPresent
+          image: ghcr.io/jd-opensource/joylive-injector:latest
+          imagePullPolicy: Always
           args:
             - --cert=/etc/kubernetes/ssl/dac.pem
             - --key=/etc/kubernetes/ssl/dac-key.pem
-            - --init-container-image=ghcr.io/jd-opensource/joylive-agent:1.0.0
+            - --init-container-image=ghcr.io/jd-opensource/joylive-agent:latest
           livenessProbe:
             httpGet:
               scheme: HTTPS
