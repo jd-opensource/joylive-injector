@@ -147,17 +147,17 @@ func addPodInitContainer(targetPod *corev1.Pod, envs []corev1.EnvVar, deployment
 			MountPath: config.InitEmptyDirMountPath,
 		},
 		{
-			Name:      deploymentName + "-configmap",
+			Name:      deploymentName + "-live-configmap",
 			MountPath: config.ConfigMountPath + "/" + config.AgentConfig,
 			SubPath:   config.AgentConfig,
 		},
 		{
-			Name:      deploymentName + "-configmap",
+			Name:      deploymentName + "-live-configmap",
 			MountPath: config.ConfigMountPath + "/" + config.BootConfig,
 			SubPath:   config.BootConfig,
 		},
 		{
-			Name:      deploymentName + "-configmap",
+			Name:      deploymentName + "-live-configmap",
 			MountPath: config.ConfigMountPath + "/" + config.LogConfig,
 			SubPath:   config.LogConfig,
 		},
@@ -235,17 +235,17 @@ func modifyPodContainer(targetPod *corev1.Pod, envs []corev1.EnvVar, deploymentN
 					MountPath: config.EmptyDirMountPath,
 				},
 				{
-					Name:      deploymentName + "-configmap",
+					Name:      deploymentName + "-live-configmap",
 					MountPath: config.ConfigMountPath + "/" + config.AgentConfig,
 					SubPath:   config.AgentConfig,
 				},
 				{
-					Name:      deploymentName + "-configmap",
+					Name:      deploymentName + "-live-configmap",
 					MountPath: config.ConfigMountPath + "/" + config.BootConfig,
 					SubPath:   config.BootConfig,
 				},
 				{
-					Name:      deploymentName + "-configmap",
+					Name:      deploymentName + "-live-configmap",
 					MountPath: config.ConfigMountPath + "/" + config.LogConfig,
 					SubPath:   config.LogConfig,
 				},
@@ -286,11 +286,11 @@ func addPodVolume(targetPod *corev1.Pod, deploymentName string) []corev1.Volume 
 			},
 		},
 		{
-			Name: deploymentName + "-configmap",
+			Name: deploymentName + "-live-configmap",
 			VolumeSource: corev1.VolumeSource{
 				ConfigMap: &corev1.ConfigMapVolumeSource{
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: deploymentName + "-configmap",
+						Name: deploymentName + "-live-configmap",
 					},
 					Items: []corev1.KeyToPath{
 						{
