@@ -98,7 +98,7 @@ func createConfigMap(deploy *appsv1.Deployment) error {
 	rs := resource.GetResource()
 	configMap := &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      deploy.Name + "-configmap",
+			Name:      deploy.Name + "-live-configmap",
 			Namespace: deploy.Namespace,
 		},
 		Data: map[string]string{
@@ -110,7 +110,7 @@ func createConfigMap(deploy *appsv1.Deployment) error {
 	//logger.Debugf("create configmap: %v", configMap)
 	err = rs.CreateOrUpdateConfigMap(context.Background(), deploy.Namespace, configMap)
 	if err != nil {
-		log.Errorf("create configmap error: %v", err)
+		log.Errorf("create configmap %s in %s error: %v", deploy.Name, deploy.Namespace, err)
 		return err
 	}
 	return nil
@@ -119,12 +119,12 @@ func createConfigMap(deploy *appsv1.Deployment) error {
 func deleteConfigMap(name, namespace string) error {
 	rs := resource.GetResource()
 	log.Debug("delete configmap")
-	err := rs.DeleteConfigMap(context.Background(), namespace, name+"-configmap")
+	err := rs.DeleteConfigMap(context.Background(), namespace, name+"-live-configmap")
 	if err != nil {
 		if errors.IsNotFound(err) {
 			return nil
 		}
-		log.Errorf("delete configmap error: %v", err)
+		log.Errorf("delete configmap %s in %s error: %v", name, namespace, err)
 		return err
 	}
 	return nil
