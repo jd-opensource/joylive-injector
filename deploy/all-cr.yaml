@@ -38,10 +38,13 @@ data:
   bootstrap.properties: |
     app.name=${APPLICATION_NAME}
     app.service.name=${APPLICATION_SERVICE_NAME:${APPLICATION_NAME}}
+    app.service.namespace=${APPLICATION_SERVICE_NAMESPACE:default}
+    app.service.group=${APPLICATION_SERVICE_GROUP:default}
     app.service.gateway=${APPLICATION_SERVICE_GATEWAY:NONE}
     app.location.region=${APPLICATION_LOCATION_REGION}
     app.location.zone=${APPLICATION_LOCATION_ZONE}
     app.location.liveSpaceId=${APPLICATION_LOCATION_LIVESPACE_ID:${CONFIG_LIVESPACE_ID}}
+    app.location.unitRuleId=${APPLICATION_LOCATION_UNIT_RULE_ID}
     app.location.unit=${APPLICATION_LOCATION_UNIT}
     app.location.cell=${APPLICATION_LOCATION_CELL}
     app.location.laneSpaceId=${APPLICATION_LOCATION_LANESPACE_ID}
@@ -86,8 +89,9 @@ data:
           - com.huaweicloud.sermant.core.plugin.classloader.ServiceClassLoader
           - com.alipay.sofa.ark.container.service.classloader.PluginClassLoader
       publisher:
-        liveEvent:
-          capacity: 20000
+        configs:
+          traffic:
+            capacity: 20000
       plugin:
         systems:
           - system
@@ -120,12 +124,12 @@ data:
         profile: null
       sync:
         liveSpace:
-          url: http://127.0.0.1:30305/v1
-          spacesUrl: http://127.0.0.1:30305/v1/workspaces
-          spaceUrl: http://127.0.0.1:30305/v1/workspaces/${space_id}/version/${space_version}
-          serviceUrl: http://127.0.0.1:30305/v1/services/${service_name}/version/${service_version}
-          type: file # [file,multilive]
-          service: true
+          type: multilive # [file,multilive]
+          url: http://11.159.56.136:30305/v1
+          #spacesUrl: http://localhost:9090/v1/workspaces
+          #spaceUrl: http://localhost:9090/v1/workspaces/${space_id}/version/${space_version}
+          #serviceUrl: http://localhost:9090/v1/services/${service_name}/version/${service_version}
+          #service: true
           interval: 5000
           timeout: 3000
           initialTimeout: 20000
@@ -137,7 +141,7 @@ data:
           type: file
         microservice:
           type: file
-          policy: FLOW_CONTROL
+          url: http://localhost:8000/v1
       watchdog:
         enabled: true
         delay: 5000
@@ -180,6 +184,8 @@ data:
       governance:
         service:
           warmups: ${CONFIG_WARMUP_SERVICES:}
+          excludes:
+            - org.apache.dubbo.metadata.MetadataService
         initializeTimeout: ${CONFIG_POLICY_INITIALIZE_TIMEOUT:10000}
         router:
           virtual: ${CONFIG_VIRTUAL_SIZE:500}

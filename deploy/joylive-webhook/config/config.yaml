@@ -22,8 +22,9 @@ agent:
       - com.huaweicloud.sermant.core.plugin.classloader.ServiceClassLoader
       - com.alipay.sofa.ark.container.service.classloader.PluginClassLoader
   publisher:
-    liveEvent:
-      capacity: 20000
+    configs:
+      traffic:
+        capacity: 20000
   plugin:
     systems:
       - system
@@ -56,12 +57,12 @@ agent:
     profile: null
   sync:
     liveSpace:
-      url: http://127.0.0.1:30305/v1
-      spacesUrl: http://127.0.0.1:30305/v1/workspaces
-      spaceUrl: http://127.0.0.1:30305/v1/workspaces/${space_id}/version/${space_version}
-      serviceUrl: http://127.0.0.1:30305/v1/services/${service_name}/version/${service_version}
-      type: file # [file,multilive]
-      service: true
+      type: multilive # [file,multilive]
+      url: http://11.159.56.136:30305/v1
+      #spacesUrl: http://localhost:9090/v1/workspaces
+      #spaceUrl: http://localhost:9090/v1/workspaces/${space_id}/version/${space_version}
+      #serviceUrl: http://localhost:9090/v1/services/${service_name}/version/${service_version}
+      #service: true
       interval: 5000
       timeout: 3000
       initialTimeout: 20000
@@ -73,7 +74,7 @@ agent:
       type: file
     microservice:
       type: file
-      policy: FLOW_CONTROL
+      url: http://localhost:8000/v1
   watchdog:
     enabled: true
     delay: 5000
@@ -116,6 +117,8 @@ agent:
   governance:
     service:
       warmups: ${CONFIG_WARMUP_SERVICES:}
+      excludes:
+        - org.apache.dubbo.metadata.MetadataService
     initializeTimeout: ${CONFIG_POLICY_INITIALIZE_TIMEOUT:10000}
     router:
       virtual: ${CONFIG_VIRTUAL_SIZE:500}
