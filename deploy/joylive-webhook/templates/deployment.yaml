@@ -19,6 +19,8 @@ spec:
         - env:
             - name: log.level
               value: {{ .Values.logLevel }}
+            - name: JOYLIVE_CONFIGMAP_NAME
+              value: {{ .Values.configMapName }}
           name: joylive-injector
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}

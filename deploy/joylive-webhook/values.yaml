@@ -11,17 +11,18 @@ matchLabels:
   matchValue: '"true"'
 
 image:
-  repository: ghcr.io/jd-opensource/joylive-injector
+  repository: ghcr.m.daocloud.io/jd-opensource/joylive-injector
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
+
+configMapName: joylive-webhook-config
 
 logLevel: debug
 
 containerArgs:
   - --cert=/etc/kubernetes/ssl/dac.pem
   - --key=/etc/kubernetes/ssl/dac-key.pem
-  - --init-container-image=ghcr.io/jd-opensource/joylive-agent:latest
 
 imagePullSecrets: []
 nameOverride: ""
@@ -59,27 +60,27 @@ VolumeMounts:
   - name: dynamic-admission-control-certs
     mountPath: /etc/kubernetes/ssl/
     readOnly: true
-  - name: joylive-webhook-config
-    mountPath: /etc/config.yaml
-    subPath: config.yaml
-  - name: joylive-webhook-config
-    mountPath: /etc/bootstrap.properties
-    subPath: bootstrap.properties
-  - name: joylive-webhook-config
-    mountPath: /etc/logback.xml
-    subPath: logback.xml
+#  - name: joylive-webhook-config
+#    mountPath: /etc/config.yaml
+#    subPath: config.yaml
+#  - name: joylive-webhook-config
+#    mountPath: /etc/bootstrap.properties
+#    subPath: bootstrap.properties
+#  - name: joylive-webhook-config
+#    mountPath: /etc/logback.xml
+#    subPath: logback.xml
 
 Volumes:
   - name: dynamic-admission-control-certs
     secret:
       secretName: dynamic-admission-control-certs
-  - name: joylive-webhook-config
-    configMap:
-      name: joylive-webhook-config
-      items:
-        - key: config.yaml
-          path: config.yaml
-        - key: bootstrap.properties
-          path: bootstrap.properties
-        - key: logback.xml
-          path: logback.xml
+#  - name: joylive-webhook-config
+#    configMap:
+#      name: joylive-webhook-config
+#      items:
+#        - key: config.yaml
+#          path: config.yaml
+#        - key: bootstrap.properties
+#          path: bootstrap.properties
+#        - key: logback.xml
+#          path: logback.xml

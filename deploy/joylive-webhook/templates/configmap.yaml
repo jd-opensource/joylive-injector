@@ -1,8 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: joylive-webhook-config
+  name: {{ .Values.configMapName }}
   namespace: {{ .Values.namespace }}
+  labels: {{ include "joylive-webhook.selectorLabels" . | nindent 4 }}
 data:
   {{- $root := . }}
   {{- range $path, $_ :=  .Files.Glob "config/*" }}

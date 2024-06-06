@@ -2,16 +2,21 @@ package config
 
 import (
 	"github.com/jd-opensource/joylive-injector/pkg/log"
+	"github.com/jd-opensource/joylive-injector/pkg/resource"
 	"os"
-	"path/filepath"
 )
 
 const (
 	// DefaultConfigPath is the default path to the configuration file
-	DefaultConfigPath = "/etc"
-	AgentConfig       = "config.yaml"
-	LogConfig         = "logback.xml"
-	BootConfig        = "bootstrap.properties"
+	DefaultConfigPath     = "/etc"
+	AgentConfig           = "config.yaml"
+	AgentInjectConfigName = "agent.yaml"
+	LogConfig             = "logback.xml"
+	BootConfig            = "bootstrap.properties"
+	ConfigMountPath       = "/joylive/config"
+	EmptyDirMountPath     = "/joylive"
+	InitEmptyDirMountPath = "/agent"
+	ConfigMapEnvName      = "JOYLIVE_CONFIGMAP_NAME"
 )
 
 var (
@@ -19,45 +24,39 @@ var (
 	Key                string
 	Addr               string
 	ConfigPath         string
-	ConfigMountPath    string
-	EmptyDirMountPath  string
 	ConfigMountSubPath string
 	MatchLabel         string
 )
 
 // injection_deploy config
 var (
-	InitContainerName     string
-	InitContainerImage    string
-	InitContainerCmd      string
-	InitContainerArgs     string
-	InitContainerEnvKey   string
-	InitContainerEnvValue string
-	InitEmptyDirMountPath string
+	InitContainerName string
+	//InitContainerImage    string
+	//InitContainerCmd      string
+	//InitContainerArgs     string
+	//InitContainerEnvKey   string
+	//InitContainerEnvValue string
+	InjectorConfigMap map[string]string
+	InjectorConfig    *AgentInjectConfig
 )
 
-func ReadConfigs() (map[string]string, error) {
-	configMap := make(map[string]string)
-	configFile, err := os.ReadFile(filepath.Join(ConfigPath, AgentConfig))
+func init() {
+	cmWatcher := NewConfigMapWatcher(resource.GetResource().ClientSet)
+	err := cmWatcher.Start()
 	if err != nil {
-		log.Infof("Error reading logback.xml: %v", err)
-		return nil, err
+		panic(err.Error())
 	}
-	configMap[AgentConfig] = string(configFile)
-	// Read logback.xml
-	xmlFile, err := os.ReadFile(filepath.Join(ConfigPath, LogConfig))
+	err = cmWatcher.InitConfigMap(GetNamespace(), os.Getenv(ConfigMapEnvName))
 	if err != nil {
-		log.Infof("Error reading logback.xml: %v", err)
-		return nil, err
+		panic(err.Error())
 	}
-	configMap[LogConfig] = string(xmlFile)
+}
 
-	// Read bootstrap.properties
-	propsFile, err := os.ReadFile(filepath.Join(ConfigPath, BootConfig))
+func GetNamespace() string {
+	namespace, err := os.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
 	if err != nil {
-		log.Infof("Error reading bootstrap.properties: %v", err)
-		return nil, err
+		log.Fatalf("Failed to read namespace file: %v", err)
+		panic(err.Error())
 	}
-	configMap[BootConfig] = string(propsFile)
-	return configMap, nil
+	return string(namespace)
 }

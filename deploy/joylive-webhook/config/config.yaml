@@ -60,7 +60,7 @@ agent:
       spacesUrl: http://127.0.0.1:30305/v1/workspaces
       spaceUrl: http://127.0.0.1:30305/v1/workspaces/${space_id}/version/${space_version}
       serviceUrl: http://127.0.0.1:30305/v1/services/${service_name}/version/${service_version}
-      type: multilive # [file,multilive]
+      type: file # [file,multilive]
       service: true
       interval: 5000
       timeout: 3000

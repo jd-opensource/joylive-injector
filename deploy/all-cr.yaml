@@ -23,7 +23,18 @@ kind: ConfigMap
 metadata:
   name: joylive-webhook-config
   namespace: joylive
+  labels: 
+    app.kubernetes.io/name: joylive-webhook
+    app.kubernetes.io/instance: joylive-webhook
+    app: joylive-webhook
 data:
+  agent.yaml: |
+    image: ghcr.m.daocloud.io/jd-opensource/joylive-agent
+    version: latest
+    cmd: /bin/sh
+    args: "-c, cp -r /joylive/* /agent && chmod -R 777 /agent"
+    envKey: JAVA_TOOL_OPTIONS
+    envValue: -javaagent:/joylive/live.jar
   bootstrap.properties: |
     app.name=${APPLICATION_NAME}
     app.service.name=${APPLICATION_SERVICE_NAME:${APPLICATION_NAME}}
@@ -113,7 +124,7 @@ data:
           spacesUrl: http://127.0.0.1:30305/v1/workspaces
           spaceUrl: http://127.0.0.1:30305/v1/workspaces/${space_id}/version/${space_version}
           serviceUrl: http://127.0.0.1:30305/v1/services/${service_name}/version/${service_version}
-          type: multilive # [file,multilive]
+          type: file # [file,multilive]
           service: true
           interval: 5000
           timeout: 3000
@@ -394,13 +405,14 @@ spec:
         - env:
             - name: log.level
               value: debug
+            - name: JOYLIVE_CONFIGMAP_NAME
+              value: joylive-webhook-config
           name: joylive-injector
-          image: ghcr.io/jd-opensource/joylive-injector:latest
+          image: ghcr.m.daocloud.io/jd-opensource/joylive-injector:latest
           imagePullPolicy: Always
           args:
             - --cert=/etc/kubernetes/ssl/dac.pem
             - --key=/etc/kubernetes/ssl/dac-key.pem
-            - --init-container-image=ghcr.io/jd-opensource/joylive-agent:latest
           livenessProbe:
             httpGet:
               scheme: HTTPS
@@ -419,29 +431,10 @@ spec:
             - mountPath: /etc/kubernetes/ssl/
               name: dynamic-admission-control-certs
               readOnly: true
-            - mountPath: /etc/config.yaml
-              name: joylive-webhook-config
-              subPath: config.yaml
-            - mountPath: /etc/bootstrap.properties
-              name: joylive-webhook-config
-              subPath: bootstrap.properties
-            - mountPath: /etc/logback.xml
-              name: joylive-webhook-config
-              subPath: logback.xml
       volumes:
         - name: dynamic-admission-control-certs
           secret:
             secretName: dynamic-admission-control-certs
-        - configMap:
-            items:
-            - key: config.yaml
-              path: config.yaml
-            - key: bootstrap.properties
-              path: bootstrap.properties
-            - key: logback.xml
-              path: logback.xml
-            name: joylive-webhook-config
-          name: joylive-webhook-config
 ---
 # Source: joylive-webhook/templates/mutatingwebhook.yaml
 apiVersion: admissionregistration.k8s.io/v1

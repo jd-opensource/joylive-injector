@@ -164,13 +164,13 @@ func addPodInitContainer(targetPod *corev1.Pod, envs []corev1.EnvVar, deployment
 	}
 	agentInitContainer := &corev1.Container{
 		Name:  config.InitContainerName,
-		Image: config.InitContainerImage,
+		Image: config.InjectorConfig.Image + ":" + config.InjectorConfig.Version,
 		//Command:      strings.Split(conf.InitContainerCmd, ","),
 		VolumeMounts: addVolumes,
 		Env: []corev1.EnvVar{
 			{
-				Name:  config.InitContainerEnvKey,
-				Value: config.InitContainerEnvValue,
+				Name:  config.InjectorConfig.EnvKey,
+				Value: config.InjectorConfig.EnvValue,
 			},
 		},
 	}
@@ -188,12 +188,12 @@ func addPodInitContainer(targetPod *corev1.Pod, envs []corev1.EnvVar, deployment
 			corev1.ResourceMemory: quantityRequestsMemory,
 		},
 	}
-	cmds := strings.Split(config.InitContainerCmd, ",")
+	cmds := strings.Split(config.InjectorConfig.Cmd, ",")
 	agentInitContainer.Command = make([]string, 0)
 	for _, cmd := range cmds {
 		agentInitContainer.Command = append(agentInitContainer.Command, cmd)
 	}
-	args := strings.Split(config.InitContainerArgs, ",")
+	args := strings.Split(config.InjectorConfig.Args, ",")
 	agentInitContainer.Args = make([]string, 0)
 	for _, arg := range args {
 		agentInitContainer.Args = append(agentInitContainer.Args, arg)
@@ -217,9 +217,9 @@ func modifyPodContainer(targetPod *corev1.Pod, envs []corev1.EnvVar, deploymentN
 				envMap[env.Name] = env
 			}
 
-			envMap[config.InitContainerEnvKey] = corev1.EnvVar{
-				Name:  config.InitContainerEnvKey,
-				Value: config.InitContainerEnvValue,
+			envMap[config.InjectorConfig.EnvKey] = corev1.EnvVar{
+				Name:  config.InjectorConfig.EnvKey,
+				Value: config.InjectorConfig.EnvValue,
 			}
 			mergeEnvs := make([]corev1.EnvVar, 0)
 			for _, envVar := range envMap {

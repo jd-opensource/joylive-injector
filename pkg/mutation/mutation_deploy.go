@@ -90,25 +90,16 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 }
 
 func createConfigMap(deploy *appsv1.Deployment) error {
-	configs, err := config.ReadConfigs()
-	if err != nil {
-		log.Errorf("read config error: %v", err)
-		return err
-	}
 	rs := resource.GetResource()
 	configMap := &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      deploy.Name + "-live-configmap",
 			Namespace: deploy.Namespace,
 		},
-		Data: map[string]string{
-			config.AgentConfig: configs[config.AgentConfig],
-			config.BootConfig:  configs[config.BootConfig],
-			config.LogConfig:   configs[config.LogConfig],
-		},
+		Data: config.InjectorConfigMap,
 	}
 	//logger.Debugf("create configmap: %v", configMap)
-	err = rs.CreateOrUpdateConfigMap(context.Background(), deploy.Namespace, configMap)
+	err := rs.CreateOrUpdateConfigMap(context.Background(), deploy.Namespace, configMap)
 	if err != nil {
 		log.Errorf("create configmap %s in %s error: %v", deploy.Name, deploy.Namespace, err)
 		return err
