@@ -89,7 +89,10 @@ func (w *ConfigMapWatcher) Start() error {
 		return err
 	}
 	go w.configMapInformer.Run(ctx.Done())
-	go w.workerForConfigMap()
+	go func() {
+		for w.processConfigMap() {
+		}
+	}()
 	return nil
 }
 
@@ -104,14 +107,15 @@ func (w *ConfigMapWatcher) cacheConfigMap(configMap *v1.ConfigMap) error {
 	cmDataString := string(cmDataBytes)
 	log.Info("Received ConfigMap update event, start updating local configuration.", zap.String("cm", configMap.Name),
 		zap.String("data", cmDataString))
+	InjectorConfigMap = configMap.Data
 	if data, ok := configMap.Data[AgentInjectConfigName]; ok {
 		c, err := GetAgentInjectConfig(data)
 		if err != nil {
 			return err
 		}
 		InjectorConfig = c
+		delete(InjectorConfigMap, AgentInjectConfigName)
 	}
-	InjectorConfigMap = configMap.Data
 	return nil
 }
 
@@ -122,11 +126,6 @@ func (w *ConfigMapWatcher) createOrUpdateCache(obj interface{}) {
 		return
 	}
 	w.cmQueue.Add(key)
-}
-
-func (w *ConfigMapWatcher) workerForConfigMap() {
-	for w.processConfigMap() {
-	}
 }
 
 func (w *ConfigMapWatcher) processConfigMap() bool {
