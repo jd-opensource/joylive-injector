@@ -54,7 +54,7 @@ func Setup() {
 			if p != handlePath {
 				log.Warnf("admission func handler path does not support '_', it has been automatically converted to '-'(%s => %s)", p, handlePath)
 			}
-			log.Infof("register admission path is: %s, p is %s ", handlePath, p)
+			log.Infof("register admission path is: %s, origin path is %s ", handlePath, p)
 			copyAf := af
 			route.RegisterHandler(route.HandleFunc{
 				Path:   handlePath,
@@ -110,9 +110,7 @@ func Setup() {
 					log.Debugf("write response: %d: %s: %v", http.StatusOK, string(respBs), err)
 				},
 			})
-
 		}
-
 	})
 }
 
