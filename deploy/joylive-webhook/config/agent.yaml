@@ -1,6 +1,0 @@
-image: ghcr.m.daocloud.io/jd-opensource/joylive-agent
-version: latest
-cmd: /bin/sh
-args: "-c, cp -r /joylive/* /agent && chmod -R 777 /agent"
-envKey: JAVA_TOOL_OPTIONS
-envValue: -javaagent:/joylive/live.jar

@@ -164,15 +164,16 @@ func addPodInitContainer(targetPod *corev1.Pod, envs []corev1.EnvVar, deployment
 	}
 	agentInitContainer := &corev1.Container{
 		Name:  config.InitContainerName,
-		Image: config.InjectorConfig.Image + ":" + config.InjectorConfig.Version,
+		Image: config.InjectorConfig.AgentConfig.Image + ":" + config.InjectorConfig.AgentConfig.Version,
 		//Command:      strings.Split(conf.InitContainerCmd, ","),
 		VolumeMounts: addVolumes,
-		Env: []corev1.EnvVar{
-			{
-				Name:  config.InjectorConfig.EnvKey,
-				Value: config.InjectorConfig.EnvValue,
-			},
-		},
+		Env: func(envMap map[string]string) []corev1.EnvVar {
+			envVars := make([]corev1.EnvVar, 0, len(envMap))
+			for key, value := range envMap {
+				envVars = append(envVars, corev1.EnvVar{Name: key, Value: value})
+			}
+			return envVars
+		}(config.InjectorConfig.AgentConfig.Env),
 	}
 	quantityLimitsCPU, _ := k8sresource.ParseQuantity(DefaultCPU)
 	quantityLimitsMemory, _ := k8sresource.ParseQuantity(DefaultMemory)
@@ -188,12 +189,12 @@ func addPodInitContainer(targetPod *corev1.Pod, envs []corev1.EnvVar, deployment
 			corev1.ResourceMemory: quantityRequestsMemory,
 		},
 	}
-	cmds := strings.Split(config.InjectorConfig.Cmd, ",")
+	cmds := strings.Split(config.InitContainerCmd, ",")
 	agentInitContainer.Command = make([]string, 0)
 	for _, cmd := range cmds {
 		agentInitContainer.Command = append(agentInitContainer.Command, cmd)
 	}
-	args := strings.Split(config.InjectorConfig.Args, ",")
+	args := strings.Split(config.InitContainerArgs, ",")
 	agentInitContainer.Args = make([]string, 0)
 	for _, arg := range args {
 		agentInitContainer.Args = append(agentInitContainer.Args, arg)
@@ -217,10 +218,12 @@ func modifyPodContainer(targetPod *corev1.Pod, envs []corev1.EnvVar, deploymentN
 				envMap[env.Name] = env
 			}
 
-			envMap[config.InjectorConfig.EnvKey] = corev1.EnvVar{
-				Name:  config.InjectorConfig.EnvKey,
-				Value: config.InjectorConfig.EnvValue,
-			}
+			func(envMapConfig map[string]string) {
+				for key, value := range envMapConfig {
+					envMap[key] = corev1.EnvVar{Name: key, Value: value}
+				}
+			}(config.InjectorConfig.AgentConfig.Env)
+
 			mergeEnvs := make([]corev1.EnvVar, 0)
 			for _, envVar := range envMap {
 				mergeEnvs = append(mergeEnvs, envVar)

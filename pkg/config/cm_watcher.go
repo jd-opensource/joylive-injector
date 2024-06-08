@@ -108,13 +108,13 @@ func (w *ConfigMapWatcher) cacheConfigMap(configMap *v1.ConfigMap) error {
 	log.Info("Received ConfigMap update event, start updating local configuration.", zap.String("cm", configMap.Name),
 		zap.String("data", cmDataString))
 	InjectorConfigMap = configMap.Data
-	if data, ok := configMap.Data[AgentInjectConfigName]; ok {
+	if data, ok := configMap.Data[InjectorConfigName]; ok {
 		c, err := GetAgentInjectConfig(data)
 		if err != nil {
 			return err
 		}
 		InjectorConfig = c
-		delete(InjectorConfigMap, AgentInjectConfigName)
+		delete(InjectorConfigMap, InjectorConfigName)
 	}
 	return nil
 }

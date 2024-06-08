@@ -93,8 +93,6 @@ func init() {
 	rootCmd.SetVersionTemplate(fmt.Sprintf(versionTpl, runtime.GOOS+"/"+runtime.GOARCH, buildDate, buildCommit))
 
 	// webhook
-	rootCmd.PersistentFlags().StringVar(&config.ConfigPath, "config", config.DefaultConfigPath, "Config file path")
-	//rootCmd.PersistentFlags().StringVar(&config.ConfigMountPath, "config-mount-path", "/joylive/config", "Config file mount path")
 	rootCmd.PersistentFlags().StringVar(&config.ConfigMountSubPath, "config-mount-sub-path", "config", "Config file mount sub path")
 	rootCmd.PersistentFlags().StringVarP(&config.Addr, "listen", "l", ":443", "Admission Controller listen address")
 	rootCmd.PersistentFlags().StringVar(&config.Cert, "cert", "", "Admission Controller TLS cert")
@@ -103,14 +101,6 @@ func init() {
 
 	// admission config
 	rootCmd.PersistentFlags().StringVar(&config.InitContainerName, "init-container-name", "joylive-init-container", "Init container name")
-	//rootCmd.PersistentFlags().StringVar(&config.InitContainerImage, "init-container-image", "busybox", "Init container image")
-	//rootCmd.PersistentFlags().StringVar(&config.InitEmptyDirMountPath, "init-empty-dir-mount-path", "/agent", "Init empty dir mount path")
-	//rootCmd.PersistentFlags().StringVar(&config.InitContainerCmd, "init-container-cmd", "/bin/sh", "Init container cmd")
-	//rootCmd.PersistentFlags().StringVar(&config.InitContainerArgs, "init-container-args", fmt.Sprintf("-c, cp -r /joylive/* %s && chmod -R 777 %s",
-	//	config.InitEmptyDirMountPath, config.InitEmptyDirMountPath), "Init container cmd")
-	//rootCmd.PersistentFlags().StringVar(&config.InitContainerEnvKey, "init-container-env-key", "JAVA_TOOL_OPTIONS", "Init container env key")
-	//rootCmd.PersistentFlags().StringVar(&config.InitContainerEnvValue, "init-container-env-value", "-javaagent:/joylive/live.jar", "Init container env value")
-	//rootCmd.PersistentFlags().StringVar(&config.EmptyDirMountPath, "empty-dir-mount-path", "/joylive", "Empty dir mount path")
 }
 
 func main() {

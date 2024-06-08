@@ -7,15 +7,15 @@ import (
 )
 
 const (
-	// DefaultConfigPath is the default path to the configuration file
-	DefaultConfigPath     = "/etc"
 	AgentConfig           = "config.yaml"
-	AgentInjectConfigName = "agent.yaml"
+	InjectorConfigName    = "injector.yaml"
 	LogConfig             = "logback.xml"
 	BootConfig            = "bootstrap.properties"
 	ConfigMountPath       = "/joylive/config"
 	EmptyDirMountPath     = "/joylive"
 	InitEmptyDirMountPath = "/agent"
+	InitContainerCmd      = "/bin/sh"
+	InitContainerArgs     = "-c, cp -r /joylive/* /agent && chmod -R 777 /agent"
 	ConfigMapEnvName      = "JOYLIVE_CONFIGMAP_NAME"
 )
 
@@ -23,7 +23,6 @@ var (
 	Cert               string
 	Key                string
 	Addr               string
-	ConfigPath         string
 	ConfigMountSubPath string
 	MatchLabel         string
 )
@@ -31,13 +30,8 @@ var (
 // injection_deploy config
 var (
 	InitContainerName string
-	//InitContainerImage    string
-	//InitContainerCmd      string
-	//InitContainerArgs     string
-	//InitContainerEnvKey   string
-	//InitContainerEnvValue string
 	InjectorConfigMap map[string]string
-	InjectorConfig    *AgentInjectConfig
+	InjectorConfig    *AgentInjectorConfig
 )
 
 func init() {

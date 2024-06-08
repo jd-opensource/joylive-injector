@@ -1,0 +1,6 @@
+# Define the version, environment variables, and other information of joylive-injector injecting joylive-agent
+agent:
+  image: ghcr.m.daocloud.io/jd-opensource/joylive-agent
+  version: latest
+  env:
+    JAVA_TOOL_OPTIONS: -javaagent:/joylive/live.jar
