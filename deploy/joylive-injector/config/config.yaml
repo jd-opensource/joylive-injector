@@ -58,7 +58,7 @@ agent:
   sync:
     liveSpace:
       type: multilive # [file,multilive]
-      url: ${CONFIG_LIVE_SPACE_API_URL:http://api.live.local:9090/v1}
+      url: ${CONFIG_LIVE_SPACE_API_URL:http://11.159.56.136:30305/v1}
       #spacesUrl: ${CONFIG_LIVE_SPACE_API_URL}/workspaces
       #spaceUrl: ${CONFIG_LIVE_SPACE_API_URL}/workspaces/${space_id}/version/${space_version}
       #serviceUrl: ${CONFIG_LIVE_SPACE_API_URL}/services/${service_name}/version/${service_version}
@@ -194,6 +194,6 @@ agent:
     service: true
     readerInterval: 1000
     exporter:
-      type: ${CONFIG_COUNTER_EXPORTER_TYPE:otlp.grpc}
-      endpoint: ${CONFIG_COUNTER_EXPORTER_ENDPOINT:http://otel-collector.otel.svc:4317}
+      type: ${CONFIG_COUNTER_EXPORTER_TYPE:logging}
+      endpoint: ${CONFIG_COUNTER_EXPORTER_ENDPOINT:}
       timeout: 5000

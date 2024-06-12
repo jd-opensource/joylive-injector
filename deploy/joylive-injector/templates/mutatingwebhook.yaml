@@ -1,10 +1,10 @@
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
-  name: {{ include "joylive-webhook.name" . }}
+  name: {{ include "joylive-injector.name" . }}
   namespace: {{ .Values.namespace }}
 webhooks:
-  - name: "joylive-webhook-deployment.joylive.io"
+  - name: "joylive-injector-deployment.joylive.io"
     rules:
       - apiGroups: [ "apps" ]
         apiVersions: [ "v1","v1beta1" ]
@@ -14,7 +14,7 @@ webhooks:
         #scope:       "Cluster"
     clientConfig:
       service:
-        name: {{ include "joylive-webhook.name" . }}
+        name: {{ include "joylive-injector.name" . }}
         namespace: {{ .Values.namespace }}
         path: /mutating/injection-deploy
         port: 443
@@ -24,8 +24,8 @@ webhooks:
     timeoutSeconds: 5
     failurePolicy: Ignore
     objectSelector:
-      matchLabels: {{ include "joylive-webhook.matchLabels" . | nindent 8 }}
-  - name: "joylive-webhook-pod.joylive.io"
+      matchLabels: {{ include "joylive-injector.matchLabels" . | nindent 8 }}
+  - name: "joylive-injector-pod.joylive.io"
     rules:
       - apiGroups: [ "" ]
         apiVersions: [ "v1","v1beta1" ]
@@ -35,7 +35,7 @@ webhooks:
         #scope:       "Cluster"
     clientConfig:
       service:
-        name: {{ include "joylive-webhook.name" . }}
+        name: {{ include "joylive-injector.name" . }}
         namespace: {{ .Values.namespace }}
         path: /mutating/injection-pod
         port: 443
@@ -45,4 +45,4 @@ webhooks:
     timeoutSeconds: 5
     failurePolicy: Ignore
     objectSelector:
-      matchLabels: {{ include "joylive-webhook.matchLabels" . | nindent 8 }}
+      matchLabels: {{ include "joylive-injector.matchLabels" . | nindent 8 }}

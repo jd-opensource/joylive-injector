@@ -8,6 +8,7 @@ import (
 	"gopkg.in/yaml.v3"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	listerv1 "k8s.io/client-go/listers/core/v1"
@@ -29,9 +30,9 @@ func NewConfigMapWatcher(kubeClient kubernetes.Interface) *ConfigMapWatcher {
 		time.Second*10,
 		informers.WithNamespace(GetNamespace()),
 		informers.WithTweakListOptions(func(options *metav1.ListOptions) {
-			//options.LabelSelector = labels.SelectorFromSet(map[string]string{
-			//	"owner": "joylive",
-			//}).String()
+			options.LabelSelector = labels.SelectorFromSet(map[string]string{
+				"app:": "joylive-injector",
+			}).String()
 		}),
 	)
 	return &ConfigMapWatcher{

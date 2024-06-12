@@ -22,15 +22,15 @@
     mv cfssljson_linux-amd64 /usr/local/bin/cfssljson
     chmod +x /usr/local/bin/cfssl-certinfo /usr/local/bin/cfssl /usr/local/bin/cfssljson
     ```
-- 拷贝deploy目录下的`cfssl`和`joylive-webhook`到要部署的环境
+- 拷贝deploy目录下的`cfssl`和`joylive-injector`到要部署的环境
 - `cfssl/dac-csr.json`中的namespace目前填写的是`joylive`，需要根据实际情况修改
-- 执行`joylive-injector/deploy/cfssl`目录下的`create-secret.sh`脚本生成secret，若`joylive-webhook`包与`cfssl`在同一目录下，可自动替换`caBundle`, `caKeyBundle` 和 `caPubBundle`字段的值
+- 执行`joylive-injector/deploy/cfssl`目录下的`create-secret.sh`脚本生成secret，若`joylive-injector`包与`cfssl`在同一目录下，可自动替换`caBundle`, `caKeyBundle` 和 `caPubBundle`字段的值
 - 若`caBundle`，`caKeyBundle` 和 `caPubBundle`的值未替换，需要手动替换chart包中的`value.yaml`中的`caBundle`，`caKeyBundle` 和 `caPubBundle`字段得值，使用`cat dac-ca.pem | base64 | tr -d '\n'` 作为 `caBundle`, `cat dac-key.pem | base64 | tr -d '\n'` 作为 `caKeyBundle`, `cat dac.pem | base64 | tr -d '\n'` 作为 `caPubBundle` 生成的内容替换
-- 执行`helm install joylive-webhook ./joylive-webhook -n joylive`安装webhook
+- 执行`helm install joylive-injector ./joylive-injector -n joylive`安装webhook
 - chart包中的`value.yaml`中配置按需修改
 
 ### 简单模式
 执行命令：
 ```bash
-helm install joylive-webhook ./packages/joylive-webhook-1.0.0.tgz 
+helm install joylive-injector ./packages/joylive-injector-1.0.0.tgz 
 ```

@@ -3,7 +3,7 @@ ARG TPAAS_RUNTIME_IMAGE
 
 FROM ${TPAAS_BUILD_IMAGE} as builder
 
-ENV SRC_PATH ${GOPATH}/src/joylive-webhook
+ENV SRC_PATH ${GOPATH}/src/joylive-injector
 
 WORKDIR ${SRC_PATH}
 

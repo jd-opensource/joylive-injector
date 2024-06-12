@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "joylive-webhook.name" -}}
+{{- define "joylive-injector.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "joylive-webhook.fullname" -}}
+{{- define "joylive-injector.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "joylive-webhook.chart" -}}
+{{- define "joylive-injector.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "joylive-webhook.labels" -}}
-helm.sh/chart: {{ include "joylive-webhook.chart" . }}
-{{ include "joylive-webhook.selectorLabels" . }}
+{{- define "joylive-injector.labels" -}}
+helm.sh/chart: {{ include "joylive-injector.chart" . }}
+{{ include "joylive-injector.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,8 +45,8 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "joylive-webhook.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "joylive-webhook.name" . }}
+{{- define "joylive-injector.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "joylive-injector.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app: {{ .Chart.Name }}
 {{- end }}
@@ -54,16 +54,16 @@ app: {{ .Chart.Name }}
 {{/*
 Match labels
 */}}
-{{- define "joylive-webhook.matchLabels" -}}
+{{- define "joylive-injector.matchLabels" -}}
 {{ .Values.matchLabels.matchKey}} : {{ .Values.matchLabels.matchValue }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "joylive-webhook.serviceAccountName" -}}
+{{- define "joylive-injector.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "joylive-webhook.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "joylive-injector.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}

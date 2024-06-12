@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: {{ .Values.configMapName }}
   namespace: {{ .Values.namespace }}
-  labels: {{ include "joylive-webhook.selectorLabels" . | nindent 4 }}
+  labels: {{ include "joylive-injector.selectorLabels" . | nindent 4 }}
 data:
   {{- $root := . }}
   {{- range $path, $_ :=  .Files.Glob "config/*" }}

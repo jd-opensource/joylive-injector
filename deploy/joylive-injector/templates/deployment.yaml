@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "joylive-webhook.name" . }}
+  name: {{ include "joylive-injector.name" . }}
   namespace: {{ .Values.namespace }}
-  labels: {{ include "joylive-webhook.selectorLabels" . | nindent 4 }}
+  labels: {{ include "joylive-injector.selectorLabels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      app: {{ include "joylive-webhook.name" . }}
+      app: {{ include "joylive-injector.name" . }}
   template:
     metadata:
       labels:
-        app: {{ include "joylive-webhook.name" . }}
+        app: {{ include "joylive-injector.name" . }}
     spec:
-      serviceAccountName: {{ include "joylive-webhook.serviceAccountName" . }}
+      serviceAccountName: {{ include "joylive-injector.serviceAccountName" . }}
       containers:
         - env:
             - name: log.level

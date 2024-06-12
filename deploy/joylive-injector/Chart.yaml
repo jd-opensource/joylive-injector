@@ -1,5 +1,5 @@
 apiVersion: v2
-name: joylive-webhook
+name: joylive-injector
 description: A Helm chart for webhook automatically injected by JoyLive Agent
 
 # A chart can be either an 'application' or a 'library' chart.

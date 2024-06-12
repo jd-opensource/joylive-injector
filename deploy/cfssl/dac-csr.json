@@ -16,9 +16,9 @@
     "hosts": [
         "127.0.0.1",
         "localhost",
-        "joylive-webhook",
-        "joylive-webhook.joylive",
-        "joylive-webhook.joylive.svc",
+        "joylive-injector",
+        "joylive-injector.joylive",
+        "joylive-injector.joylive.svc",
         "validating-webhook",
         "validating-webhook.kube-addons",
         "validating-webhook.kube-addons.svc"
