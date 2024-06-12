@@ -31,7 +31,7 @@ func NewConfigMapWatcher(kubeClient kubernetes.Interface) *ConfigMapWatcher {
 		informers.WithNamespace(GetNamespace()),
 		informers.WithTweakListOptions(func(options *metav1.ListOptions) {
 			options.LabelSelector = labels.SelectorFromSet(map[string]string{
-				"app:": "joylive-injector",
+				"app": "joylive-injector",
 			}).String()
 		}),
 	)
