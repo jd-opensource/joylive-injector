@@ -16,5 +16,3 @@ RUN set -ex \
 ADD bin/joylive-injector /opt/
 
 ENTRYPOINT ["/opt/joylive-injector"]
-
-CMD ["--help"]

@@ -41,5 +41,3 @@ RUN set -ex \
 COPY --from=builder /root/go/bin/joylive-injector /joylive-injector
 
 ENTRYPOINT ["/joylive-injector"]
-
-CMD ["--help"]
