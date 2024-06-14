@@ -162,9 +162,13 @@ func addPodInitContainer(targetPod *corev1.Pod, envs []corev1.EnvVar, deployment
 			SubPath:   config.LogConfig,
 		},
 	}
+	agentVersion := config.InjectorConfig.AgentConfig.Version
+	if av, ok := targetPod.Labels[config.AgentVersionLabel]; ok {
+		agentVersion = av
+	}
 	agentInitContainer := &corev1.Container{
 		Name:  config.InitContainerName,
-		Image: config.InjectorConfig.AgentConfig.Image + ":" + config.InjectorConfig.AgentConfig.Version,
+		Image: config.InjectorConfig.AgentConfig.Image + ":" + agentVersion,
 		//Command:      strings.Split(conf.InitContainerCmd, ","),
 		VolumeMounts: addVolumes,
 		Env: func(envMap map[string]string) []corev1.EnvVar {

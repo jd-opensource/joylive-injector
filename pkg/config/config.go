@@ -17,6 +17,7 @@ const (
 	InitContainerCmd      = "/bin/sh"
 	InitContainerArgs     = "-c, cp -r /joylive/* /agent && chmod -R 777 /agent"
 	ConfigMapEnvName      = "JOYLIVE_CONFIGMAP_NAME"
+	AgentVersionLabel     = "x-live-version"
 )
 
 var (
