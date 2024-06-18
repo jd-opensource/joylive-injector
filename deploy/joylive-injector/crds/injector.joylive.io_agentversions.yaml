@@ -1,0 +1,62 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.15.0
+  name: agentversions.injector.joylive.io
+spec:
+  group: injector.joylive.io
+  names:
+    kind: AgentVersion
+    listKind: AgentVersionList
+    plural: agentversions
+    singular: agentversion
+  scope: Namespaced
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: AgentVersion is the Schema for the agentversions API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: AgentVersionSpec defines the desired state of AgentVersion
+            properties:
+              configMapName:
+                description: ConfigMapName record storage version configuration file
+                type: string
+              enable:
+                description: Enable indicates whether this version is enabled
+                type: boolean
+              version:
+                description: Version of JoyLive Agent release
+                type: string
+            required:
+            - enable
+            - version
+            type: object
+          status:
+            description: AgentVersionStatus defines the observed state of AgentVersion
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
