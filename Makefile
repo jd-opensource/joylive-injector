@@ -24,5 +24,5 @@ push:
 	docker push $(repo)/joylive-injector:$(version)-AMD64
 
 build-charts-crs:
-	helm template joylive-injector deploy/joylive-injector > deploy/all-cr.yaml
+	helm template joylive-injector deploy/joylive-injector --include-crds > deploy/all-cr.yaml
 	helm package deploy/joylive-injector --destination deploy/packages
