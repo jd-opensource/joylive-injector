@@ -7,7 +7,10 @@ else
 GOBIN=$(shell go env GOBIN)
 endif
 
-all: build image push
+all: gen-client build image push build-charts-crs
+
+gen-client:
+	hack/update-codegen.sh
 
 build:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o bin/joylive-injector main.go
