@@ -28,6 +28,10 @@ source "${CODEGEN_PKG}/kube_codegen.sh"
 
 THIS_PKG="github.com/jd-opensource/joylive-injector"
 
+kube::codegen::gen_helpers \
+    --boilerplate "${SCRIPT_ROOT}/hack/boilerplate.go.txt" \
+    "${SCRIPT_ROOT}"
+
 #kube::codegen::gen_openapi \
 #    --output-dir "${SCRIPT_ROOT}/apiserver/openapi" \
 #    --output-pkg "k8s.io/${THIS_PKG}/apiserver/openapi" \

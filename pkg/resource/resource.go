@@ -4,11 +4,15 @@ import (
 	"context"
 	"errors"
 	"github.com/jd-opensource/joylive-injector/pkg/log"
+	"go.uber.org/zap"
 	corev1 "k8s.io/api/core/v1"
 	errors2 "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/util/homedir"
+	"path/filepath"
 	"sync"
 )
 
@@ -24,17 +28,27 @@ func initResource() *Resource {
 	initOnce.Do(func() {
 		var err error
 		globalRes = &Resource{}
-		config, err := rest.InClusterConfig()
-		if err != nil {
-			log.Errorf("init k8s config error: %v", err)
-			panic(err.Error())
+		var kubeconfig string
+		var config *rest.Config
+		if home := homedir.HomeDir(); home != "" {
+			kubeconfig = filepath.Join(home, ".kube", "config")
+			// Get a `rest.Config` using the local kubeconfig
+			config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+			if err != nil {
+				log.Warn("failed to build restConfig in local: ", zap.Error(err))
+			}
+		}
+		if config == nil {
+			config, err = rest.InClusterConfig()
+			if err != nil {
+				log.Fatalf("init k8s config error: %v", err)
+			}
 		}
 		// creates the clientset
 		globalRes.RestConfig = config
 		globalRes.ClientSet, err = kubernetes.NewForConfig(config)
 		if err != nil {
-			log.Errorf("init k8s client error: %v", err)
-			panic(err.Error())
+			log.Fatalf("init k8s client error: %v", err)
 		}
 	})
 

@@ -4,6 +4,7 @@ import (
 	v1 "github.com/jd-opensource/joylive-injector/client-go/apis/injector/v1"
 	"github.com/jd-opensource/joylive-injector/pkg/log"
 	"github.com/jd-opensource/joylive-injector/pkg/resource"
+	"go.uber.org/zap"
 	"os"
 )
 
@@ -18,6 +19,8 @@ const (
 	InitContainerCmd      = "/bin/sh"
 	InitContainerArgs     = "-c, cp -r /joylive/* /agent && chmod -R 777 /agent"
 	ConfigMapEnvName      = "JOYLIVE_CONFIGMAP_NAME"
+	NamespaceEnvName      = "JOYLIVE_NAMESPACE"
+	DefaultNamespace      = "joylive"
 	AgentVersionLabel     = "x-live-version"
 	LiveSpaceIdLabel      = "x-live-space-id"
 	LiveUnitLabel         = "x-live-unit"
@@ -46,30 +49,36 @@ func init() {
 	cmWatcher := NewConfigMapWatcher(resource.GetResource().ClientSet)
 	err := cmWatcher.Start()
 	if err != nil {
-		panic(err.Error())
+		log.Fatal("start cmWatcher error", zap.Error(err))
 	}
 	err = cmWatcher.InitConfigMap(GetNamespace())
 	if err != nil {
-		panic(err.Error())
+		log.Fatal("init cm error", zap.Error(err))
 	}
 
 	// Start the AgentVersion listener and initialize the content
 	avWatcher := NewAgentVersionWatcher(resource.GetResource().RestConfig)
 	err = avWatcher.Start()
 	if err != nil {
-		panic(err.Error())
+		log.Fatal("start avWatcher error", zap.Error(err))
 	}
 	err = avWatcher.InitAgentVersion(GetNamespace())
 	if err != nil {
-		panic(err.Error())
+		log.Fatal("init agentVersion error", zap.Error(err))
 	}
 }
 
 func GetNamespace() string {
-	namespace, err := os.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
-	if err != nil {
-		log.Fatalf("Failed to read namespace file: %v", err)
-		panic(err.Error())
+	namespace := os.Getenv(NamespaceEnvName)
+	if len(namespace) == 0 {
+		namespaceBytes, err := os.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
+		if err != nil {
+			log.Warnf("Failed to read namespace file: %v", err)
+		}
+		namespace = string(namespaceBytes)
 	}
-	return string(namespace)
+	if len(namespace) == 0 {
+		return DefaultNamespace
+	}
+	return namespace
 }

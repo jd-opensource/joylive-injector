@@ -21,6 +21,8 @@ spec:
               value: {{ .Values.logLevel }}
             - name: JOYLIVE_CONFIGMAP_NAME
               value: {{ .Values.configMapName }}
+            - name: JOYLIVE_NAMESPACE
+              value: {{ .Values.namespace }}
           name: joylive-injector
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}

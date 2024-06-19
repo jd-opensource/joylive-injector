@@ -27,8 +27,7 @@ type AgentVersionWatcher struct {
 func NewAgentVersionWatcher(client *rest.Config) *AgentVersionWatcher {
 	cs, err := clientset.NewForConfig(client)
 	if err != nil {
-		log.Error("get clientset error", zap.Error(err))
-		panic(err)
+		log.Fatal("get clientset error", zap.Error(err))
 	}
 	factory := externalversions.NewSharedInformerFactory(
 		cs,
