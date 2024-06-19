@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"net/http"
 
-	examplev1 "github.com/jd-opensource/joylive-injector/client-go/clientset/versioned/typed/injector/v1"
+	injectorv1 "github.com/jd-opensource/joylive-injector/client-go/clientset/versioned/typed/injector/v1"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"
@@ -30,18 +30,18 @@ import (
 
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
-	ExampleV1() examplev1.ExampleV1Interface
+	InjectorV1() injectorv1.InjectorV1Interface
 }
 
 // Clientset contains the clients for groups.
 type Clientset struct {
 	*discovery.DiscoveryClient
-	exampleV1 *examplev1.ExampleV1Client
+	injectorV1 *injectorv1.InjectorV1Client
 }
 
-// ExampleV1 retrieves the ExampleV1Client
-func (c *Clientset) ExampleV1() examplev1.ExampleV1Interface {
-	return c.exampleV1
+// InjectorV1 retrieves the InjectorV1Client
+func (c *Clientset) InjectorV1() injectorv1.InjectorV1Interface {
+	return c.injectorV1
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -88,7 +88,7 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*Clientset,
 
 	var cs Clientset
 	var err error
-	cs.exampleV1, err = examplev1.NewForConfigAndClient(&configShallowCopy, httpClient)
+	cs.injectorV1, err = injectorv1.NewForConfigAndClient(&configShallowCopy, httpClient)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 // New creates a new Clientset for the given RESTClient.
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
-	cs.exampleV1 = examplev1.New(c)
+	cs.injectorV1 = injectorv1.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)
 	return &cs

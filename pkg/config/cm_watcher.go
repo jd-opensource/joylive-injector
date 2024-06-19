@@ -14,6 +14,7 @@ import (
 	listerv1 "k8s.io/client-go/listers/core/v1"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
+	"os"
 	"time"
 )
 
@@ -43,16 +44,18 @@ func NewConfigMapWatcher(kubeClient kubernetes.Interface) *ConfigMapWatcher {
 	}
 }
 
-func (w *ConfigMapWatcher) InitConfigMap(namespace, name string) error {
-	cm, err := w.configMapLister.ConfigMaps(namespace).Get(name)
+func (w *ConfigMapWatcher) InitConfigMap(namespace string) error {
+	cms, err := w.configMapLister.ConfigMaps(namespace).List(labels.Everything())
 	if err != nil {
-		log.Error("get configMap error", zap.String("namespace", namespace), zap.String("cmName", name), zap.Error(err))
+		log.Error("get configMap error", zap.String("namespace", namespace), zap.Error(err))
 		return err
 	}
-	err = w.cacheConfigMap(cm)
-	if err != nil {
-		log.Error("cache configMap error", zap.String("cmName", cm.Name), zap.Error(err))
-		return err
+	for _, cm := range cms {
+		err = w.cacheConfigMap(cm)
+		if err != nil {
+			log.Error("cache configMap error", zap.String("cmName", cm.Name), zap.Error(err))
+			return err
+		}
 	}
 	return nil
 }
@@ -81,7 +84,7 @@ func (w *ConfigMapWatcher) Start() error {
 					return
 				}
 				log.Warn("configMap deleted", zap.String("cm", key))
-				InjectorConfigMap = make(map[string]string)
+				DefaultInjectorConfigMap = make(map[string]string)
 			},
 		}
 	}
@@ -108,14 +111,22 @@ func (w *ConfigMapWatcher) cacheConfigMap(configMap *v1.ConfigMap) error {
 	cmDataString := string(cmDataBytes)
 	log.Info("Received ConfigMap update event, start updating local configuration.", zap.String("cm", configMap.Name),
 		zap.String("data", cmDataString))
-	InjectorConfigMap = configMap.Data
-	if data, ok := configMap.Data[InjectorConfigName]; ok {
-		c, err := GetAgentInjectConfig(data)
-		if err != nil {
-			return err
+	if configMap.Name == os.Getenv(ConfigMapEnvName) {
+		DefaultInjectorConfigMap = configMap.Data
+		if data, ok := configMap.Data[InjectorConfigName]; ok {
+			c, err := GetAgentInjectConfig(data)
+			if err != nil {
+				return err
+			}
+			InjectorConfig = c
+			delete(DefaultInjectorConfigMap, InjectorConfigName)
 		}
-		InjectorConfig = c
-		delete(InjectorConfigMap, InjectorConfigName)
+	} else {
+		if version, ok := configMap.Labels[AgentVersionLabel]; ok {
+			InjectorConfigMaps[version] = configMap.Data
+		} else {
+			log.Warn("missing version label on cm", zap.String("name", configMap.Name))
+		}
 	}
 	return nil
 }

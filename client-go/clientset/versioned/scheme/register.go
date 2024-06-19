@@ -19,7 +19,7 @@ limitations under the License.
 package scheme
 
 import (
-	examplev1 "github.com/jd-opensource/joylive-injector/client-go/apis/injector/v1"
+	injectorv1 "github.com/jd-opensource/joylive-injector/client-go/apis/injector/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -31,7 +31,7 @@ var Scheme = runtime.NewScheme()
 var Codecs = serializer.NewCodecFactory(Scheme)
 var ParameterCodec = runtime.NewParameterCodec(Scheme)
 var localSchemeBuilder = runtime.SchemeBuilder{
-	examplev1.AddToScheme,
+	injectorv1.AddToScheme,
 }
 
 // AddToScheme adds all types of this clientset into the given scheme. This allows composition

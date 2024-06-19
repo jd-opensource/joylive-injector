@@ -26,24 +26,24 @@ import (
 	rest "k8s.io/client-go/rest"
 )
 
-type ExampleV1Interface interface {
+type InjectorV1Interface interface {
 	RESTClient() rest.Interface
 	AgentVersionsGetter
 }
 
-// ExampleV1Client is used to interact with features provided by the example.crd.code-generator.k8s.io group.
-type ExampleV1Client struct {
+// InjectorV1Client is used to interact with features provided by the injector.joylive.io group.
+type InjectorV1Client struct {
 	restClient rest.Interface
 }
 
-func (c *ExampleV1Client) AgentVersions(namespace string) AgentVersionInterface {
+func (c *InjectorV1Client) AgentVersions(namespace string) AgentVersionInterface {
 	return newAgentVersions(c, namespace)
 }
 
-// NewForConfig creates a new ExampleV1Client for the given config.
+// NewForConfig creates a new InjectorV1Client for the given config.
 // NewForConfig is equivalent to NewForConfigAndClient(c, httpClient),
 // where httpClient was generated with rest.HTTPClientFor(c).
-func NewForConfig(c *rest.Config) (*ExampleV1Client, error) {
+func NewForConfig(c *rest.Config) (*InjectorV1Client, error) {
 	config := *c
 	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
@@ -55,9 +55,9 @@ func NewForConfig(c *rest.Config) (*ExampleV1Client, error) {
 	return NewForConfigAndClient(&config, httpClient)
 }
 
-// NewForConfigAndClient creates a new ExampleV1Client for the given config and http client.
+// NewForConfigAndClient creates a new InjectorV1Client for the given config and http client.
 // Note the http client provided takes precedence over the configured transport values.
-func NewForConfigAndClient(c *rest.Config, h *http.Client) (*ExampleV1Client, error) {
+func NewForConfigAndClient(c *rest.Config, h *http.Client) (*InjectorV1Client, error) {
 	config := *c
 	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
@@ -66,12 +66,12 @@ func NewForConfigAndClient(c *rest.Config, h *http.Client) (*ExampleV1Client, er
 	if err != nil {
 		return nil, err
 	}
-	return &ExampleV1Client{client}, nil
+	return &InjectorV1Client{client}, nil
 }
 
-// NewForConfigOrDie creates a new ExampleV1Client for the given config and
+// NewForConfigOrDie creates a new InjectorV1Client for the given config and
 // panics if there is an error in the config.
-func NewForConfigOrDie(c *rest.Config) *ExampleV1Client {
+func NewForConfigOrDie(c *rest.Config) *InjectorV1Client {
 	client, err := NewForConfig(c)
 	if err != nil {
 		panic(err)
@@ -79,9 +79,9 @@ func NewForConfigOrDie(c *rest.Config) *ExampleV1Client {
 	return client
 }
 
-// New creates a new ExampleV1Client for the given RESTClient.
-func New(c rest.Interface) *ExampleV1Client {
-	return &ExampleV1Client{c}
+// New creates a new InjectorV1Client for the given RESTClient.
+func New(c rest.Interface) *InjectorV1Client {
+	return &InjectorV1Client{c}
 }
 
 func setConfigDefaults(config *rest.Config) error {
@@ -99,7 +99,7 @@ func setConfigDefaults(config *rest.Config) error {
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *ExampleV1Client) RESTClient() rest.Interface {
+func (c *InjectorV1Client) RESTClient() rest.Interface {
 	if c == nil {
 		return nil
 	}

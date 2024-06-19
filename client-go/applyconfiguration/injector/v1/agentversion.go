@@ -41,7 +41,7 @@ func AgentVersion(name, namespace string) *AgentVersionApplyConfiguration {
 	b.WithName(name)
 	b.WithNamespace(namespace)
 	b.WithKind("AgentVersion")
-	b.WithAPIVersion("example.crd.code-generator.k8s.io/v1")
+	b.WithAPIVersion("injector.joylive.io/v1")
 	return b
 }
 

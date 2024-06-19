@@ -1,6 +1,7 @@
 package config
 
 import (
+	v1 "github.com/jd-opensource/joylive-injector/client-go/apis/injector/v1"
 	"github.com/jd-opensource/joylive-injector/pkg/log"
 	"github.com/jd-opensource/joylive-injector/pkg/resource"
 	"os"
@@ -33,18 +34,32 @@ var (
 
 // injection_deploy config
 var (
-	InitContainerName string
-	InjectorConfigMap map[string]string
-	InjectorConfig    *AgentInjectorConfig
+	InitContainerName        string
+	DefaultInjectorConfigMap map[string]string
+	InjectorConfigMaps       map[string]map[string]string
+	InjectorConfig           *AgentInjectorConfig
+	InjectorAgentVersion     map[string]v1.AgentVersionSpec
 )
 
 func init() {
+	// Start the ConfigMap listener and initialize the content
 	cmWatcher := NewConfigMapWatcher(resource.GetResource().ClientSet)
 	err := cmWatcher.Start()
 	if err != nil {
 		panic(err.Error())
 	}
-	err = cmWatcher.InitConfigMap(GetNamespace(), os.Getenv(ConfigMapEnvName))
+	err = cmWatcher.InitConfigMap(GetNamespace())
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// Start the AgentVersion listener and initialize the content
+	avWatcher := NewAgentVersionWatcher(resource.GetResource().RestConfig)
+	err = avWatcher.Start()
+	if err != nil {
+		panic(err.Error())
+	}
+	err = avWatcher.InitAgentVersion(GetNamespace())
 	if err != nil {
 		panic(err.Error())
 	}

@@ -28,7 +28,7 @@ import (
 // apply configuration type exists for the given GroupVersionKind.
 func ForKind(kind schema.GroupVersionKind) interface{} {
 	switch kind {
-	// Group=example.crd.code-generator.k8s.io, Version=v1
+	// Group=injector.joylive.io, Version=v1
 	case v1.SchemeGroupVersion.WithKind("AgentVersion"):
 		return &injectorv1.AgentVersionApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("AgentVersionSpec"):

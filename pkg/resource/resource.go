@@ -16,7 +16,8 @@ var globalRes *Resource
 var initOnce sync.Once
 
 type Resource struct {
-	ClientSet *kubernetes.Clientset
+	RestConfig *rest.Config
+	ClientSet  *kubernetes.Clientset
 }
 
 func initResource() *Resource {
@@ -29,6 +30,7 @@ func initResource() *Resource {
 			panic(err.Error())
 		}
 		// creates the clientset
+		globalRes.RestConfig = config
 		globalRes.ClientSet, err = kubernetes.NewForConfig(config)
 		if err != nil {
 			log.Errorf("init k8s client error: %v", err)

@@ -34,7 +34,7 @@ import (
 
 // FakeAgentVersions implements AgentVersionInterface
 type FakeAgentVersions struct {
-	Fake *FakeExampleV1
+	Fake *FakeInjectorV1
 	ns   string
 }
 

@@ -20,8 +20,8 @@ package fake
 
 import (
 	clientset "github.com/jd-opensource/joylive-injector/client-go/clientset/versioned"
-	examplev1 "github.com/jd-opensource/joylive-injector/client-go/clientset/versioned/typed/injector/v1"
-	fakeexamplev1 "github.com/jd-opensource/joylive-injector/client-go/clientset/versioned/typed/injector/v1/fake"
+	injectorv1 "github.com/jd-opensource/joylive-injector/client-go/clientset/versioned/typed/injector/v1"
+	fakeinjectorv1 "github.com/jd-opensource/joylive-injector/client-go/clientset/versioned/typed/injector/v1/fake"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"
@@ -79,7 +79,7 @@ var (
 	_ testing.FakeClient  = &Clientset{}
 )
 
-// ExampleV1 retrieves the ExampleV1Client
-func (c *Clientset) ExampleV1() examplev1.ExampleV1Interface {
-	return &fakeexamplev1.FakeExampleV1{Fake: &c.Fake}
+// InjectorV1 retrieves the InjectorV1Client
+func (c *Clientset) InjectorV1() injectorv1.InjectorV1Interface {
+	return &fakeinjectorv1.FakeInjectorV1{Fake: &c.Fake}
 }

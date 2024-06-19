@@ -253,9 +253,9 @@ type SharedInformerFactory interface {
 	// client.
 	InformerFor(obj runtime.Object, newFunc internalinterfaces.NewInformerFunc) cache.SharedIndexInformer
 
-	Example() injector.Interface
+	Injector() injector.Interface
 }
 
-func (f *sharedInformerFactory) Example() injector.Interface {
+func (f *sharedInformerFactory) Injector() injector.Interface {
 	return injector.New(f, f.namespace, f.tweakListOptions)
 }

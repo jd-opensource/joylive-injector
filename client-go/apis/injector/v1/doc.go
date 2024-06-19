@@ -16,6 +16,6 @@ limitations under the License.
 
 // +k8s:deepcopy-gen=package
 // +k8s:defaulter-gen=TypeMeta
-// +groupName=example.crd.code-generator.k8s.io
+// +groupName=injector.joylive.io
 
-package v1 // import "k8s.io/code-generator/examples/crd/apis/example/v1"
+package v1 // import "github.com/jd-opensource/joylive-injector/client-go/apis/injector/v1"

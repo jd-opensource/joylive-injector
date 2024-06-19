@@ -423,6 +423,32 @@ rules:
       - '*'
     verbs:
       - '*'
+  - apiGroups:
+      - injector.joylive.io
+    resources:
+      - agentversions
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - injector.joylive.io
+    resources:
+      - agentversions/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - injector.joylive.io
+    resources:
+      - agentversions/status
+    verbs:
+      - get
+      - patch
+      - update
 ---
 # Source: joylive-injector/templates/rbac.yaml
 kind: ClusterRoleBinding

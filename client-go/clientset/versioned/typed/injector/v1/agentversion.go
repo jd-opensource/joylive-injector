@@ -62,7 +62,7 @@ type agentVersions struct {
 }
 
 // newAgentVersions returns a AgentVersions
-func newAgentVersions(c *ExampleV1Client, namespace string) *agentVersions {
+func newAgentVersions(c *InjectorV1Client, namespace string) *agentVersions {
 	return &agentVersions{
 		client: c.RESTClient(),
 		ns:     namespace,

@@ -90,13 +90,22 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 }
 
 func createConfigMap(deploy *appsv1.Deployment) error {
+	configMapData := config.DefaultInjectorConfigMap
+	if version, ok := deploy.Spec.Template.Labels[config.AgentVersionLabel]; ok {
+		if agentVersion, ok := config.InjectorAgentVersion[version]; ok {
+			cmd, configExists := config.InjectorConfigMaps[version]
+			if agentVersion.Enable && configExists {
+				configMapData = cmd
+			}
+		}
+	}
 	rs := resource.GetResource()
 	configMap := &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      deploy.Name + "-live-configmap",
 			Namespace: deploy.Namespace,
 		},
-		Data: config.InjectorConfigMap,
+		Data: configMapData,
 	}
 	//logger.Debugf("create configmap: %v", configMap)
 	err := rs.CreateOrUpdateConfigMap(context.Background(), deploy.Namespace, configMap)
