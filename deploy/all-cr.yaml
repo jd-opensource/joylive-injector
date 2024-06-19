@@ -507,6 +507,8 @@ spec:
               value: debug
             - name: JOYLIVE_CONFIGMAP_NAME
               value: joylive-injector-config
+            - name: JOYLIVE_NAMESPACE
+              value: joylive
           name: joylive-injector
           image: ghcr.m.daocloud.io/jd-opensource/joylive-injector:latest
           imagePullPolicy: Always
