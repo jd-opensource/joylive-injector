@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: joylive-agent-config-1.0.0-e979a2d-AMD64
+  name: joylive-agent-config-1.0.0-e979a2d-amd64
   namespace: joylive
   labels:
     app.kubernetes.io/name: joylive-injector

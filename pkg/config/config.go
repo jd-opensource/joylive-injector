@@ -43,9 +43,9 @@ var (
 	// DefaultInjectorConfig define the default agent version information that can be injected into the application
 	DefaultInjectorConfig *AgentInjectorConfig
 	// InjectorConfigMaps key is configMap name, value is configMap data
-	InjectorConfigMaps map[string]map[string]string
+	InjectorConfigMaps = map[string]map[string]string{}
 	// InjectorAgentVersion store all versions of the agent and associated configuration information
-	InjectorAgentVersion map[string]v1.AgentVersionSpec
+	InjectorAgentVersion = map[string]v1.AgentVersionSpec{}
 )
 
 func init() {

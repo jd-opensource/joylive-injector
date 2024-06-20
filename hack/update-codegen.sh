@@ -18,9 +18,6 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-#SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
-#SCRIPT_ROOT="${SCRIPT_DIR}/.."
-#CODEGEN_PKG="${CODEGEN_PKG:-"${SCRIPT_ROOT}/.."}"
 SCRIPT_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 CODEGEN_PKG=$(go env GOPATH)/pkg/mod/k8s.io/code-generator@$(go list -m k8s.io/code-generator | awk '{print $2}')
 
@@ -31,14 +28,6 @@ THIS_PKG="github.com/jd-opensource/joylive-injector"
 kube::codegen::gen_helpers \
     --boilerplate "${SCRIPT_ROOT}/hack/boilerplate.go.txt" \
     "${SCRIPT_ROOT}"
-
-#kube::codegen::gen_openapi \
-#    --output-dir "${SCRIPT_ROOT}/apiserver/openapi" \
-#    --output-pkg "k8s.io/${THIS_PKG}/apiserver/openapi" \
-#    --report-filename "${report_filename:-"/dev/null"}" \
-#    ${update_report:+"${update_report}"} \
-#    --boilerplate "${SCRIPT_ROOT}/hack/boilerplate.go.txt" \
-#    "${SCRIPT_ROOT}/pkg/apis"
 
 kube::codegen::gen_client \
     --with-watch \
