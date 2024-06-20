@@ -93,7 +93,7 @@ func createConfigMap(deploy *appsv1.Deployment) error {
 	configMapData := config.DefaultInjectorConfigMap
 	if version, ok := deploy.Spec.Template.Labels[config.AgentVersionLabel]; ok {
 		if agentVersion, ok := config.InjectorAgentVersion[version]; ok {
-			cmd, configExists := config.InjectorConfigMaps[version]
+			cmd, configExists := config.InjectorConfigMaps[agentVersion.ConfigMapName]
 			if agentVersion.Enable && configExists {
 				configMapData = cmd
 			}
