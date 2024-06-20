@@ -10,6 +10,11 @@
 这是一个针对kubernetes的动态准入控制webhook，它可以用于修改`kubernete`资源。
 此程序监视`deployments`的CREATE、UPDATE、DELETE事件和`pods`的CREATE事件，并为`POD`添加initContainer、默认增加环境变量`JAVA_TOOL_OPTIONS`、挂载configmap、修改主容器的卷装载等操作。
 
+## 特性
+- 支持自动将`joylive-agent`注入Java应用的Pod。
+- 支持多版本`joylive-agent`与对应配置管理。
+- 支持注入指定版本`joylive-agent`及对应配置。
+
 ## 使用方式
 ### 完全模式
 - 在要部署的环境中安装 CFSSL(用于签名，验证和捆绑TLS证书的HTTP API工具)

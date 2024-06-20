@@ -10,6 +10,11 @@ English | [简体中文](./README-zh.md)
 This is a dynamic admission control webhook for kubernetes, it can be used to mutate kubernetes resources.
 This program monitors the `CREATE`, `UPDATE`, `DELETE` events for `deployments` and the `CREATE` events for `pods` and adds the initContainer for `Pod` , adds the environment variable `JAVA_TOOL_OPTIONS` by default, mounts the configmap, modifies the volume load for the main container, and so on.
 
+## Features
+- Supports automatically injecting `joylive-agent` into Pods of Java applications.
+- Supports multi-version `joylive-agent` and corresponding configuration management.
+- Support injection of specified version `joylive-agent` and corresponding configuration.
+
 ## Used
 ### Full mode
 - Install CFSSL (HTTP API tool for signing, verifying, and bundling TLS certificates) in the environment to be deployed
