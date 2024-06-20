@@ -14,6 +14,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
+	"reflect"
 	"time"
 )
 
@@ -71,8 +72,10 @@ func (w *AgentVersionWatcher) Start() error {
 			AddFunc: func(obj interface{}) {
 				w.createOrUpdateCache(obj)
 			},
-			UpdateFunc: func(_ interface{}, obj interface{}) {
-				w.createOrUpdateCache(obj)
+			UpdateFunc: func(oldObj interface{}, newObj interface{}) {
+				if !isAgentVersionEqual(oldObj, newObj) {
+					w.createOrUpdateCache(newObj)
+				}
 			},
 			DeleteFunc: func(obj interface{}) {
 				key, err := cache.MetaNamespaceKeyFunc(obj)
@@ -94,6 +97,16 @@ func (w *AgentVersionWatcher) Start() error {
 		}
 	}()
 	return nil
+}
+
+// isAgentVersionEqual compares two AgentVersion objects to see if they are equal
+func isAgentVersionEqual(oldObj, newObj interface{}) bool {
+	oldConfigMap, ok1 := oldObj.(*v1.AgentVersion)
+	newConfigMap, ok2 := newObj.(*v1.AgentVersion)
+	if !ok1 || !ok2 {
+		return false
+	}
+	return reflect.DeepEqual(oldConfigMap.Spec, newConfigMap.Spec)
 }
 
 func (w *AgentVersionWatcher) cacheAgentVersion(agentVersion *v1.AgentVersion) error {

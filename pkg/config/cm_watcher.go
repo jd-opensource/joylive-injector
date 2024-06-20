@@ -15,6 +15,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"os"
+	"reflect"
 	"time"
 )
 
@@ -74,8 +75,10 @@ func (w *ConfigMapWatcher) Start() error {
 			AddFunc: func(obj interface{}) {
 				w.createOrUpdateCache(obj)
 			},
-			UpdateFunc: func(_ interface{}, obj interface{}) {
-				w.createOrUpdateCache(obj)
+			UpdateFunc: func(oldObj interface{}, newObj interface{}) {
+				if !isConfigMapEqual(oldObj, newObj) {
+					w.createOrUpdateCache(newObj)
+				}
 			},
 			DeleteFunc: func(obj interface{}) {
 				key, err := cache.MetaNamespaceKeyFunc(obj)
@@ -98,6 +101,16 @@ func (w *ConfigMapWatcher) Start() error {
 		}
 	}()
 	return nil
+}
+
+// isConfigMapEqual compares two ConfigMap objects to see if they are equal
+func isConfigMapEqual(oldObj, newObj interface{}) bool {
+	oldConfigMap, ok1 := oldObj.(*v1.ConfigMap)
+	newConfigMap, ok2 := newObj.(*v1.ConfigMap)
+	if !ok1 || !ok2 {
+		return false
+	}
+	return reflect.DeepEqual(oldConfigMap.Data, newConfigMap.Data) && reflect.DeepEqual(oldConfigMap.BinaryData, newConfigMap.BinaryData)
 }
 
 func (w *ConfigMapWatcher) cacheConfigMap(configMap *v1.ConfigMap) error {
