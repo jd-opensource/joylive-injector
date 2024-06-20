@@ -118,15 +118,11 @@ func (w *ConfigMapWatcher) cacheConfigMap(configMap *v1.ConfigMap) error {
 			if err != nil {
 				return err
 			}
-			InjectorConfig = c
+			DefaultInjectorConfig = c
 			delete(DefaultInjectorConfigMap, InjectorConfigName)
 		}
 	} else {
-		if version, ok := configMap.Labels[AgentVersionLabel]; ok {
-			InjectorConfigMaps[version] = configMap.Data
-		} else {
-			log.Warn("missing version label on cm", zap.String("name", configMap.Name))
-		}
+		InjectorConfigMaps[configMap.Name] = configMap.Data
 	}
 	return nil
 }

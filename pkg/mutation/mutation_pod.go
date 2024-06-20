@@ -162,13 +162,13 @@ func addPodInitContainer(targetPod *corev1.Pod, envs []corev1.EnvVar, deployment
 			SubPath:   config.LogConfig,
 		},
 	}
-	agentVersion := config.InjectorConfig.AgentConfig.Version
+	agentVersion := config.DefaultInjectorConfig.AgentConfig.Version
 	if av, ok := targetPod.Labels[config.AgentVersionLabel]; ok {
 		agentVersion = av
 	}
 	agentInitContainer := &corev1.Container{
 		Name:  config.InitContainerName,
-		Image: config.InjectorConfig.AgentConfig.Image + ":" + agentVersion,
+		Image: config.DefaultInjectorConfig.AgentConfig.Image + ":" + agentVersion,
 		//Command:      strings.Split(conf.InitContainerCmd, ","),
 		VolumeMounts: addVolumes,
 		Env: func(envMap map[string]string) []corev1.EnvVar {
@@ -177,7 +177,7 @@ func addPodInitContainer(targetPod *corev1.Pod, envs []corev1.EnvVar, deployment
 				envVars = append(envVars, corev1.EnvVar{Name: key, Value: value})
 			}
 			return envVars
-		}(config.InjectorConfig.AgentConfig.Env),
+		}(config.DefaultInjectorConfig.AgentConfig.Env),
 	}
 	quantityLimitsCPU, _ := k8sresource.ParseQuantity(DefaultCPU)
 	quantityLimitsMemory, _ := k8sresource.ParseQuantity(DefaultMemory)
@@ -226,7 +226,7 @@ func modifyPodContainer(targetPod *corev1.Pod, envs []corev1.EnvVar, deploymentN
 				for key, value := range envMapConfig {
 					envMap[key] = corev1.EnvVar{Name: key, Value: value}
 				}
-			}(config.InjectorConfig.AgentConfig.Env)
+			}(config.DefaultInjectorConfig.AgentConfig.Env)
 
 			mergeEnvs := make([]corev1.EnvVar, 0)
 			for _, envVar := range envMap {
