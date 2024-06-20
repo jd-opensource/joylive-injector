@@ -7,7 +7,6 @@ metadata:
     app.kubernetes.io/name: joylive-injector
     app.kubernetes.io/instance: joylive-injector
     app: joylive-injector
-    x-live-version: 1.0.0-e979a2d-AMD64
 data:
   bootstrap.properties: |
     app.name=${APPLICATION_NAME}
