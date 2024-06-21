@@ -8,6 +8,7 @@ import (
 	"github.com/jd-opensource/joylive-injector/pkg/log"
 	"github.com/jd-opensource/joylive-injector/pkg/resource"
 	jsoniter "github.com/json-iterator/go"
+	"go.uber.org/zap"
 	admissionv1 "k8s.io/api/admission/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -96,6 +97,9 @@ func createConfigMap(deploy *appsv1.Deployment) error {
 			cmd, configExists := config.InjectorConfigMaps[agentVersion.ConfigMapName]
 			if agentVersion.Enable && configExists {
 				configMapData = cmd
+				log.Info("[mutation] injection-deploy: Inject the specified version of configMap",
+					zap.String("deployment", deploy.Name), zap.String("version", version),
+					zap.String("cmName", agentVersion.ConfigMapName))
 			}
 		}
 	}
