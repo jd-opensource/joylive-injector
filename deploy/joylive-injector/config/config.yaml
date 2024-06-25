@@ -50,7 +50,6 @@ agent:
       - redis
     disables: null
     dynamics: null
-    passives: null
     profiles:
       test: null
       production: null
@@ -58,7 +57,7 @@ agent:
   sync:
     liveSpace:
       type: multilive # [file,multilive]
-      url: ${CONFIG_LIVE_SPACE_API_URL:http://11.159.56.136:30305/v1}
+      url: ${CONFIG_LIVE_SPACE_API_URL:http://api.multilive.local:8080/v1}
       #spacesUrl: ${CONFIG_LIVE_SPACE_API_URL}/workspaces
       #spaceUrl: ${CONFIG_LIVE_SPACE_API_URL}/workspaces/${space_id}/version/${space_version}
       #serviceUrl: ${CONFIG_LIVE_SPACE_API_URL}/services/${service_name}/version/${service_version}
@@ -89,8 +88,9 @@ agent:
       jsf: true
       spring: true
       phevos: true
+      rocketmq: true
     lane:
-      enabled: ${CONFIG_LANE_ENABLED:true}
+      enabled: ${CONFIG_LANE_ENABLED:false}
     transmission:
       enabled: ${CONFIG_TRANSMISSION_ENABLED:true}
       threadpool: ${CONFIG_TRANSMISSION_THREADPOOL_ENABLED:true}
@@ -116,16 +116,30 @@ agent:
     counter:
       enabled: true
   governance:
+    initializeTimeout: ${CONFIG_POLICY_INITIALIZE_TIMEOUT:10000}
     service:
       warmups: ${CONFIG_WARMUP_SERVICES:}
       excludes:
         - org.apache.dubbo.metadata.MetadataService
-    initializeTimeout: ${CONFIG_POLICY_INITIALIZE_TIMEOUT:10000}
+    live:
+      topics: ${CONFIG_LIVE_TOPICS}
+    lane:
+      topics: ${CONFIG_LANE_TOPICS}
     router:
       virtual: ${CONFIG_VIRTUAL_SIZE:500}
       phevos:
         groupExpression: ${unit}-${cell}-${group}
     transmission:
+      keys:
+        - x-live-space-id
+        - x-live-rule-id
+        - x-live-uid
+        - x-lane-space-id
+        - x-lane-code
+      prefixes:
+        - x-live-
+        - x-lane-
+        - x-service-
       thread:
         excludeExecutors:
           - org.apache.dubbo.common.threadpool.ThreadlessExecutor
