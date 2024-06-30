@@ -2,7 +2,7 @@
 
 [![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://joylivehq.slack.com)
 
-<img src="docs/image/weixin.jpg" alt="pic" style="zoom:33%;" />
+<img src="docs/image/weixin.png" alt="pic" style="zoom:33%;" />
 
 English | [简体中文](./README-zh.md)
 
