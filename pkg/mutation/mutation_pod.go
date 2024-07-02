@@ -3,6 +3,7 @@ package mutation
 import (
 	"encoding/json"
 	"fmt"
+	"go.uber.org/zap"
 	"net/http"
 	"strings"
 
@@ -164,7 +165,14 @@ func addPodInitContainer(targetPod *corev1.Pod, envs []corev1.EnvVar, deployment
 	}
 	agentVersion := config.DefaultInjectorConfig.AgentConfig.Version
 	if av, ok := targetPod.Labels[config.AgentVersionLabel]; ok {
-		agentVersion = av
+		if v, ok := config.InjectorAgentVersion[av]; ok {
+			_, configExists := config.InjectorConfigMaps[v.ConfigMapName]
+			if v.Enable && configExists {
+				agentVersion = v.Version
+				log.Info("[mutation] injection-pod: Inject the specified version to pod",
+					zap.String("pod", targetPod.Name), zap.String("version", agentVersion))
+			}
+		}
 	}
 	agentInitContainer := &corev1.Container{
 		Name:  config.InitContainerName,
