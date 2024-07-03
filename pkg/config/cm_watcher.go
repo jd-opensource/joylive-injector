@@ -87,7 +87,6 @@ func (w *ConfigMapWatcher) Start() error {
 					return
 				}
 				log.Warn("configMap deleted", zap.String("cm", key))
-				DefaultInjectorConfigMap = make(map[string]string)
 			},
 		}
 	}
