@@ -5,7 +5,8 @@ metadata:
     app.kubernetes.io/name: joylive-injector
     app.kubernetes.io/managed-by: joylive-injector
   name: agentversion-1.0.0-e979a2d-amd64
+  namespace: joylive
 spec:
   version: 1.0.0-e979a2d-AMD64
-  configMapName: joylive-agent-config-1.0.0-e979a2d-AMD64
+  configMapName: joylive-agent-config-1.0.0-e979a2d-amd64
   enable: true
