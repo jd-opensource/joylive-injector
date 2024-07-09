@@ -524,7 +524,7 @@ spec:
             - name: JOYLIVE_NAMESPACE
               value: joylive
           name: joylive-injector
-          image: ghcr.m.daocloud.io/jd-opensource/joylive-injector:latest
+          image: ghcr.m.daocloud.io/jd-opensource/joylive-injector:v1.0.0
           imagePullPolicy: Always
           args:
             - --cert=/etc/kubernetes/ssl/dac.pem
