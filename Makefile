@@ -9,6 +9,8 @@ endif
 
 all: gen-client build image push build-charts-crs
 
+all-image: build image push
+
 gen-client:
 	hack/update-codegen.sh
 
