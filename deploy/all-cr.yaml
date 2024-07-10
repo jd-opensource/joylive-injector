@@ -182,7 +182,7 @@ data:
       sync:
         liveSpace:
           type: ${CONFIG_LIVE_SPACE_API_TYPE:file} # [file,multilive]
-          url: ${CONFIG_LIVE_SPACE_API_URL:http://api.multilive.local:8080/v1}
+          url: ${CONFIG_LIVE_SPACE_API_URL:http://api.live.local:9090/v1}
           #spacesUrl: ${CONFIG_LIVE_SPACE_API_URL}/workspaces
           #spaceUrl: ${CONFIG_LIVE_SPACE_API_URL}/workspaces/${space_id}/version/${space_version}
           #serviceUrl: ${CONFIG_LIVE_SPACE_API_URL}/services/${service_name}/version/${service_version}
@@ -208,6 +208,7 @@ data:
       switch:
         live:
           enabled: ${CONFIG_LIVE_ENABLED:true}
+          mq: ${CONFIG_LIVE_MQ_ENABLED:false}
           dubbo: true
           sofarpc: true
           jsf: true
@@ -246,10 +247,16 @@ data:
           warmups: ${CONFIG_WARMUP_SERVICES:}
           excludes:
             - org.apache.dubbo.metadata.MetadataService
+          circuitBreaker:
+            type: Resilience4j
+            cleanInterval: 30000
+            expireTime: 60000
         live:
           topics: ${CONFIG_LIVE_TOPICS}
+          modifyMQGroupEnabled: ${CONFIG_LIVE_MODIFY_MQ_GROUP:true}
         lane:
           topics: ${CONFIG_LANE_TOPICS}
+          modifyMQGroupEnabled: ${CONFIG_LANE_MODIFY_MQ_GROUP:true}
         router:
           virtual: ${CONFIG_VIRTUAL_SIZE:500}
           phevos:
@@ -524,7 +531,7 @@ spec:
             - name: JOYLIVE_NAMESPACE
               value: joylive
           name: joylive-injector
-          image: ghcr.m.daocloud.io/jd-opensource/joylive-injector:v1.0.0
+          image: ghcr.m.daocloud.io/jd-opensource/joylive-injector:latest
           imagePullPolicy: Always
           args:
             - --cert=/etc/kubernetes/ssl/dac.pem
