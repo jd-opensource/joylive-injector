@@ -1,5 +1,7 @@
 # joylive-injector
 
+[![GitHub repo](https://img.shields.io/badge/GitHub-repo-blue)](https://github.com/jd-opensource/joylive-injector)
+[![GitHub release](https://img.shields.io/github/release/jd-opensource/joylive-injector.svg)](https://github.com/jd-opensource/joylive-injector/releases)
 [![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://joylivehq.slack.com)
 
 <img src="docs/image/weixin.png" alt="pic" width="150" />
