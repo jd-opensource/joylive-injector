@@ -37,7 +37,7 @@ This program monitors the `CREATE`, `UPDATE`, `DELETE` events for `deployments` 
 - Modify the configuration in the `value.yaml` section of the chart package as needed
 
 ### Simple mode
-Execute command：
+Since the certificate signature has been pre-generated according to the namespace `joylive`, it is necessary to specify installation to the corresponding namespace. Execute the command:
 ```bash
-helm install joylive-injector ./packages/joylive-injector-1.0.0.tgz 
+helm install joylive-injector ./packages/joylive-injector-1.1.0.tgz -n joylive
 ```
