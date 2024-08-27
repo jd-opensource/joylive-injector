@@ -332,6 +332,7 @@ data:
               - com.alibaba.nacos.shaded.io.grpc.internal.SerializingExecutor
               - com.alibaba.nacos.shaded.io.grpc.internal.LogExceptionRunnable
               - com.jd.live.agent.core.thread.NamedThreadFactory
+              - com.jd.jr.sgm.client.disruptor.LogEventFactory
             excludeTaskPrefixes:
               - reactor.core.scheduler.BoundedElasticScheduler$$Lambda
               - org.springframework.cloud.commons.util.InetUtils$$Lambda$
