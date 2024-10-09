@@ -39,5 +39,7 @@ This program monitors the `CREATE`, `UPDATE`, `DELETE` events for `deployments` 
 ### Simple mode
 Since the certificate signature has been pre-generated according to the namespace `joylive`, it is necessary to specify installation to the corresponding namespace. Execute the command:
 ```bash
-helm install joylive-injector ./packages/joylive-injector-1.1.0.tgz -n joylive
+helm repo add joylive https://jd-opensource.github.io/joylive-helm-charts
+kubectl create namespace joylive
+helm install joylive-injector joylive/joylive-injector -n joylive
 ```

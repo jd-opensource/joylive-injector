@@ -39,5 +39,7 @@
 ### 简单模式
 因证书签名已按照命名空间为`joylive`预生成，所以须指定安装到对应命名空间。 执行命令：
 ```bash
-helm install joylive-injector ./packages/joylive-injector-1.1.0.tgz -n joylive
+helm repo add joylive https://jd-opensource.github.io/joylive-helm-charts
+kubectl create namespace joylive
+helm install joylive-injector joylive/joylive-injector -n joylive
 ```
