@@ -1,5 +1,5 @@
 repo ?= ghcr.io/jd-opensource
-version:=1.0.0-$(shell git rev-parse --short HEAD)-$(shell date +%Y%m%d%H%M%S)
+version:=1.2.0-$(shell git rev-parse --short HEAD)
 
 ifeq (,$(shell go env GOBIN))
 GOBIN=$(shell go env GOPATH)/bin
