@@ -1,4 +1,5 @@
-FROM golang:alpine AS builder
+ARG BASE_IMAGE=golang:alpine
+FROM ${BASE_IMAGE} AS builder
 
 ENV SRC_PATH ${GOPATH}/src/joylive-injector
 
