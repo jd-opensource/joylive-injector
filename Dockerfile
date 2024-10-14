@@ -1,5 +1,5 @@
-ARG BASE_IMAGE=golang:alpine
-FROM ${BASE_IMAGE} AS builder
+ARG BUILD_IMAGE=golang:alpine
+FROM ${BUILD_IMAGE} AS builder
 
 ENV SRC_PATH ${GOPATH}/src/joylive-injector
 
@@ -19,7 +19,8 @@ RUN set -ex \
         -X 'main.commitID=${COMMIT_SHA1}' \
         -w -s"
 
-FROM alpine
+ARG RUNTIME_IMAGE=alpine
+FROM ${RUNTIME_IMAGE}
 
 ARG TZ="Asia/Shanghai"
 
