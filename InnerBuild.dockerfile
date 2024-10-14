@@ -1,4 +1,6 @@
 ARG BUILD_IMAGE=golang:alpine
+ARG RUNTIME_IMAGE=alpine
+
 FROM ${BUILD_IMAGE} AS builder
 
 WORKDIR /workspace
@@ -17,7 +19,6 @@ RUN go env
 # Build the application
 RUN go build -ldflags "-w -s -X main.VERSION=${RELEASE_TAG}" -o ./${APP} .
 
-ARG RUNTIME_IMAGE=alpine
 FROM ${RUNTIME_IMAGE}
 
 ARG TZ="Asia/Shanghai"
