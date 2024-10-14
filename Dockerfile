@@ -8,7 +8,6 @@ WORKDIR ${SRC_PATH}
 COPY . .
 
 RUN set -ex \
-    && apk add git \
     && export BUILD_VERSION=$(cat version) \
     && export BUILD_DATE=$(date "+%F %T") \
     && export COMMIT_SHA1=$(git rev-parse HEAD) \
@@ -30,7 +29,6 @@ ENV LC_ALL en_US.UTF-8
 ENV LANGUAGE en_US:en
 
 RUN set -ex \
-    && apk add bash tzdata ca-certificates \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo ${TZ} > /etc/timezone \
     && rm -rf /var/cache/apk/*
