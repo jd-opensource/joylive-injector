@@ -1,9 +1,7 @@
 ARG BUILD_IMAGE=golang:alpine
 FROM ${BUILD_IMAGE} AS builder
 
-ENV SRC_PATH ${GOPATH}/src/joylive-injector
-
-WORKDIR ${SRC_PATH}
+WORKDIR /workspace
 
 COPY . .
 
@@ -11,16 +9,13 @@ ENV GO111MODULE=on
 ENV GOPROXY http://jdos-goproxy.jdcloud.com,direct
 ENV GOPRIVATE ""
 
-RUN set -ex \
-    && export BUILD_VERSION=$(cat version) \
-    && export BUILD_DATE=$(date "+%F %T") \
-    && export COMMIT_SHA1=$(git rev-parse HEAD) \
-    && go mod tidy \
-    && go install -trimpath -ldflags \
-        "-X 'main.version=${BUILD_VERSION}' \
-        -X 'main.buildDate=${BUILD_DATE}' \
-        -X 'main.commitID=${COMMIT_SHA1}' \
-        -w -s"
+ARG APP=joylive-injector
+ARG RELEASE_TAG=$(VERSION)
+
+RUN go env
+
+# Build the application
+RUN go build -ldflags "-w -s -X main.VERSION=${RELEASE_TAG}" -o ./${APP} .
 
 ARG RUNTIME_IMAGE=alpine
 FROM ${RUNTIME_IMAGE}
@@ -37,6 +32,6 @@ RUN set -ex \
     && echo ${TZ} > /etc/timezone \
     && rm -rf /var/cache/apk/*
 
-COPY --from=builder /go/bin/joylive-injector /joylive-injector
+COPY --from=builder /workspace/joylive-injector /joylive-injector
 
 ENTRYPOINT ["/joylive-injector"]
