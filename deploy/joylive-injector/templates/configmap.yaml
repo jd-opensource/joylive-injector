@@ -6,8 +6,10 @@ metadata:
   labels: {{ include "joylive-injector.selectorLabels" . | nindent 4 }}
 data:
   {{- $root := . }}
-  {{- range $path, $_ :=  .Files.Glob "config/*" }}
+  {{- range $path, $_ :=  $root.Files.Glob "config/*" }}
   {{- $fileName := base $path }}
   {{ $fileName }}: |
-{{ $.Files.Get $path | indent 4 }}
+{{- $fileContent := $root.Files.Get $path }}
+{{- $parsedContent := tpl $fileContent $root }}
+{{ $parsedContent | indent 4 -}}
   {{- end }}

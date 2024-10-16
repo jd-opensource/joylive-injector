@@ -42,6 +42,8 @@ spec:
               path: /readyz
             periodSeconds: 10
             initialDelaySeconds: 5
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             {{- toYaml .Values.VolumeMounts | nindent 12 }}
       {{- with .Values.imagePullSecrets }}
