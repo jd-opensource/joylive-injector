@@ -20,6 +20,7 @@
 因证书签名已按照命名空间为`joylive`预生成，所以须指定安装到对应命名空间。 执行命令：
 ```bash
 helm repo add joylive https://jd-opensource.github.io/joylive-helm-charts
+helm repo update
 kubectl create namespace joylive
 helm install joylive-injector joylive/joylive-injector -n joylive
 ```

@@ -56,8 +56,8 @@ agent:
     profile: null
   sync:
     liveSpace:
-      type: ${CONFIG_LIVE_SPACE_API_TYPE:{{ .Values.sync.liveSpace.type }}} # [file,multilive]
-      url: ${CONFIG_LIVE_SPACE_API_URL:{{ .Values.sync.liveSpace.url }}}
+      type: ${CONFIG_LIVE_SPACE_API_TYPE:{{ .Values.agent.sync.liveSpace.type }}} # [file,multilive]
+      url: ${CONFIG_LIVE_SPACE_API_URL:{{ .Values.agent.sync.liveSpace.url }}}
       #spacesUrl: ${CONFIG_LIVE_SPACE_API_URL}/workspaces
       #spaceUrl: ${CONFIG_LIVE_SPACE_API_URL}/workspaces/${space_id}/version/${space_version}
       #serviceUrl: ${CONFIG_LIVE_SPACE_API_URL}/services/${service_name}/version/${service_version}
@@ -71,8 +71,8 @@ agent:
     laneSpace:
       type: file
     microservice:
-      type: ${CONFIG_SERVICE_API_TYPE:{{ .Values.sync.microservice.type }}}
-      url: ${CONFIG_SERVICE_API_URL:{{ .Values.sync.microservice.url }}}
+      type: ${CONFIG_SERVICE_API_TYPE:{{ .Values.agent.sync.microservice.type }}}
+      url: ${CONFIG_SERVICE_API_URL:{{ .Values.agent.sync.microservice.url }}}
       headers: ${CONFIG_SERVICE_API_HEADERS}
       interval: 5000
       timeout: 3000
@@ -118,6 +118,8 @@ agent:
   governance:
     initializeTimeout: ${CONFIG_POLICY_INITIALIZE_TIMEOUT:10000}
     service:
+      serviceGroups: ${CONFIG_SERVICE_GROUPS:}
+      serviceGroupOpen: ${CONFIG_SERVICE_GROUP_OPEN:true}
       warmups: ${CONFIG_WARMUP_SERVICES:}
       systemPaths: ${CONFIG_SYSTEM_HTTP_PATHS}
       concurrencyLimiter:
