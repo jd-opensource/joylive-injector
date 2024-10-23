@@ -61,6 +61,8 @@ agent:
       #spacesUrl: ${CONFIG_LIVE_SPACE_API_URL}/workspaces
       #spaceUrl: ${CONFIG_LIVE_SPACE_API_URL}/workspaces/${space_id}/version/${space_version}
       #serviceUrl: ${CONFIG_LIVE_SPACE_API_URL}/services/${service_name}/version/${service_version}
+      accessKey: ${CONFIG_MULTILIVE_ACCESS_KEY:{{ .Values.agent.sync.liveSpace.accessKey }}}
+      secretKey: ${CONFIG_MULTILIVE_SECRET_KEY:{{ .Values.agent.sync.liveSpace.secretKey }}}
       service: true
       interval: 5000
       timeout: 3000
@@ -229,6 +231,6 @@ agent:
     service: true
     readerInterval: 1000
     exporter:
-      type: ${CONFIG_COUNTER_EXPORTER_TYPE:logging}
-      endpoint: ${CONFIG_COUNTER_EXPORTER_ENDPOINT:}
+      type: ${CONFIG_COUNTER_EXPORTER_TYPE:{{ .Values.agent.exporter.type }}}
+      endpoint: ${CONFIG_COUNTER_EXPORTER_ENDPOINT:{{ .Values.agent.exporter.endpoint }}}
       timeout: 5000
