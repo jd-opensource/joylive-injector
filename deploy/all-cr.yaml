@@ -99,6 +99,8 @@ data:
     app.service.namespace=${APPLICATION_SERVICE_NAMESPACE:default}
     app.service.group=${APPLICATION_SERVICE_GROUP:default}
     app.service.gateway=${APPLICATION_SERVICE_GATEWAY:NONE}
+    app.service.weight=${APPLICATION_SERVICE_WEIGHT:}
+    app.service.warmupDuration=${APPLICATION_SERVICE_WARMUP_DURATION:}
     app.location.cloud=${APPLICATION_LOCATION_CLOUD:}
     app.location.region=${APPLICATION_LOCATION_REGION}
     app.location.zone=${APPLICATION_LOCATION_ZONE}
@@ -188,6 +190,8 @@ data:
           #spacesUrl: ${CONFIG_LIVE_SPACE_API_URL}/workspaces
           #spaceUrl: ${CONFIG_LIVE_SPACE_API_URL}/workspaces/${space_id}/version/${space_version}
           #serviceUrl: ${CONFIG_LIVE_SPACE_API_URL}/services/${service_name}/version/${service_version}
+          accessKey: ${CONFIG_MULTILIVE_ACCESS_KEY:}
+          secretKey: ${CONFIG_MULTILIVE_SECRET_KEY:}
           service: true
           interval: 5000
           timeout: 3000
@@ -220,7 +224,7 @@ data:
           phevos: true
           rocketmq: true
         lane:
-          enabled: ${CONFIG_LANE_ENABLED:false}
+          enabled: ${CONFIG_LANE_ENABLED:true}
         transmission:
           enabled: ${CONFIG_TRANSMISSION_ENABLED:true}
           threadpool: ${CONFIG_TRANSMISSION_THREADPOOL_ENABLED:true}
@@ -245,6 +249,8 @@ data:
       governance:
         initializeTimeout: ${CONFIG_POLICY_INITIALIZE_TIMEOUT:10000}
         service:
+          localFirst: ${CONFIG_LOCAL_FIRST:true}
+          localFirstMode: ${CONFIG_LOCAL_FIRST_MODE:CELL}
           serviceGroups: ${CONFIG_SERVICE_GROUPS:}
           serviceGroupOpen: ${CONFIG_SERVICE_GROUP_OPEN:true}
           warmups: ${CONFIG_WARMUP_SERVICES:}
@@ -356,15 +362,15 @@ data:
         service: true
         readerInterval: 1000
         exporter:
-          type: ${CONFIG_COUNTER_EXPORTER_TYPE:logging}
-          endpoint: ${CONFIG_COUNTER_EXPORTER_ENDPOINT:}
+          type: ${CONFIG_COUNTER_EXPORTER_TYPE:otlp.grpc}
+          endpoint: ${CONFIG_COUNTER_EXPORTER_ENDPOINT:http://otel-collector.otel.svc:4317}
           timeout: 5000
     
   injector.yaml: |
     # Define the version, environment variables, and other information of joylive-injector injecting joylive-agent
     agent:
       image: ghcr.m.daocloud.io/jd-opensource/joylive-agent
-      version: v1.3.3
+      version: v1.4.0
       env:
         JAVA_TOOL_OPTIONS: -javaagent:/joylive/live.jar
   logback.xml: |
