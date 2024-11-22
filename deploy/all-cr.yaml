@@ -612,7 +612,12 @@ spec:
             periodSeconds: 10
             initialDelaySeconds: 5
           resources:
-            {}
+            limits:
+              cpu: "2"
+              memory: 4Gi
+            requests:
+              cpu: 500m
+              memory: 512Mi
           volumeMounts:
             - mountPath: /etc/kubernetes/ssl/
               name: dynamic-admission-control-certs
