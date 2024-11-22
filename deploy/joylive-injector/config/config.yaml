@@ -56,13 +56,8 @@ agent:
     profile: null
   sync:
     liveSpace:
-      type: ${CONFIG_LIVE_SPACE_API_TYPE:{{ .Values.agent.sync.liveSpace.type }}} # [file,multilive]
+      type: ${CONFIG_LIVE_SPACE_API_TYPE:{{ .Values.agent.sync.liveSpace.type }}} # [file,multilive,multilive-openapi,nacos]
       url: ${CONFIG_LIVE_SPACE_API_URL:{{ .Values.agent.sync.liveSpace.url }}}
-      #spacesUrl: ${CONFIG_LIVE_SPACE_API_URL}/workspaces
-      #spaceUrl: ${CONFIG_LIVE_SPACE_API_URL}/workspaces/${space_id}/version/${space_version}
-      #serviceUrl: ${CONFIG_LIVE_SPACE_API_URL}/services/${service_name}/version/${service_version}
-      accessKey: ${CONFIG_MULTILIVE_ACCESS_KEY:{{ .Values.agent.sync.liveSpace.accessKey }}}
-      secretKey: ${CONFIG_MULTILIVE_SECRET_KEY:{{ .Values.agent.sync.liveSpace.secretKey }}}
       service: true
       interval: 5000
       timeout: 3000
@@ -70,15 +65,56 @@ agent:
       delay: 0
       fault: 5000
       headers: ${CONFIG_LIVE_SPACE_API_HEADERS}
+      # for multilive
+      multilive:
+        spacesUrl: /workspaces
+        spaceUrl: /workspaces/${space_id}/version/${space_version}
+        serviceUrl: /services/${service_name}/version/${service_version}
+      # for multilive-openapi
+      jdcloud:
+        accessKey: ${CONFIG_MULTILIVE_ACCESS_KEY:{{ .Values.agent.sync.liveSpace.jdcloud.accessKey }}}
+        secretKey: ${CONFIG_MULTILIVE_SECRET_KEY:{{ .Values.agent.sync.liveSpace.jdcloud.secretKey }}}
+      # for nacos
+      nacos:
+        username: ${CONFIG_NACOS_USERNAME:nacos}
+        password: ${CONFIG_NACOS_PASSWORD:nacos}
+        namespace: ${CONFIG_NACOS_NAMESPACE:public}
+        liveSpaceGroup: ${CONFIG_NACOS_GROUP_LIVE_SPACE:DEFAULT_GROUP}
+        liveSpacesKey: ${CONFIG_NACOS_KEY_LIVE_SPACES:govern-liveSpaces}
+        liveSpaceKeyTemplate: ${CONFIG_NACOS_KEY_LIVE_SPACE_TEMPLATE:govern-liveSpace-${id}}
+        liveServiceTemplate: ${CONFIG_NACOS_KEY_LIVE_SERVICE_TEMPLATE:govern-liveService-${name}}
     laneSpace:
-      type: file
+      type: ${CONFIG_LANE_SPACE_API_TYPE:{{ .Values.agent.sync.lane.type }}} # [file,jmsf,nacos]
+      url: ${CONFIG_LANE_SPACE_API_URL:{{ .Values.agent.sync.lane.url }}}
+      # for jmsf
+      jmsf:
+        spacesUrl: /laneSpaces
+        spaceUrl: /laneSpace/${space_id}/version/${space_version}
+      # for nacos
+      nacos:
+        username: ${CONFIG_NACOS_USERNAME:nacos}
+        password: ${CONFIG_NACOS_PASSWORD:nacos}
+        namespace: ${CONFIG_NACOS_NAMESPACE:public}
+        laneSpaceGroup: ${CONFIG_NACOS_GROUP_LANE_SPACE:DEFAULT_GROUP}
+        laneSpacesKey: ${CONFIG_NACOS_KEY_LANE_SPACES:govern-laneSpaces}
+        laneSpaceKeyTemplate: ${CONFIG_NACOS_KEY_LANE_SPACE_TEMPLATE:govern-laneSpace-${id}}
     microservice:
-      type: ${CONFIG_SERVICE_API_TYPE:{{ .Values.agent.sync.microservice.type }}}
+      type: ${CONFIG_SERVICE_API_TYPE:{{ .Values.agent.sync.microservice.type }}} # [file,jmsf,nacos]
       url: ${CONFIG_SERVICE_API_URL:{{ .Values.agent.sync.microservice.url }}}
       headers: ${CONFIG_SERVICE_API_HEADERS}
       interval: 5000
       timeout: 3000
       initialTimeout: 20000
+      # for jmsf
+      jmsf:
+        serviceUrl: /space/${space}/service/${service_name}/version/${service_version}?application=${application}
+      # for nacos
+      nacos:
+        username: ${CONFIG_NACOS_USERNAME:nacos}
+        password: ${CONFIG_NACOS_PASSWORD:nacos}
+        namespace: ${CONFIG_NACOS_NAMESPACE:public}
+        serviceGroup: ${CONFIG_NACOS_GROUP_SERVICE:DEFAULT_GROUP}
+        serviceKeyTemplate: ${CONFIG_NACOS_KEY_SERVICE_TEMPLATE:govern-service-${name}}
   watchdog:
     enabled: true
     delay: 5000
@@ -89,13 +125,14 @@ agent:
       enabled: ${CONFIG_LIVE_ENABLED:{{ .Values.agent.switch.live }}}
       mq: ${CONFIG_LIVE_MQ_ENABLED:false}
       dubbo: true
+      grpc: true
       sofarpc: true
       jsf: true
       spring: true
       phevos: true
       rocketmq: true
     lane:
-      enabled: ${CONFIG_LANE_ENABLED:{{ .Values.agent.switch.live }}}
+      enabled: ${CONFIG_LANE_ENABLED:{{ .Values.agent.switch.lane }}}
     transmission:
       enabled: ${CONFIG_TRANSMISSION_ENABLED:true}
       threadpool: ${CONFIG_TRANSMISSION_THREADPOOL_ENABLED:true}
@@ -131,14 +168,18 @@ agent:
         cleanInterval: 30000
         expireTime: 60000
       rateLimiter:
-        type: Resilience4j
+        type: SmoothBursty
         cleanInterval: 30000
         expireTime: 60000
+      loadLimiter:
+        cpuUsage: ${CONFIG_MAX_CPU_USAGE:}
+        loadUsage: ${CONFIG_MAX_LOAD_USAGE:}
       circuitBreaker:
         type: Resilience4j
         cleanInterval: 30000
         expireTime: 60000
     live:
+      fallbackLocationIfNoSpace: ${CONFIG_FALLBACK_LOCATION_IF_NO_SPACE:false}
       topics: ${CONFIG_LIVE_TOPICS}
       modifyMQGroupEnabled: ${CONFIG_LIVE_MODIFY_MQ_GROUP:false}
     lane:

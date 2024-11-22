@@ -41,8 +41,13 @@ agent:
       type: file
       url: http://api.live.local:9090/v1
       headers: ${CONFIG_LIVE_SPACE_API_HEADERS}
-      accessKey:
-      secretKey:
+      # for multilive-openapi
+      jdcloud:
+        accessKey:
+        secretKey:
+    lane:
+      type: file
+      url: http://api.jmsf.local:8080/v1
     microservice:
       type: file
       url: http://api.jmsf.local:8080/v1
