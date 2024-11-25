@@ -158,8 +158,10 @@ func (w *ConfigMapWatcher) processConfigMap() bool {
 	item, exists, err := w.configMapInformer.GetIndexer().GetByKey(key.(string))
 	if err != nil {
 		log.Error("get configMap by key error", zap.String("key", key.(string)), zap.Error(err))
+		w.cmQueue.AddRateLimited(key)
 		return true
 	}
+
 	if !exists {
 		log.Info("configMap not exist", zap.String("key", key.(string)))
 		return true
@@ -167,7 +169,6 @@ func (w *ConfigMapWatcher) processConfigMap() bool {
 	if configMap, ok := item.(*v1.ConfigMap); ok {
 		if err := w.cacheConfigMap(configMap); err != nil {
 			log.Error("cache this configMap error", zap.String("key", key.(string)), zap.Error(err))
-			w.cmQueue.AddRateLimited(item)
 			return true
 		}
 	}
