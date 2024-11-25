@@ -156,13 +156,14 @@ func (w *ConfigMapWatcher) processConfigMap() bool {
 	}
 	defer w.cmQueue.Done(key)
 	item, exists, err := w.configMapInformer.GetIndexer().GetByKey(key.(string))
-	if !exists {
-		log.Info("configMap not exist", zap.String("key", key.(string)))
-		return true
-	}
 	if err != nil {
 		log.Error("get configMap by key error", zap.String("key", key.(string)), zap.Error(err))
 		w.cmQueue.AddRateLimited(key)
+		return true
+	}
+
+	if !exists {
+		log.Info("configMap not exist", zap.String("key", key.(string)))
 		return true
 	}
 	if configMap, ok := item.(*v1.ConfigMap); ok {
