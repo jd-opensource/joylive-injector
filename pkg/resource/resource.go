@@ -64,6 +64,9 @@ func GetResource() *Resource {
 
 func (r *Resource) CreateOrUpdateConfigMap(ctx context.Context, namespace string, configMap *corev1.ConfigMap) error {
 	cm, err := r.ClientSet.CoreV1().ConfigMaps(namespace).Get(ctx, configMap.Name, metav1.GetOptions{})
+	if !errors2.IsNotFound(err) {
+		return err
+	}
 	if cm == nil || errors2.IsNotFound(err) {
 		// create
 		_, err = r.ClientSet.CoreV1().ConfigMaps(namespace).Create(context.TODO(), configMap, metav1.CreateOptions{})
