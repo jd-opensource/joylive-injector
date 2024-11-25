@@ -43,3 +43,7 @@ helm repo add joylive https://jd-opensource.github.io/joylive-helm-charts
 kubectl create namespace joylive
 helm install joylive-injector joylive/joylive-injector -n joylive
 ```
+
+## 成员
+
+感谢各位贡献者！[名单](./community/members.md) 
