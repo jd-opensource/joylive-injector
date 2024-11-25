@@ -167,7 +167,6 @@ func (w *ConfigMapWatcher) processConfigMap() bool {
 	if configMap, ok := item.(*v1.ConfigMap); ok {
 		if err := w.cacheConfigMap(configMap); err != nil {
 			log.Error("cache this configMap error", zap.String("key", key.(string)), zap.Error(err))
-			w.cmQueue.AddRateLimited(item)
 			return true
 		}
 	}
