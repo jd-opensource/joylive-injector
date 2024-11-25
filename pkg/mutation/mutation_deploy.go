@@ -10,6 +10,7 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
 	admissionv1 "k8s.io/api/admission/v1"
+	apiv1 "k8s.io/api/admission/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -31,7 +32,7 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 	switch request.Kind.Kind {
 	case "Deployment":
 		log.Debugf("[mutation] ----- /injection-deploy: received request: %v,the operition is %s ", request.Resource, request.Operation)
-		if request.Operation == "DELETE" {
+		if request.Operation == apiv1.Operation("DELETE") {
 			log.Debugf("[mutation] /injection-deploy: received delete request name is : %s, namespace is %s ", request.Name, request.Namespace)
 			err := deleteConfigMap(request.Name, request.Namespace)
 			if err != nil {
