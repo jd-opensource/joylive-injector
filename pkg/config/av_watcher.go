@@ -143,6 +143,7 @@ func (w *AgentVersionWatcher) processAgentVersion() bool {
 	item, exists, err := w.agentVersionInformer.GetIndexer().GetByKey(key.(string))
 	if err != nil {
 		log.Error("get agentVersion by key error", zap.String("key", key.(string)), zap.Error(err))
+		w.cmQueue.AddRateLimited(item)
 		return true
 	}
 	if !exists {
@@ -152,7 +153,6 @@ func (w *AgentVersionWatcher) processAgentVersion() bool {
 	if agentVersion, ok := item.(*v1.AgentVersion); ok {
 		if err := w.cacheAgentVersion(agentVersion); err != nil {
 			log.Error("cache this agentVersion error", zap.String("key", key.(string)), zap.Error(err))
-			w.cmQueue.AddRateLimited(item)
 			return true
 		}
 	}
