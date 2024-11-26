@@ -404,7 +404,7 @@ data:
         readerInterval: 1000
         exporter:
           type: ${CONFIG_COUNTER_EXPORTER_TYPE:otlp.grpc}
-          endpoint: ${CONFIG_COUNTER_EXPORTER_ENDPOINT:http://otel-collector.otel.svc:4317}
+          endpoint: ${CONFIG_COUNTER_EXPORTER_ENDPOINT:http://otel-collector.joylive.svc:4317}
           timeout: 5000
     
   injector.yaml: |

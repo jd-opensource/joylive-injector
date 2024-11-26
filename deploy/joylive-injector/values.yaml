@@ -24,7 +24,7 @@ containerArgs:
   - --cert=/etc/kubernetes/ssl/dac.pem
   - --key=/etc/kubernetes/ssl/dac-key.pem
 
-imagePullSecrets: []
+imagePullSecrets: [ ]
 nameOverride: ""
 fullnameOverride: ""
 
@@ -53,7 +53,7 @@ agent:
       url: http://api.jmsf.local:8080/v1
   exporter:
     type: otlp.grpc # otlp.grpc
-    endpoint: http://otel-collector.otel.svc:4317
+    endpoint: http://otel-collector.joylive.svc:4317
   switch:
     live: true
     lane: false
