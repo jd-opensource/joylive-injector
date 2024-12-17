@@ -153,7 +153,7 @@ data:
       publisher:
         configs:
           traffic:
-            capacity: 20000
+            capacity: ${CONFIG_TRAFFIC_BUFFER_SIZE:40000}
       plugin:
         systems:
           - system
@@ -188,7 +188,7 @@ data:
           type: ${CONFIG_LIVE_SPACE_API_TYPE:file} # [file,multilive,multilive-openapi,nacos]
           url: ${CONFIG_LIVE_SPACE_API_URL:http://api.live.local:9090/v1}
           service: true
-          interval: 5000
+          interval: 3000
           timeout: 3000
           initialTimeout: 20000
           delay: 0
@@ -215,6 +215,11 @@ data:
         laneSpace:
           type: ${CONFIG_LANE_SPACE_API_TYPE:file} # [file,jmsf,nacos]
           url: ${CONFIG_LANE_SPACE_API_URL:http://api.jmsf.local:8080/v1}
+          interval: 3000
+          timeout: 3000
+          initialTimeout: 20000
+          delay: 0
+          fault: 5000
           # for jmsf
           jmsf:
             spacesUrl: /laneSpaces
@@ -231,9 +236,11 @@ data:
           type: ${CONFIG_SERVICE_API_TYPE:file} # [file,jmsf,nacos]
           url: ${CONFIG_SERVICE_API_URL:http://api.jmsf.local:8080/v1}
           headers: ${CONFIG_SERVICE_API_HEADERS}
-          interval: 5000
+          interval: 3000
           timeout: 3000
           initialTimeout: 20000
+          delay: 0
+          fault: 5000
           # for jmsf
           jmsf:
             serviceUrl: /space/${space}/service/${service_name}/version/${service_version}?application=${application}
@@ -251,7 +258,7 @@ data:
         timeout: 5000
       switch:
         live:
-          enabled: ${CONFIG_LIVE_ENABLED:true}
+          enabled: ${CONFIG_LIVE_ENABLED:false}
           mq: ${CONFIG_LIVE_MQ_ENABLED:false}
           dubbo: true
           grpc: true
@@ -266,9 +273,9 @@ data:
           enabled: ${CONFIG_TRANSMISSION_ENABLED:true}
           threadpool: ${CONFIG_TRANSMISSION_THREADPOOL_ENABLED:true}
         registry:
-          enabled: ${CONFIG_REGISTRY_ENABLED:true}
+          enabled: ${CONFIG_REGISTRY_ENABLED:${CONFIG_FLOW_CONTROL_ENABLED}}
         flowcontrol:
-          enabled: ${CONFIG_FLOW_CONTROL_ENABLED:true}
+          enabled: ${CONFIG_FLOW_CONTROL_ENABLED:false}
           localhost: ${CONFIG_LOCALHOST_ENABLED:false}
           virtual: ${CONFIG_VIRTUAL_ENABLED:false}
         protect:
@@ -290,6 +297,7 @@ data:
           localFirstMode: ${CONFIG_LOCAL_FIRST_MODE:CELL}
           serviceGroups: ${CONFIG_SERVICE_GROUPS:}
           serviceGroupOpen: ${CONFIG_SERVICE_GROUP_OPEN:true}
+          responseException: ${CONFIG_RESPONSE_EXCEPTION:true}
           warmups: ${CONFIG_WARMUP_SERVICES:}
           systemPaths: ${CONFIG_SYSTEM_HTTP_PATHS}
           concurrencyLimiter:
@@ -307,13 +315,16 @@ data:
             type: Resilience4j
             cleanInterval: 30000
             expireTime: 60000
+          monitor:
+            forwardEnabled: ${CONFIG_MONITOR_FORWARD_TRAFFIC_ENABLED:}
+            rejectEnabled: true
         live:
           fallbackLocationIfNoSpace: ${CONFIG_FALLBACK_LOCATION_IF_NO_SPACE:false}
           topics: ${CONFIG_LIVE_TOPICS}
-          modifyMQGroupEnabled: ${CONFIG_LIVE_MODIFY_MQ_GROUP:false}
+          modifyMQGroupEnabled: ${CONFIG_LIVE_MODIFY_MQ_GROUP:true}
         lane:
           topics: ${CONFIG_LANE_TOPICS}
-          modifyMQGroupEnabled: ${CONFIG_LANE_MODIFY_MQ_GROUP:false}
+          modifyMQGroupEnabled: ${CONFIG_LANE_MODIFY_MQ_GROUP:true}
         router:
           virtual: ${CONFIG_VIRTUAL_SIZE:500}
           spring:
@@ -406,7 +417,6 @@ data:
           type: ${CONFIG_COUNTER_EXPORTER_TYPE:otlp.grpc}
           endpoint: ${CONFIG_COUNTER_EXPORTER_ENDPOINT:http://otel-collector.joylive.svc:4317}
           timeout: 5000
-    
   injector.yaml: |
     # Define the version, environment variables, and other information of joylive-injector injecting joylive-agent
     agent:
@@ -822,3 +832,31 @@ webhooks:
     objectSelector:
       matchLabels: 
         x-live-enabled : "true"
+---
+# Source: joylive-injector/templates/servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations:
+    meta.helm.sh/release-name: brolly
+    meta.helm.sh/release-namespace: brolly
+  labels:
+    app.kubernetes.io/instance: brolly
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: monitor
+    app.kubernetes.io/system: brolly
+    integration: tpaas-jmsf-otel
+    inputType: integrations
+    release: brolly
+  name: tpaas-jmsf-otel
+  namespace: brolly
+spec:
+  endpoints:
+    - port: prometheus
+      interval: 10s
+  namespaceSelector:
+    any: true
+  selector:
+    matchLabels:
+      app: opentelemetry
+      component: otel-collector
