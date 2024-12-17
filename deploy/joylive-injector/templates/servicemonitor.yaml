@@ -18,6 +18,8 @@ spec:
   endpoints:
     - port: prometheus
       interval: 10s
+    - port: metrics
+      interval: 10s
   namespaceSelector:
     any: true
   selector:
