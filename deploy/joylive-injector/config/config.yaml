@@ -24,7 +24,7 @@ agent:
   publisher:
     configs:
       traffic:
-        capacity: 20000
+        capacity: ${CONFIG_TRAFFIC_BUFFER_SIZE:40000}
   plugin:
     systems:
       - system
@@ -59,7 +59,7 @@ agent:
       type: ${CONFIG_LIVE_SPACE_API_TYPE:{{ .Values.agent.sync.liveSpace.type }}} # [file,multilive,multilive-openapi,nacos]
       url: ${CONFIG_LIVE_SPACE_API_URL:{{ .Values.agent.sync.liveSpace.url }}}
       service: true
-      interval: 5000
+      interval: 3000
       timeout: 3000
       initialTimeout: 20000
       delay: 0
@@ -86,6 +86,11 @@ agent:
     laneSpace:
       type: ${CONFIG_LANE_SPACE_API_TYPE:{{ .Values.agent.sync.lane.type }}} # [file,jmsf,nacos]
       url: ${CONFIG_LANE_SPACE_API_URL:{{ .Values.agent.sync.lane.url }}}
+      interval: 3000
+      timeout: 3000
+      initialTimeout: 20000
+      delay: 0
+      fault: 5000
       # for jmsf
       jmsf:
         spacesUrl: /laneSpaces
@@ -102,9 +107,11 @@ agent:
       type: ${CONFIG_SERVICE_API_TYPE:{{ .Values.agent.sync.microservice.type }}} # [file,jmsf,nacos]
       url: ${CONFIG_SERVICE_API_URL:{{ .Values.agent.sync.microservice.url }}}
       headers: ${CONFIG_SERVICE_API_HEADERS}
-      interval: 5000
+      interval: 3000
       timeout: 3000
       initialTimeout: 20000
+      delay: 0
+      fault: 5000
       # for jmsf
       jmsf:
         serviceUrl: /space/${space}/service/${service_name}/version/${service_version}?application=${application}
@@ -137,7 +144,7 @@ agent:
       enabled: ${CONFIG_TRANSMISSION_ENABLED:true}
       threadpool: ${CONFIG_TRANSMISSION_THREADPOOL_ENABLED:true}
     registry:
-      enabled: ${CONFIG_REGISTRY_ENABLED:true}
+      enabled: ${CONFIG_REGISTRY_ENABLED:${CONFIG_FLOW_CONTROL_ENABLED}}
     flowcontrol:
       enabled: ${CONFIG_FLOW_CONTROL_ENABLED:{{ .Values.agent.switch.flowcontrol }}}
       localhost: ${CONFIG_LOCALHOST_ENABLED:false}
@@ -161,6 +168,7 @@ agent:
       localFirstMode: ${CONFIG_LOCAL_FIRST_MODE:CELL}
       serviceGroups: ${CONFIG_SERVICE_GROUPS:}
       serviceGroupOpen: ${CONFIG_SERVICE_GROUP_OPEN:true}
+      responseException: ${CONFIG_RESPONSE_EXCEPTION:true}
       warmups: ${CONFIG_WARMUP_SERVICES:}
       systemPaths: ${CONFIG_SYSTEM_HTTP_PATHS}
       concurrencyLimiter:
@@ -178,13 +186,16 @@ agent:
         type: Resilience4j
         cleanInterval: 30000
         expireTime: 60000
+      monitor:
+        forwardEnabled: ${CONFIG_MONITOR_FORWARD_TRAFFIC_ENABLED:}
+        rejectEnabled: true
     live:
       fallbackLocationIfNoSpace: ${CONFIG_FALLBACK_LOCATION_IF_NO_SPACE:false}
       topics: ${CONFIG_LIVE_TOPICS}
-      modifyMQGroupEnabled: ${CONFIG_LIVE_MODIFY_MQ_GROUP:false}
+      modifyMQGroupEnabled: ${CONFIG_LIVE_MODIFY_MQ_GROUP:true}
     lane:
       topics: ${CONFIG_LANE_TOPICS}
-      modifyMQGroupEnabled: ${CONFIG_LANE_MODIFY_MQ_GROUP:false}
+      modifyMQGroupEnabled: ${CONFIG_LANE_MODIFY_MQ_GROUP:true}
     router:
       virtual: ${CONFIG_VIRTUAL_SIZE:500}
       spring:

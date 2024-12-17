@@ -55,9 +55,9 @@ agent:
     type: otlp.grpc # otlp.grpc
     endpoint: http://otel-collector.joylive.svc:4317
   switch:
-    live: true
+    live: false
     lane: false
-    flowcontrol: true
+    flowcontrol: false
 
 otel:
   replicas: 2
