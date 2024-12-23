@@ -112,6 +112,7 @@ data:
     app.location.laneSpaceId=${APPLICATION_LOCATION_LANESPACE_ID}
     app.location.lane=${APPLICATION_LOCATION_LANE}
     agent.enhance.shutdownOnError=${CONFIG_ENHANCE_SHUTDOWN_ON_ERROR:true}
+    agent.enhance.excludeApp=${CONFIG_ENHANCE_EXCLUDE_APPS:com.taobao.arthas.boot.Bootstrap,org.netbeans.Main}
     classloader.contextLoaderEnabled=${CLASSLOADER_CONTEXT_LOADER_ENABLED:true}
     classloader.core.configExtensions=yaml,yml,xml,json,properties
     #classloader.core.parentResources=
@@ -138,6 +139,7 @@ data:
         excludeInterfaces: null
         excludeClassLoaders:
           - com.jd.jr.sgm.agent.loader.ClientLibClassLoader
+          - com.jd.jr.sgm.agent.loader.ClientAppClassLoader
           - com.jd.pfinder.profiler.load.InterceptorClassLoader
           - com.jd.pfinder.profiler.utils.ModuleClassLoader
           - com.jd.pfinder.profiler.load.ModuleInterceptorClassLoader
@@ -516,18 +518,13 @@ data:
       prometheus:
         endpoint: 0.0.0.0:8889
         namespace: ''
-      logging: {}
     service:
       extensions: [zpages]
       pipelines:
-        traces:
-          receivers: [otlp]
-          processors: [memory_limiter, batch]
-          exporters: [logging]
         metrics:
           receivers: [otlp]
           processors: [memory_limiter, batch]
-          exporters: [logging, prometheus]
+          exporters: [prometheus]
 ---
 # Source: joylive-injector/templates/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -666,6 +663,15 @@ spec:
         app: joylive-injector
     spec:
       serviceAccountName: joylive-injector
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: joylive-injector
+                topologyKey: "kubernetes.io/hostname"
       containers:
         - env:
             - name: log.level
@@ -736,7 +742,7 @@ spec:
         - command:
             - "/otelcol"
             - "--config=/conf/otel-collector-config.yaml"
-          image: otel/opentelemetry-collector:0.100.0
+          image: otel/opentelemetry-collector:0.115.1
           name: otel-collector
           resources:
             limits:
@@ -806,7 +812,7 @@ webhooks:
     admissionReviewVersions: [ "v1", "v1beta1" ]
     sideEffects: None
     timeoutSeconds: 5
-    failurePolicy: Ignore
+    failurePolicy: Fail
     objectSelector:
       matchLabels: 
         x-live-enabled : "true"
@@ -828,7 +834,7 @@ webhooks:
     admissionReviewVersions: [ "v1", "v1beta1" ]
     sideEffects: None
     timeoutSeconds: 5
-    failurePolicy: Ignore
+    failurePolicy: Fail
     objectSelector:
       matchLabels: 
         x-live-enabled : "true"
@@ -853,6 +859,8 @@ metadata:
 spec:
   endpoints:
     - port: prometheus
+      interval: 10s
+    - port: metrics
       interval: 10s
   namespaceSelector:
     any: true

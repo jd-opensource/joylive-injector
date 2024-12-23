@@ -15,6 +15,15 @@ spec:
         app: {{ include "joylive-injector.name" . }}
     spec:
       serviceAccountName: {{ include "joylive-injector.serviceAccountName" . }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: {{ include "joylive-injector.name" . }}
+                topologyKey: "kubernetes.io/hostname"
       containers:
         - env:
             - name: log.level
