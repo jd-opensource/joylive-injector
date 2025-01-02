@@ -144,6 +144,7 @@ data:
           - com.jd.pfinder.profiler.utils.ModuleClassLoader
           - com.jd.pfinder.profiler.load.ModuleInterceptorClassLoader
           - io.opentelemetry.javaagent.bootstrap.AgentClassLoader
+          - io.opentelemetry.javaagent.tooling.ExtensionClassLoader
           - org.apache.skywalking.apm.agent.core.plugin.loader.AgentClassLoader
           - org.apache.skywalking.apm.agent.core.plugin.loader.PluginClassLoader
           - com.navercorp.pinpoint.bootstrap.classloader.AgentClassLoader
@@ -275,7 +276,7 @@ data:
           enabled: ${CONFIG_TRANSMISSION_ENABLED:true}
           threadpool: ${CONFIG_TRANSMISSION_THREADPOOL_ENABLED:true}
         registry:
-          enabled: ${CONFIG_REGISTRY_ENABLED:${CONFIG_FLOW_CONTROL_ENABLED}}
+          enabled: ${CONFIG_REGISTRY_ENABLED:true}
         flowcontrol:
           enabled: ${CONFIG_FLOW_CONTROL_ENABLED:false}
           localhost: ${CONFIG_LOCALHOST_ENABLED:false}
@@ -323,10 +324,10 @@ data:
         live:
           fallbackLocationIfNoSpace: ${CONFIG_FALLBACK_LOCATION_IF_NO_SPACE:false}
           topics: ${CONFIG_LIVE_TOPICS}
-          modifyMQGroupEnabled: ${CONFIG_LIVE_MODIFY_MQ_GROUP:true}
+          modifyMQGroupEnabled: ${CONFIG_LIVE_MODIFY_MQ_GROUP:false}
         lane:
           topics: ${CONFIG_LANE_TOPICS}
-          modifyMQGroupEnabled: ${CONFIG_LANE_MODIFY_MQ_GROUP:true}
+          modifyMQGroupEnabled: ${CONFIG_LANE_MODIFY_MQ_GROUP:false}
         router:
           virtual: ${CONFIG_VIRTUAL_SIZE:500}
           spring:
@@ -347,29 +348,15 @@ data:
             - x-service-
           thread:
             excludeExecutors:
-              - org.apache.dubbo.common.threadpool.ThreadlessExecutor
-              - org.apache.tomcat.util.threads.ThreadPoolExecutor
-              - org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor
-              - org.apache.tomcat.util.threads.InlineExecutorService
-              - javax.management.NotificationBroadcasterSupport$1
-              - io.grpc.stub.ClientCalls.ThreadlessExecutor
-              - io.grpc.SynchronizationContext
               - io.netty.channel.MultithreadEventLoopGroup
               - io.netty.channel.nio.NioEventLoop
               - io.netty.channel.SingleThreadEventLoop
               - io.netty.channel.kqueue.KQueueEventLoopGroup
               - io.netty.channel.kqueue.KQueueEventLoop
-              - io.netty.util.concurrent.MultithreadEventExecutorGroup
-              - io.netty.util.concurrent.AbstractEventExecutorGroup
-              - io.netty.util.concurrent.ThreadPerTaskExecutor
-              - io.netty.util.concurrent.GlobalEventExecutor
-              - io.netty.util.concurrent.AbstractScheduledEventExecutor
-              - io.netty.util.concurrent.AbstractEventExecutor
-              - io.netty.util.concurrent.DefaultEventExecutor
-              - io.netty.util.concurrent.SingleThreadEventExecutor
-              - io.netty.util.internal.ThreadExecutorMap$1
-              - reactor.core.scheduler.BoundedElasticScheduler$BoundedScheduledExecutorService
-              - reactor.netty.resources.ColocatedEventLoopGroup
+              - org.apache.tomcat.util.threads.ThreadPoolExecutor
+              - org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor
+              - org.apache.tomcat.util.threads.InlineExecutorService
+              - javax.management.NotificationBroadcasterSupport$1
               - com.alibaba.nacos.shaded.io.grpc.netty.shaded.io.netty.channel.nio.NioEventLoopGroup
               - com.alibaba.nacos.shaded.io.grpc.netty.shaded.io.netty.channel.MultithreadEventLoopGroup
               - com.alibaba.nacos.shaded.io.grpc.netty.shaded.io.netty.util.concurrent.MultithreadEventExecutorGroup
@@ -390,6 +377,7 @@ data:
               - com.alibaba.nacos.shaded.io.grpc.SynchronizationContext
               - com.alibaba.nacos.shaded.com.google.common.util.concurrent.DirectExecutor
             excludeTasks:
+              - com.alibaba.nacos.common.executor.NameThreadFactory
               - com.alibaba.nacos.shaded.io.grpc.internal.DnsNameResolver.Resolve
               - com.alibaba.nacos.client.naming.backups.FailoverReactor$DiskFileWriter
               - com.alibaba.nacos.client.naming.backups.FailoverReactor.SwitchRefresher
@@ -398,8 +386,25 @@ data:
               - com.alibaba.nacos.shaded.io.grpc.internal.DelayedClientTransport$5
               - com.alibaba.nacos.shaded.io.grpc.internal.SerializingExecutor
               - com.alibaba.nacos.shaded.io.grpc.internal.LogExceptionRunnable
+              - com.alibaba.nacos.shaded.com.google.common.util.concurrent.ThreadFactoryBuilder$1
               - com.jd.live.agent.core.thread.NamedThreadFactory
               - com.jd.jr.sgm.client.disruptor.LogEventFactory
+              - com.jd.jr.sgm.client.util.AgentThreadFactory
+              - com.jd.pfinder.profiler.common.util.NamedThreadFactory
+              - io.opentelemetry.sdk.internal.DaemonThreadFactory
+              - io.sermant.dubbo.registry.factory.RegistryNotifyThreadFactory
+              - io.sermant.dynamic.config.init.DynamicConfigThreadFactory
+              - io.sermant.flowcontrol.common.factory.FlowControlThreadFactory
+              - io.sermant.loadbalancer.factory.LoadbalancerThreadFactory
+              - io.sermant.core.utils.ThreadFactoryUtils
+              - io.sermant.implement.service.xds.handler.XdsHandler.NamedThreadFactory
+              - io.sermant.discovery.factory.RealmServiceThreadFactory
+              - org.apache.skywalking.apm.agent.core.boot.DefaultNamedThreadFactory
+              - sun.rmi.runtime.RuntimeUtil$1
+              - sun.rmi.transport.tcp.TCPTransport$1
+              - sun.rmi.transport.DGCImpl$1
+              - sun.rmi.transport.DGCAckHandler$1
+              - org.apache.tomcat.util.threads.TaskThreadFactory
             excludeTaskPrefixes:
               - reactor.core.scheduler.BoundedElasticScheduler$$Lambda
               - org.springframework.cloud.commons.util.InetUtils$$Lambda$
@@ -408,9 +413,8 @@ data:
               - com.alibaba.nacos.client.naming.remote.NamingClientProxyDelegate$$Lambda$
               - com.alibaba.nacos.common.remote.client.RpcClient$$Lambda$
               - com.alibaba.nacos.common.utils.ThreadFactoryBuilder$$Lambda$
-              - sun.rmi.transport.tcp.TCPTransport$
-              - sun.rmi.transport.DGCImpl$
-              - sun.rmi.transport.DGCAckHandler$
+              - org.apache.catalina.core.ContainerBase$
+              - org.apache.catalina.core.StandardServer$$Lambda$
       counter:
         gateway: true
         service: true
@@ -419,6 +423,7 @@ data:
           type: ${CONFIG_COUNTER_EXPORTER_TYPE:otlp.grpc}
           endpoint: ${CONFIG_COUNTER_EXPORTER_ENDPOINT:http://otel-collector.joylive.svc:4317}
           timeout: 5000
+    
   injector.yaml: |
     # Define the version, environment variables, and other information of joylive-injector injecting joylive-agent
     agent:
