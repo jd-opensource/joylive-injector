@@ -58,6 +58,7 @@ agent:
     live: false
     lane: false
     flowcontrol: false
+    configcenter: false
 
 otel:
   replicas: 2

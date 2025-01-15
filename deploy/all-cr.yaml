@@ -282,6 +282,8 @@ data:
           enabled: ${CONFIG_FLOW_CONTROL_ENABLED:false}
           localhost: ${CONFIG_LOCALHOST_ENABLED:false}
           virtual: ${CONFIG_VIRTUAL_ENABLED:false}
+        configcenter:
+          enabled: ${CONFIG_CENTER_ENABLED:false}
         protect:
           enabled: ${CONFIG_PROTECT_ENABLED:false}
           mariadb: true
@@ -337,6 +339,8 @@ data:
           phevos:
             groupExpression: ${unit}-${cell}-${group}
         transmission:
+          type: ${CONFIG_TRANSMISSION_TYPE:live}
+          autoDetect: ${CONFIG_TRANSMISSION_AUTO_DETECT:NONE}
           keys:
             - x-live-space-id
             - x-live-rule-id
@@ -416,6 +420,15 @@ data:
               - com.alibaba.nacos.common.utils.ThreadFactoryBuilder$$Lambda$
               - org.apache.catalina.core.ContainerBase$
               - org.apache.catalina.core.StandardServer$$Lambda$
+        configcenter:
+          type: nacos
+          address: ${CONFIG_CENTER_ADDRESS:${NACOS_CONFIG_EXTERNAL_ADDRESS}:${NACOS_CONFIG_EXTERNAL_HTTP_PORT}}
+          username: ${CONFIG_CENTER_USERNAME:${NACOS_CONFIG_USERNAME:nacos}}
+          password: ${CONFIG_CENTER_PASSWORD:${NACOS_CONFIG_PASSWORD:nacos}}
+          name:
+            namespace: ${CONFIG_CENTER_NAMESPACE:public}
+            name: ${CONFIG_CENTER_NAME:${APPLICATION_NAME}}
+            profile: ${CONFIG_CENTER_PROFILE:DEFAULT_GROUP}
       counter:
         gateway: true
         service: true
