@@ -59,7 +59,17 @@ agent:
     lane: false
     flowcontrol: false
     configcenter: false
-
+  location:
+    cloud:
+    region:
+    zone:
+    cluster:
+    liveSpaceId:
+    unitRuleId:
+    unit:
+    cell:
+    laneSpaceId:
+    lane: base
 otel:
   replicas: 2
   image:
