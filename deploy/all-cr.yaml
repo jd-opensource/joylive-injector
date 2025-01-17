@@ -99,7 +99,7 @@ data:
     app.service.namespace=${APPLICATION_SERVICE_NAMESPACE:default}
     app.service.group=${APPLICATION_SERVICE_GROUP:default}
     app.service.gateway=${APPLICATION_SERVICE_GATEWAY:NONE}
-    app.service.weight=${APPLICATION_SERVICE_WEIGHT:}
+    app.service.weight=${APPLICATION_SERVICE_WEIGHT:100}
     app.service.warmupDuration=${APPLICATION_SERVICE_WARMUP_DURATION:}
     app.location.cloud=${APPLICATION_LOCATION_CLOUD:}
     app.location.region=${APPLICATION_LOCATION_REGION:}
@@ -166,21 +166,20 @@ data:
           - grpc
           - httpclient
           - jdk
-          - jmq
-          - jsf
           - kafka
-          - okhttp
-          - netty
-          - phevos
-          - rocketmq
-          - shenyu
-          - sofarpc
-          - spring
           - mariadb
           - mongodb
+          - nacos
+          - netty
+          - okhttp
           - opengauss
           - postgresql
+          - pulsar
+          - rabbitmq
           - redis
+          - rocketmq
+          - sofarpc
+          - spring
         disables: null
         dynamics: null
         profiles:
@@ -322,7 +321,7 @@ data:
             cleanInterval: 30000
             expireTime: 60000
           monitor:
-            forwardEnabled: ${CONFIG_MONITOR_FORWARD_TRAFFIC_ENABLED:}
+            forwardEnabled: ${CONFIG_MONITOR_FORWARD_TRAFFIC_ENABLED:true}
             rejectEnabled: true
         live:
           fallbackLocationIfNoSpace: ${CONFIG_FALLBACK_LOCATION_IF_NO_SPACE:false}
