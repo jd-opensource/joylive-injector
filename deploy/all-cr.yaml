@@ -208,8 +208,8 @@ data:
             secretKey: ${CONFIG_MULTILIVE_SECRET_KEY:}
           # for nacos
           nacos:
-            username: ${CONFIG_NACOS_USERNAME:nacos}
-            password: ${CONFIG_NACOS_PASSWORD:nacos}
+            username: ${CONFIG_NACOS_USERNAME:guest}
+            password: ${CONFIG_NACOS_PASSWORD:guest}
             namespace: ${CONFIG_NACOS_NAMESPACE:public}
             liveSpaceGroup: ${CONFIG_NACOS_GROUP_LIVE_SPACE:DEFAULT_GROUP}
             liveSpacesKey: ${CONFIG_NACOS_KEY_LIVE_SPACES:govern-liveSpaces}
@@ -229,8 +229,8 @@ data:
             spaceUrl: /laneSpace/${space_id}/version/${space_version}
           # for nacos
           nacos:
-            username: ${CONFIG_NACOS_USERNAME:nacos}
-            password: ${CONFIG_NACOS_PASSWORD:nacos}
+            username: ${CONFIG_NACOS_USERNAME:guest}
+            password: ${CONFIG_NACOS_PASSWORD:guest}
             namespace: ${CONFIG_NACOS_NAMESPACE:public}
             laneSpaceGroup: ${CONFIG_NACOS_GROUP_LANE_SPACE:DEFAULT_GROUP}
             laneSpacesKey: ${CONFIG_NACOS_KEY_LANE_SPACES:govern-laneSpaces}
@@ -249,8 +249,8 @@ data:
             serviceUrl: /space/${space}/service/${service_name}/version/${service_version}?application=${application}
           # for nacos
           nacos:
-            username: ${CONFIG_NACOS_USERNAME:nacos}
-            password: ${CONFIG_NACOS_PASSWORD:nacos}
+            username: ${CONFIG_NACOS_USERNAME:guest}
+            password: ${CONFIG_NACOS_PASSWORD:guest}
             namespace: ${CONFIG_NACOS_NAMESPACE:public}
             serviceGroup: ${CONFIG_NACOS_GROUP_SERVICE:DEFAULT_GROUP}
             serviceKeyTemplate: ${CONFIG_NACOS_KEY_SERVICE_TEMPLATE:govern-service-${name}}
@@ -422,8 +422,8 @@ data:
         configcenter:
           type: nacos
           address: ${CONFIG_CENTER_ADDRESS:${NACOS_CONFIG_EXTERNAL_ADDRESS}:${NACOS_CONFIG_EXTERNAL_HTTP_PORT}}
-          username: ${CONFIG_CENTER_USERNAME:${NACOS_CONFIG_USERNAME:nacos}}
-          password: ${CONFIG_CENTER_PASSWORD:${NACOS_CONFIG_PASSWORD:nacos}}
+          username: ${CONFIG_CENTER_USERNAME:${CONFIG_USERNAME:guest}}
+          password: ${CONFIG_CENTER_PASSWORD:${CONFIG_PASSWORD:guest}}
           name:
             namespace: ${CONFIG_CENTER_NAMESPACE:public}
             name: ${CONFIG_CENTER_NAME:${APPLICATION_NAME}}
