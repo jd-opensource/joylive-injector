@@ -169,7 +169,7 @@ agent:
     initializeTimeout: ${CONFIG_POLICY_INITIALIZE_TIMEOUT:10000}
     service:
       localFirst: ${CONFIG_LOCAL_FIRST:true}
-      localFirstMode: ${CONFIG_LOCAL_FIRST_MODE:CELL}
+      localFirstMode: ${CONFIG_LOCAL_FIRST_MODE:{{ .Values.agent.governance.service.localFirstMode }}}
       serviceGroups: ${CONFIG_SERVICE_GROUPS:}
       serviceGroupOpen: ${CONFIG_SERVICE_GROUP_OPEN:true}
       responseException: ${CONFIG_RESPONSE_EXCEPTION:true}

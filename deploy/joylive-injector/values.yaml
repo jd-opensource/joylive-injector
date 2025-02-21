@@ -59,6 +59,9 @@ agent:
     lane: false
     flowcontrol: false
     configcenter: false
+  governance:
+    service:
+      localFirstMode: CLUSTER
   location:
     cloud:
     region:
