@@ -425,6 +425,7 @@ data:
           address: ${CONFIG_CENTER_ADDRESS:${NACOS_CONFIG_EXTERNAL_ADDRESS}:${NACOS_CONFIG_EXTERNAL_HTTP_PORT}}
           username: ${CONFIG_CENTER_USERNAME:${CONFIG_USERNAME:guest}}
           password: ${CONFIG_CENTER_PASSWORD:${CONFIG_PASSWORD:guest}}
+          names: ${CONFIG_CENTER_NAMES:}
           name:
             namespace: ${CONFIG_CENTER_NAMESPACE:public}
             name: ${CONFIG_CENTER_NAME:${APPLICATION_NAME}}
