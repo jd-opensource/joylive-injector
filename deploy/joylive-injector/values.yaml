@@ -71,7 +71,7 @@ agent:
     unitRuleId:
     unit:
     cell:
-    laneSpaceId: default
+    laneSpaceId:
     lane: base
 otel:
   replicas: 2
