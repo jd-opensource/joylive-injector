@@ -139,10 +139,7 @@ func makePodEnvs(pod *corev1.Pod) []corev1.EnvVar {
 
 		for _, prefix := range validPrefixes {
 			if strings.HasPrefix(labelKey, prefix) {
-				trimmedKey := strings.TrimPrefix(labelKey, prefix)
-				if trimmedKey != "" {
-					metaPairs = append(metaPairs, fmt.Sprintf("%s=%s", trimmedKey, labelValue))
-				}
+				metaPairs = append(metaPairs, fmt.Sprintf("%s=%s", labelKey, labelValue))
 				break
 			}
 		}
