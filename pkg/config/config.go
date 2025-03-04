@@ -1,11 +1,12 @@
 package config
 
 import (
+	"os"
+
 	v1 "github.com/jd-opensource/joylive-injector/client-go/apis/injector/v1"
 	"github.com/jd-opensource/joylive-injector/pkg/log"
 	"github.com/jd-opensource/joylive-injector/pkg/resource"
 	"go.uber.org/zap"
-	"os"
 )
 
 const (
@@ -20,6 +21,7 @@ const (
 	InitContainerArgs     = "-c, cp -r /joylive/* /agent && chmod -R 777 /agent"
 	ConfigMapEnvName      = "JOYLIVE_CONFIGMAP_NAME"
 	NamespaceEnvName      = "JOYLIVE_NAMESPACE"
+	MatchLabelsEnvName    = "JOYLIVE_MATCH_ENV_LABELS"
 	DefaultNamespace      = "joylive"
 	AgentVersionLabel     = "x-live-version"
 	LiveSpaceIdLabel      = "x-live-space-id"
@@ -32,7 +34,7 @@ var (
 	Key                string
 	Addr               string
 	ConfigMountSubPath string
-	MatchLabel         string
+	MatchLabels        string
 )
 
 // injection_deploy config
@@ -70,6 +72,9 @@ func init() {
 	if err != nil {
 		log.Fatal("init agentVersion error", zap.Error(err))
 	}
+
+	// Initialize the default matchLabels from environment variables
+	MatchLabels = os.Getenv(MatchLabelsEnvName)
 }
 
 func GetNamespace() string {

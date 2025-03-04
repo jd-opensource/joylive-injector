@@ -300,7 +300,7 @@ data:
         initializeTimeout: ${CONFIG_POLICY_INITIALIZE_TIMEOUT:10000}
         service:
           localFirst: ${CONFIG_LOCAL_FIRST:true}
-          localFirstMode: ${CONFIG_LOCAL_FIRST_MODE:CLUSTER}
+          localFirstMode: ${CONFIG_LOCAL_FIRST_MODE:CELL}
           serviceGroups: ${CONFIG_SERVICE_GROUPS:}
           serviceGroupOpen: ${CONFIG_SERVICE_GROUP_OPEN:true}
           responseException: ${CONFIG_RESPONSE_EXCEPTION:true}
@@ -423,12 +423,12 @@ data:
         configcenter:
           type: nacos
           address: ${CONFIG_CENTER_ADDRESS:}
-          username: ${CONFIG_CENTER_USERNAME:${CONFIG_USERNAME:guest}}
-          password: ${CONFIG_CENTER_PASSWORD:${CONFIG_PASSWORD:guest}}
+          username: ${CONFIG_USERNAME:guest}
+          password: ${CONFIG_PASSWORD:guest}
           names: ${CONFIG_CENTER_NAMES:}
           name:
             namespace: ${CONFIG_CENTER_NAMESPACE:public}
-            name: ${CONFIG_CENTER_NAME:${APPLICATION_NAME}}
+            name: ${CONFIG_CENTER_NAME}
             profile: ${CONFIG_CENTER_PROFILE:DEFAULT_GROUP}
       counter:
         gateway: true
@@ -443,7 +443,7 @@ data:
     # Define the version, environment variables, and other information of joylive-injector injecting joylive-agent
     agent:
       image: ghcr.m.daocloud.io/jd-opensource/joylive-agent
-      version: v1.4.0
+      version: v1.6.0
       env:
         JAVA_TOOL_OPTIONS: -javaagent:/joylive/live.jar
   logback.xml: |
@@ -702,6 +702,8 @@ spec:
               value: joylive-injector-config
             - name: JOYLIVE_NAMESPACE
               value: joylive
+            - name: JOYLIVE_MATCH_ENV_LABELS
+              value: x-live, x-service
           name: joylive-injector
           image: ghcr.m.daocloud.io/jd-opensource/joylive-injector:v1.2.1
           imagePullPolicy: Always

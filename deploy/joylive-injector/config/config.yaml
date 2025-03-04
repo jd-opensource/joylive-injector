@@ -292,12 +292,12 @@ agent:
     configcenter:
       type: nacos
       address: ${CONFIG_CENTER_ADDRESS:}
-      username: ${CONFIG_CENTER_USERNAME:${CONFIG_USERNAME:guest}}
-      password: ${CONFIG_CENTER_PASSWORD:${CONFIG_PASSWORD:guest}}
+      username: ${CONFIG_USERNAME:guest}
+      password: ${CONFIG_PASSWORD:guest}
       names: ${CONFIG_CENTER_NAMES:}
       name:
         namespace: ${CONFIG_CENTER_NAMESPACE:public}
-        name: ${CONFIG_CENTER_NAME:${APPLICATION_NAME}}
+        name: ${CONFIG_CENTER_NAME}
         profile: ${CONFIG_CENTER_PROFILE:DEFAULT_GROUP}
   counter:
     gateway: true

@@ -4,14 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/jd-opensource/joylive-injector/pkg/log"
-	"go.uber.org/zap"
 	"net/http"
 	"os"
 	"os/signal"
 	"runtime"
 	"sync"
 	"syscall"
+
+	"github.com/jd-opensource/joylive-injector/pkg/log"
+	"go.uber.org/zap"
 
 	"github.com/jd-opensource/joylive-injector/pkg/admission"
 	_ "github.com/jd-opensource/joylive-injector/pkg/mutation"
@@ -97,7 +98,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&config.Addr, "listen", "l", ":443", "Admission Controller listen address")
 	rootCmd.PersistentFlags().StringVar(&config.Cert, "cert", "", "Admission Controller TLS cert")
 	rootCmd.PersistentFlags().StringVar(&config.Key, "key", "", "Admission Controller TLS cert key")
-	rootCmd.PersistentFlags().StringVar(&config.MatchLabel, "match-label", "x-live", "Match label")
+	rootCmd.PersistentFlags().StringVar(&config.MatchLabels, "match-label", config.MatchLabels, "Match label")
 
 	// admission config
 	rootCmd.PersistentFlags().StringVar(&config.InitContainerName, "init-container-name", "joylive-init-container", "Init container name")

@@ -3,9 +3,10 @@ package mutation
 import (
 	"encoding/json"
 	"fmt"
-	"go.uber.org/zap"
 	"net/http"
 	"strings"
+
+	"go.uber.org/zap"
 
 	"github.com/jd-opensource/joylive-injector/pkg/admission"
 	"github.com/jd-opensource/joylive-injector/pkg/config"
@@ -110,31 +111,60 @@ func injectionPod(request *admissionv1.AdmissionRequest) (*admissionv1.Admission
 }
 
 func makePodEnvs(pod *corev1.Pod) []corev1.EnvVar {
-	anoEnv := pod.Annotations
-	envs := make([]corev1.EnvVar, 0)
-	if _, ok := anoEnv[config.MatchLabel]; !ok {
-		log.Warnf("[mutation] /injection-pod: the annotations do not have %s", config.MatchLabel)
-		return envs
-	}
-	log.Debugf("[mutation] /injection-pod: the annotations is %s", anoEnv[config.MatchLabel])
-	anoEnvMap := make(map[string]string)
-	err := json.Unmarshal([]byte(anoEnv[config.MatchLabel]), &anoEnvMap)
-	if err != nil {
-		log.Errorf("[mutation] /injection-pod: failed to unmarshal annotations: %v", err)
-		return envs
-	}
-	for k, v := range anoEnvMap {
-		if k != "" && v != "" {
-			envs = append(envs, corev1.EnvVar{
-				Name:  k,
-				Value: v,
-			})
+	metaPairs := make([]string, 0)
+	rawPrefixes := config.MatchLabels
+
+	// Split multiple prefix configurations
+	prefixes := strings.Split(rawPrefixes, ",")
+	validPrefixes := make([]string, 0, len(prefixes))
+
+	// Clean up and validate prefixes
+	for _, p := range prefixes {
+		trimmed := strings.TrimSpace(p)
+		if trimmed != "" {
+			validPrefixes = append(validPrefixes, trimmed)
 		}
 	}
-	return envs
+
+	if len(validPrefixes) == 0 {
+		log.Warnf("[mutation] /injection-pod: no valid prefix configured in MatchLabels")
+		return nil
+	}
+
+	// Iterate through all labels, matching multiple prefixes
+	for labelKey, labelValue := range pod.Labels {
+		if labelValue == "" {
+			continue
+		}
+
+		for _, prefix := range validPrefixes {
+			if strings.HasPrefix(labelKey, prefix) {
+				trimmedKey := strings.TrimPrefix(labelKey, prefix)
+				if trimmedKey != "" {
+					metaPairs = append(metaPairs, fmt.Sprintf("%s=%s", trimmedKey, labelValue))
+				}
+				break
+			}
+		}
+	}
+
+	if len(metaPairs) > 0 {
+		metaValue := strings.Join(metaPairs, ";") + ";"
+		log.Debugf("[mutation] /injection-pod: APPLICATION_SERVICE_META=%s (prefixes: %v)",
+			metaValue, validPrefixes)
+		return []corev1.EnvVar{
+			{
+				Name:  "APPLICATION_SERVICE_META",
+				Value: metaValue,
+			},
+		}
+	}
+
+	log.Debugf("[mutation] /injection-pod: no labels matched with prefixes %v", validPrefixes)
+	return nil
 }
 
-func addPodInitContainer(targetPod *corev1.Pod, envs []corev1.EnvVar, deploymentName string) []corev1.Container {
+func addPodInitContainer(targetPod *corev1.Pod, _ []corev1.EnvVar, deploymentName string) []corev1.Container {
 	initContainers := targetPod.Spec.InitContainers
 	for _, container := range initContainers {
 		if container.Name == config.InitContainerName {

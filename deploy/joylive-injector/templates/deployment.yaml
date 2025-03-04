@@ -32,6 +32,8 @@ spec:
               value: {{ .Values.configMapName }}
             - name: JOYLIVE_NAMESPACE
               value: {{ .Values.namespace }}
+            - name: JOYLIVE_MATCH_ENV_LABELS
+              value: {{ .Values.matchEnvLabels }}
           name: joylive-injector
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}

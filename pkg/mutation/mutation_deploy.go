@@ -31,7 +31,7 @@ func init() {
 func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.AdmissionResponse, error) {
 	switch request.Kind.Kind {
 	case "Deployment":
-		log.Debugf("[mutation] ----- /injection-deploy: received request: %v,the operition is %s ", request.Resource, request.Operation)
+		log.Debugf("[mutation] /injection-deploy: received request: %v,the operition is %s ", request.Resource, request.Operation)
 		if request.Operation == apiv1.Operation("DELETE") {
 			log.Debugf("[mutation] /injection-deploy: received delete request name is : %s, namespace is %s ", request.Name, request.Namespace)
 			err := deleteConfigMap(request.Name, request.Namespace)

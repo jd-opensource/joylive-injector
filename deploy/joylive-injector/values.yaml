@@ -24,6 +24,8 @@ containerArgs:
   - --cert=/etc/kubernetes/ssl/dac.pem
   - --key=/etc/kubernetes/ssl/dac-key.pem
 
+matchEnvLabels: x-live, x-service
+
 imagePullSecrets: [ ]
 nameOverride: ""
 fullnameOverride: ""
@@ -35,7 +37,7 @@ serviceAccount:
 agent:
   image:
     repository: ghcr.m.daocloud.io/jd-opensource/joylive-agent
-    tag: v1.4.0
+    tag: v1.6.0
   sync:
     liveSpace:
       type: file
@@ -61,7 +63,7 @@ agent:
     configcenter: false
   governance:
     service:
-      localFirstMode: CLUSTER
+      localFirstMode: CELL
   location:
     cloud:
     region:
