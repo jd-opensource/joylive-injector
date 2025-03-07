@@ -111,13 +111,10 @@ func injectionPod(request *admissionv1.AdmissionRequest) (*admissionv1.Admission
 }
 
 func makePodEnvs(pod *corev1.Pod) []corev1.EnvVar {
-	metaPairs := make([]string, 0)
 	rawPrefixes := config.MatchLabels
-
 	// Split multiple prefix configurations
 	prefixes := strings.Split(rawPrefixes, ",")
 	validPrefixes := make([]string, 0, len(prefixes))
-
 	// Clean up and validate prefixes
 	for _, p := range prefixes {
 		trimmed := strings.TrimSpace(p)
@@ -125,40 +122,64 @@ func makePodEnvs(pod *corev1.Pod) []corev1.EnvVar {
 			validPrefixes = append(validPrefixes, trimmed)
 		}
 	}
-
 	if len(validPrefixes) == 0 {
 		log.Warnf("[mutation] /injection-pod: no valid prefix configured in MatchLabels")
 		return nil
 	}
-
+	var envs []corev1.EnvVar
 	// Iterate through all labels, matching multiple prefixes
 	for labelKey, labelValue := range pod.Labels {
 		if labelValue == "" {
 			continue
 		}
-
 		for _, prefix := range validPrefixes {
 			if strings.HasPrefix(labelKey, prefix) {
-				metaPairs = append(metaPairs, fmt.Sprintf("%s=%s", labelKey, labelValue))
+				envs = append(envs, corev1.EnvVar{
+					Name:  labelKey,
+					Value: labelValue,
+				})
 				break
 			}
 		}
 	}
-
-	if len(metaPairs) > 0 {
-		metaValue := strings.Join(metaPairs, ";") + ";"
-		log.Debugf("[mutation] /injection-pod: APPLICATION_SERVICE_META=%s (prefixes: %v)",
-			metaValue, validPrefixes)
-		return []corev1.EnvVar{
-			{
-				Name:  "APPLICATION_SERVICE_META",
-				Value: metaValue,
+	envs = append(envs,
+		corev1.EnvVar{
+			Name: "NODE_NAME",
+			ValueFrom: &corev1.EnvVarSource{
+				FieldRef: &corev1.ObjectFieldSelector{
+					FieldPath: "spec.nodeName",
+				},
 			},
+		},
+		corev1.EnvVar{
+			Name:  "NODE_ZONES",
+			Value: getNodeWithZone(),
+		})
+	return envs
+}
+
+func getNodeWithZone() string {
+	nodes, err := resource.GetResource().GetNodes()
+	if err != nil {
+		log.Error("[mutation] /injection-pod: failed to get nodes", zap.Error(err))
+		return ""
+	}
+
+	// Get all zones from all nodes
+	zoneMap := make(map[string][]string)
+	for _, node := range nodes.Items {
+		zone := node.Labels["topology.jdos.io/zone"]
+		if zone != "" {
+			zoneMap[zone] = append(zoneMap[zone], node.Name)
 		}
 	}
 
-	log.Debugf("[mutation] /injection-pod: no labels matched with prefixes %v", validPrefixes)
-	return nil
+	var zoneList []string
+	for zone, nodeNames := range zoneMap {
+		zoneList = append(zoneList, zone+":"+strings.Join(nodeNames, ","))
+	}
+
+	return strings.Join(zoneList, ";")
 }
 
 func addPodInitContainer(targetPod *corev1.Pod, _ []corev1.EnvVar, deploymentName string) []corev1.Container {
@@ -168,27 +189,6 @@ func addPodInitContainer(targetPod *corev1.Pod, _ []corev1.EnvVar, deploymentNam
 			log.Warnf("[mutation] /injection-pod: A container [%s] already exists, skipping the addition logic.", config.InitContainerName)
 			return initContainers
 		}
-	}
-	addVolumes := []corev1.VolumeMount{
-		{
-			Name:      AgentVolumeName,
-			MountPath: config.InitEmptyDirMountPath,
-		},
-		{
-			Name:      deploymentName + "-live-configmap",
-			MountPath: config.ConfigMountPath + "/" + config.AgentConfig,
-			SubPath:   config.AgentConfig,
-		},
-		{
-			Name:      deploymentName + "-live-configmap",
-			MountPath: config.ConfigMountPath + "/" + config.BootConfig,
-			SubPath:   config.BootConfig,
-		},
-		{
-			Name:      deploymentName + "-live-configmap",
-			MountPath: config.ConfigMountPath + "/" + config.LogConfig,
-			SubPath:   config.LogConfig,
-		},
 	}
 	agentVersion := config.DefaultInjectorConfig.AgentConfig.Version
 	if av, ok := targetPod.Labels[config.AgentVersionLabel]; ok {
@@ -205,7 +205,7 @@ func addPodInitContainer(targetPod *corev1.Pod, _ []corev1.EnvVar, deploymentNam
 		Name:  config.InitContainerName,
 		Image: config.DefaultInjectorConfig.AgentConfig.Image + ":" + agentVersion,
 		//Command:      strings.Split(conf.InitContainerCmd, ","),
-		VolumeMounts: addVolumes,
+		VolumeMounts: createAgentVolumeMounts(config.InitEmptyDirMountPath, deploymentName),
 		Env: func(envMap map[string]string) []corev1.EnvVar {
 			envVars := make([]corev1.EnvVar, 0, len(envMap))
 			for key, value := range envMap {
@@ -255,11 +255,20 @@ func modifyPodContainer(targetPod *corev1.Pod, envs []corev1.EnvVar, deploymentN
 			}
 			for _, env := range envs {
 				envMap[env.Name] = env
+				//if envVar, exist := envMap[env.Name]; exist {
+				//	envVar.Value = envVar.Value + env.Value
+				//} else {
+				//	envMap[env.Name] = env
+				//}
 			}
 
 			func(envMapConfig map[string]string) {
 				for key, value := range envMapConfig {
-					envMap[key] = corev1.EnvVar{Name: key, Value: value}
+					if envVar, exist := envMap[key]; exist {
+						envVar.Value = envVar.Value + " " + value
+					} else {
+						envMap[key] = corev1.EnvVar{Name: key, Value: value}
+					}
 				}
 			}(config.DefaultInjectorConfig.AgentConfig.Env)
 
@@ -271,27 +280,6 @@ func modifyPodContainer(targetPod *corev1.Pod, envs []corev1.EnvVar, deploymentN
 			log.Debugf("[mutation] /injection-pod: envs = %v", container.Env)
 
 			// add volumeMounts
-			volumesConfig := []corev1.VolumeMount{
-				{
-					Name:      AgentVolumeName,
-					MountPath: config.EmptyDirMountPath,
-				},
-				{
-					Name:      deploymentName + "-live-configmap",
-					MountPath: config.ConfigMountPath + "/" + config.AgentConfig,
-					SubPath:   config.AgentConfig,
-				},
-				{
-					Name:      deploymentName + "-live-configmap",
-					MountPath: config.ConfigMountPath + "/" + config.BootConfig,
-					SubPath:   config.BootConfig,
-				},
-				{
-					Name:      deploymentName + "-live-configmap",
-					MountPath: config.ConfigMountPath + "/" + config.LogConfig,
-					SubPath:   config.LogConfig,
-				},
-			}
 			agentVolumeMounts := container.VolumeMounts
 			addVolumeForContainer := true
 			for _, volume := range agentVolumeMounts {
@@ -302,13 +290,37 @@ func modifyPodContainer(targetPod *corev1.Pod, envs []corev1.EnvVar, deploymentN
 				}
 			}
 			if addVolumeForContainer {
-				container.VolumeMounts = append(agentVolumeMounts, volumesConfig...)
+				container.VolumeMounts = append(agentVolumeMounts, createAgentVolumeMounts(config.EmptyDirMountPath, deploymentName)...)
 				log.Debugf("[mutation] /injection-pod: volumes = %v", container.VolumeMounts)
 			}
 			containers = append(containers, container)
 		}
 	}
 	return containers
+}
+
+func createAgentVolumeMounts(agentVolumePath, deploymentName string) []corev1.VolumeMount {
+	return []corev1.VolumeMount{
+		{
+			Name:      AgentVolumeName,
+			MountPath: agentVolumePath,
+		},
+		{
+			Name:      deploymentName + "-live-configmap",
+			MountPath: config.ConfigMountPath + "/" + config.AgentConfig,
+			SubPath:   config.AgentConfig,
+		},
+		{
+			Name:      deploymentName + "-live-configmap",
+			MountPath: config.ConfigMountPath + "/" + config.BootConfig,
+			SubPath:   config.BootConfig,
+		},
+		{
+			Name:      deploymentName + "-live-configmap",
+			MountPath: config.ConfigMountPath + "/" + config.LogConfig,
+			SubPath:   config.LogConfig,
+		},
+	}
 }
 
 func addPodVolume(targetPod *corev1.Pod, deploymentName string) []corev1.Volume {

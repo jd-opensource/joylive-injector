@@ -10,6 +10,7 @@ rules:
       - events
       - configmaps
       - namespaces
+      - nodes
     verbs:
       - "*"
   - apiGroups:

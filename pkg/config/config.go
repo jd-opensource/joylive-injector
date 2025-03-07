@@ -24,17 +24,13 @@ const (
 	MatchLabelsEnvName    = "JOYLIVE_MATCH_ENV_LABELS"
 	DefaultNamespace      = "joylive"
 	AgentVersionLabel     = "x-live-version"
-	LiveSpaceIdLabel      = "x-live-space-id"
-	LiveUnitLabel         = "x-live-unit"
-	LiveCellLabel         = "x-live-cell"
 )
 
 var (
-	Cert               string
-	Key                string
-	Addr               string
-	ConfigMountSubPath string
-	MatchLabels        string
+	Cert        string
+	Key         string
+	Addr        string
+	MatchLabels string
 )
 
 // injection_deploy config

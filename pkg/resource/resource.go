@@ -110,3 +110,11 @@ func (r *Resource) GetDeploymentName(pod *corev1.Pod, namespace string) (string,
 	}
 	return "", errors.New("no corresponding resources found")
 }
+
+func (r *Resource) GetNodes() (*corev1.NodeList, error) {
+	nodeList, err := r.ClientSet.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+	return nodeList, nil
+}

@@ -1,5 +1,5 @@
-repo ?= ghcr.io/jd-opensource
-version:=1.2.1-$(shell git rev-parse --short HEAD)
+repo ?= hub.jdcloud.com/jmsf
+version:=1.2.1-$(shell git rev-parse --short HEAD)4
 
 ifeq (,$(shell go env GOBIN))
 GOBIN=$(shell go env GOPATH)/bin
@@ -19,14 +19,14 @@ build:
 
 image:
 	DOCKER_SCAN_SUGGEST=false
-	docker build --platform linux/amd64 -t $(repo)/joylive-injector:$(version)-AMD64 -f LocalBuild.dockerfile .
+	docker build --platform linux/amd64 -t $(repo)/joylive-injector:$(version)-amd64 -f LocalBuild.dockerfile .
 
 build-image:
 	DOCKER_SCAN_SUGGEST=false
-	docker build -t $(repo)/joylive-injector:$(version)-AMD64 .
+	docker build -t $(repo)/joylive-injector:$(version) .
 
 push:
-	docker push $(repo)/joylive-injector:$(version)-AMD64
+	docker push $(repo)/joylive-injector:$(version)-amd64
 
 build-charts-crs:
 	helm template joylive-injector deploy/joylive-injector --include-crds > deploy/all-cr.yaml

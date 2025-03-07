@@ -94,7 +94,6 @@ func init() {
 	rootCmd.SetVersionTemplate(fmt.Sprintf(versionTpl, runtime.GOOS+"/"+runtime.GOARCH, buildDate, buildCommit))
 
 	// webhook
-	rootCmd.PersistentFlags().StringVar(&config.ConfigMountSubPath, "config-mount-sub-path", "config", "Config file mount sub path")
 	rootCmd.PersistentFlags().StringVarP(&config.Addr, "listen", "l", ":443", "Admission Controller listen address")
 	rootCmd.PersistentFlags().StringVar(&config.Cert, "cert", "", "Admission Controller TLS cert")
 	rootCmd.PersistentFlags().StringVar(&config.Key, "key", "", "Admission Controller TLS cert key")
