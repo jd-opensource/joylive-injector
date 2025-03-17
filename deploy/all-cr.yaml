@@ -96,8 +96,8 @@ data:
   bootstrap.properties: |
     app.name=${APPLICATION_NAME}
     app.service.name=${APPLICATION_SERVICE_NAME:${APPLICATION_NAME}}
-    app.service.namespace=${APPLICATION_SERVICE_NAMESPACE:default}
-    app.service.group=${APPLICATION_SERVICE_GROUP:default}
+    app.service.namespace=${APPLICATION_SERVICE_NAMESPACE}
+    app.service.group=${APPLICATION_SERVICE_GROUP}
     app.service.gateway=${APPLICATION_SERVICE_GATEWAY:NONE}
     app.service.weight=${APPLICATION_SERVICE_WEIGHT:100}
     app.service.warmupDuration=${APPLICATION_SERVICE_WARMUP_DURATION:}
@@ -135,7 +135,7 @@ data:
         retransformEnabled: true
         poolEnabled: true
         loggerEnabled: true
-        exporterEnabled: false
+        exporterEnabled: ${CONFIG_ENHANCE_EXPORTER_ENABLED:false}
         excludePrefixes: null
         excludeTypes: null
         excludeInterfaces: null
@@ -261,8 +261,7 @@ data:
         interval: 100
         timeout: 5000
       switch:
-        live:
-          enabled: ${CONFIG_LIVE_ENABLED:false}
+        govern:
           mq: ${CONFIG_LIVE_MQ_ENABLED:false}
           dubbo: true
           grpc: true
@@ -271,6 +270,8 @@ data:
           spring: true
           phevos: true
           rocketmq: true
+        live:
+          enabled: ${CONFIG_LIVE_ENABLED:false}
         lane:
           enabled: ${CONFIG_LANE_ENABLED:false}
         transmission:
@@ -299,6 +300,7 @@ data:
         service:
           localFirst: ${CONFIG_LOCAL_FIRST:true}
           localFirstMode: ${CONFIG_LOCAL_FIRST_MODE:CELL}
+          cellFailoverThresholds: ${CELL_FAILOVER_THRESHOLDS}
           serviceGroups: ${CONFIG_SERVICE_GROUPS:}
           serviceGroupOpen: ${CONFIG_SERVICE_GROUP_OPEN:true}
           responseException: ${CONFIG_RESPONSE_EXCEPTION:true}
@@ -421,7 +423,7 @@ data:
               - com.jd.live.agent.shaded.
               - org.apache.catalina.core.ContainerBase$
               - org.apache.catalina.core.StandardServer$$Lambda$
-        configcenter:
+        configCenter:
           type: ${CONFIG_CENTER_TYPE:nacos}
           address: ${CONFIG_CENTER_ADDRESS:}
           username: ${CONFIG_CENTER_USERNAME:${CONFIG_USERNAME:guest}}
@@ -528,7 +530,10 @@ data:
     
         <logger name="com.jd.live.agent.bootstrap.bytekit.advice.AdviceHandler" level="${logger.advice.level}"/>
     
-        <logger name="com.jd.live.agent.governance.invoke.filter.RouteFilterChain" level="${logger.route.level}"/>
+        <logger name="com.jd.live.agent.governance.invoke.filter.RouteFilterChain" level="${logger.route.level}"
+                additivity="false">
+            <appender-ref ref="CONSOLE_APPENDER"/>
+        </logger>
     
         <root level="${logger.level}">
             <appender-ref ref="${LIVE_LOG_APPENDER:-ROLLING_APPENDER}"/>
@@ -733,7 +738,7 @@ spec:
             - name: JOYLIVE_MATCH_ENV_LABELS
               value: x-live, x-service
           name: joylive-injector
-          image: ghcr.m.daocloud.io/jd-opensource/joylive-injector:v1.2.1
+          image: ghcr.m.daocloud.io/jd-opensource/joylive-injector:v1.2.2
           imagePullPolicy: Always
           args:
             - --cert=/etc/kubernetes/ssl/dac.pem
