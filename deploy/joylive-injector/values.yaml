@@ -60,7 +60,7 @@ agent:
     live: false
     lane: false
     flowcontrol: false
-    configcenter: false
+    configCenter: false
   governance:
     service:
       localFirstMode: CELL
