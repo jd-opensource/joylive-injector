@@ -445,18 +445,21 @@ data:
           enabled: ${CONFIG_REGISTRY_ENABLED:false}
           clusters:
             - type: ${CONFIG_REGISTRY_TYPE_FIRST:nacos}
+              mode: ${CONFIG_REGISTRY_MODE_FIRST:FULL}
               address: ${CONFIG_REGISTRY_ADDRESS_FIRST}
               username: ${CONFIG_REGISTRY_USERNAME_FIRST:nacos}
               password: ${CONFIG_REGISTRY_PASSWORD_FIRST:nacos}
               namespace: ${CONFIG_REGISTRY_NAMESPACE_FIRST}
               group: ${CONFIG_REGISTRY_GROUP_FIRST}
             - type: ${CONFIG_REGISTRY_TYPE_SECOND:nacos}
+              mode: ${CONFIG_REGISTRY_MODE_FIRST:FULL}
               address: ${CONFIG_REGISTRY_ADDRESS_SECOND}
               username: ${CONFIG_REGISTRY_USERNAME_SECOND:nacos}
               password: ${CONFIG_REGISTRY_PASSWORD_SECOND:nacos}
               namespace: ${CONFIG_REGISTRY_NAMESPACE_SECOND}
               group: ${CONFIG_REGISTRY_GROUP_SECOND}
             - type: ${CONFIG_REGISTRY_TYPE_THIRD:nacos}
+              mode: ${CONFIG_REGISTRY_MODE_FIRST:FULL}
               address: ${CONFIG_REGISTRY_ADDRESS_THIRD}
               username: ${CONFIG_REGISTRY_USERNAME_THIRD:nacos}
               password: ${CONFIG_REGISTRY_PASSWORD_THIRD:nacos}
@@ -502,6 +505,7 @@ data:
         <property scope="context" name="logger.level" value="${LIVE_LOG_LEVEL:-info}"/>
         <property scope="context" name="logger.advice.level" value="${LIVE_LOG_ADVICE_LEVEL:-${logger.level}}"/>
         <property scope="context" name="logger.route.level" value="${LIVE_LOG_ROUTE_LEVEL:-${logger.level}}"/>
+        <property scope="context" name="logger.metric.level" value="${LIVE_LOG_METRIC_LEVEL:-${logger.level}}"/>
         <property scope="context" name="logger.totalSize" value="${LIVE_LOG_TOTAL_SIZE:-10GB}"/>
         <property scope="context" name="logger.maxHistory" value="${LIVE_LOG_MAX_HISTORY:-30}"/>
         <property scope="context" name="logger.maxFileSize" value="${LIVE_LOG_MAX_SIZE:-1GB}"/>
@@ -533,7 +537,14 @@ data:
     
         <logger name="com.jd.live.agent.bootstrap.bytekit.advice.AdviceHandler" level="${logger.advice.level}"/>
     
-        <logger name="com.jd.live.agent.governance.invoke.filter.RouteFilterChain" level="${logger.route.level}"
+        <logger name="com.jd.live.agent.governance.invoke.filter.RouteFilterChain"
+                level="${logger.route.level}"
+                additivity="false">
+            <appender-ref ref="CONSOLE_APPENDER"/>
+        </logger>
+    
+        <logger name="com.jd.live.agent.implement.event.opentelemetry.log.LoggingMetricExporter"
+                level="${logger.metric.level}"
                 additivity="false">
             <appender-ref ref="CONSOLE_APPENDER"/>
         </logger>

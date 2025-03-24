@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	AgentVolumeName       = "agent-empty-dir"
+	AgentVolumeName       = "joylive-agent-dir"
 	MutatingWebhookConfig = "mutating-webhook-config"
 	DefaultCPU            = "200m"
 	DefaultMemory         = "300Mi"
