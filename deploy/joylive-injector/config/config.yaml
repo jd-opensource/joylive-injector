@@ -7,7 +7,6 @@ agent:
     exporterEnabled: ${CONFIG_ENHANCE_EXPORTER_ENABLED:false}
     excludePrefixes: null
     excludeTypes: null
-    excludeInterfaces: null
     excludeClassLoaders:
       - com.jd.jr.sgm.agent.loader.ClientLibClassLoader
       - com.jd.jr.sgm.agent.loader.ClientAppClassLoader
@@ -150,8 +149,6 @@ agent:
       enabled: ${CONFIG_FLOW_CONTROL_ENABLED:{{ .Values.agent.switch.flowcontrol }}}
       localhost: ${CONFIG_LOCALHOST_ENABLED:false}
       virtual: ${CONFIG_VIRTUAL_ENABLED:false}
-    configCenter:
-      enabled: ${CONFIG_CENTER_ENABLED:{{ .Values.agent.switch.configCenter }}}
     protect:
       enabled: ${CONFIG_PROTECT_ENABLED:false}
       mariadb: true
@@ -293,10 +290,11 @@ agent:
           - org.apache.catalina.core.ContainerBase$
           - org.apache.catalina.core.StandardServer$$Lambda$
     configCenter:
+      enabled: ${CONFIG_CENTER_ENABLED:{{ .Values.agent.switch.configCenter }}}
       type: ${CONFIG_CENTER_TYPE:nacos}
-      address: ${CONFIG_CENTER_ADDRESS:}
-      username: ${CONFIG_CENTER_USERNAME:${CONFIG_USERNAME:guest}}
-      password: ${CONFIG_CENTER_PASSWORD:${CONFIG_PASSWORD:guest}}
+      address: ${CONFIG_CENTER_ADDRESS:${CONFIG_EXTERNAL_HOST:${CONFIG_INTERNAL_HOST}}:${CONFIG_EXTERNAL_HTTP_PORT:${CONFIG_INTERNAL_HTTP_PORT:8848}}}
+      username: ${CONFIG_CENTER_USERNAME:${CONFIG_USERNAME:nacos}}
+      password: ${CONFIG_CENTER_PASSWORD:${CONFIG_PASSWORD:nacos}}
       refresh:
         environmentEnabled: ${CONFIG_CENTER_REFRESH_ENVIRONMENT_ENABLED:false}
         beanEnabled: ${CONFIG_CENTER_REFRESH_BEAN_ENABLED:true}
@@ -306,33 +304,36 @@ agent:
         ignoreKeyPrefixes: ${CONFIG_CENTER_REFRESH_IGNORE_KEY_PREFIXES:}
       names: ${CONFIG_CENTER_NAMES:}
       name:
-        namespace: ${CONFIG_CENTER_NAMESPACE:public}
+        namespace: ${CONFIG_CENTER_NAMESPACE:${APPLICATION_SERVICE_NAMESPACE}}
         name: ${CONFIG_CENTER_NAME:${APPLICATION_NAME}}
-        profile: ${CONFIG_CENTER_PROFILE:DEFAULT_GROUP}
+        profile: ${CONFIG_CENTER_PROFILE:${APPLICATION_SERVICE_GROUP}}
     registry:
       enabled: ${CONFIG_REGISTRY_ENABLED:false}
+      host:
+        enabled: ${CONFIG_HOST_SERVICE_ENABLED:true}
+        services: ${CONFIG_HOST_SERVICES}
       clusters:
         - type: ${CONFIG_REGISTRY_TYPE_FIRST:nacos}
           mode: ${CONFIG_REGISTRY_MODE_FIRST:FULL}
-          address: ${CONFIG_REGISTRY_ADDRESS_FIRST}
-          username: ${CONFIG_REGISTRY_USERNAME_FIRST:nacos}
-          password: ${CONFIG_REGISTRY_PASSWORD_FIRST:nacos}
-          namespace: ${CONFIG_REGISTRY_NAMESPACE_FIRST}
-          group: ${CONFIG_REGISTRY_GROUP_FIRST}
+          address: ${CONFIG_REGISTRY_ADDRESS_FIRST:${REGISTRY_EXTERNAL_HOST:${REGISTRY_INTERNAL_HOST}}:${REGISTRY_EXTERNAL_HTTP_PORT:${REGISTRY_INTERNAL_HTTP_PORT:8848}}}
+          username: ${CONFIG_REGISTRY_USERNAME_FIRST:${REGISTRY_USERNAME:nacos}}
+          password: ${CONFIG_REGISTRY_PASSWORD_FIRST:${REGISTRY_PASSWORD:nacos}}
+          namespace: ${CONFIG_REGISTRY_NAMESPACE_FIRST:${APPLICATION_SERVICE_NAMESPACE}}
+          group: ${CONFIG_REGISTRY_GROUP_FIRST:${APPLICATION_SERVICE_GROUP}}
         - type: ${CONFIG_REGISTRY_TYPE_SECOND:nacos}
-          mode: ${CONFIG_REGISTRY_MODE_FIRST:FULL}
+          mode: ${CONFIG_REGISTRY_MODE_SECOND:FULL}
           address: ${CONFIG_REGISTRY_ADDRESS_SECOND}
-          username: ${CONFIG_REGISTRY_USERNAME_SECOND:nacos}
-          password: ${CONFIG_REGISTRY_PASSWORD_SECOND:nacos}
-          namespace: ${CONFIG_REGISTRY_NAMESPACE_SECOND}
-          group: ${CONFIG_REGISTRY_GROUP_SECOND}
+          username: ${CONFIG_REGISTRY_USERNAME_SECOND:${REGISTRY_USERNAME:nacos}}
+          password: ${CONFIG_REGISTRY_PASSWORD_SECOND:${REGISTRY_PASSWORD:nacos}}
+          namespace: ${CONFIG_REGISTRY_NAMESPACE_SECOND:${APPLICATION_SERVICE_NAMESPACE}}
+          group: ${CONFIG_REGISTRY_GROUP_SECOND:${APPLICATION_SERVICE_GROUP}}
         - type: ${CONFIG_REGISTRY_TYPE_THIRD:nacos}
-          mode: ${CONFIG_REGISTRY_MODE_FIRST:FULL}
+          mode: ${CONFIG_REGISTRY_MODE_THIRD:FULL}
           address: ${CONFIG_REGISTRY_ADDRESS_THIRD}
-          username: ${CONFIG_REGISTRY_USERNAME_THIRD:nacos}
-          password: ${CONFIG_REGISTRY_PASSWORD_THIRD:nacos}
-          namespace: ${CONFIG_REGISTRY_NAMESPACE_THIRD}
-          group: ${CONFIG_REGISTRY_GROUP_THIRD}
+          username: ${CONFIG_REGISTRY_USERNAME_THIRD:${REGISTRY_USERNAME:nacos}}
+          password: ${CONFIG_REGISTRY_PASSWORD_THIRD:${REGISTRY_PASSWORD:nacos}}
+          namespace: ${CONFIG_REGISTRY_NAMESPACE_THIRD:${APPLICATION_SERVICE_NAMESPACE}}
+          group: ${CONFIG_REGISTRY_GROUP_THIRD:${APPLICATION_SERVICE_GROUP}}
   counter:
     gateway: true
     service: true
