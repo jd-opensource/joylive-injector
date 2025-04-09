@@ -13,7 +13,7 @@ type AgentInjectorConfig struct {
 type Agent struct {
 	Image   string            `yaml:"image"`
 	Version string            `yaml:"version"`
-	Env     map[string]string `json:"env"`
+	Envs    map[string]string `json:"envs"`
 }
 
 func GetAgentInjectConfig(yamlData string) (*AgentInjectorConfig, error) {

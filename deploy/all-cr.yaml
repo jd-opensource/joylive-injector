@@ -462,7 +462,7 @@ data:
     agent:
       image: ghcr.m.daocloud.io/jd-opensource/joylive-agent
       version: v1.6.0
-      env:
+      envs:
         JAVA_TOOL_OPTIONS: -javaagent:/joylive/live.jar
   logback.xml: |
     <?xml version="1.0" encoding="UTF-8"?>
