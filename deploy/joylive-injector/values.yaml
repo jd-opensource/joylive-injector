@@ -35,6 +35,7 @@ serviceAccount:
   name: joylive-injector
 
 agent:
+  env: JAVA_TOOL_OPTIONS
   image:
     repository: ghcr.m.daocloud.io/jd-opensource/joylive-agent
     tag: v1.6.0

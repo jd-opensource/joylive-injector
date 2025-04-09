@@ -3,4 +3,4 @@ agent:
   image: {{ .Values.agent.image.repository }}
   version: {{ .Values.agent.image.tag }}
   env:
-    JAVA_TOOL_OPTIONS: -javaagent:/joylive/live.jar
+    {{ .Values.agent.env }}: -javaagent:/joylive/live.jar
