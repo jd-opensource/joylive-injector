@@ -212,7 +212,7 @@ func addPodInitContainer(targetPod *corev1.Pod, _ []corev1.EnvVar, deploymentNam
 				envVars = append(envVars, corev1.EnvVar{Name: key, Value: value})
 			}
 			return envVars
-		}(config.DefaultInjectorConfig.AgentConfig.Env),
+		}(config.DefaultInjectorConfig.AgentConfig.Envs),
 	}
 	quantityLimitsCPU, _ := k8sresource.ParseQuantity(DefaultCPU)
 	quantityLimitsMemory, _ := k8sresource.ParseQuantity(DefaultMemory)
@@ -270,7 +270,7 @@ func modifyPodContainer(targetPod *corev1.Pod, envs []corev1.EnvVar, deploymentN
 						envMap[key] = corev1.EnvVar{Name: key, Value: value}
 					}
 				}
-			}(config.DefaultInjectorConfig.AgentConfig.Env)
+			}(config.DefaultInjectorConfig.AgentConfig.Envs)
 
 			mergeEnvs := make([]corev1.EnvVar, 0)
 			for _, envVar := range envMap {
