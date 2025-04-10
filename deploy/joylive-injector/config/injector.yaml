@@ -3,4 +3,8 @@ agent:
   image: {{ .Values.agent.image.repository }}
   version: {{ .Values.agent.image.tag }}
   envs:
-    {{- toYaml .Values.agent.envs | nindent 4 }}
+    {{- with .Values.agent.envs }}
+      {{- toYaml . | nindent 4 }}
+    {{- else }}
+    JAVA_TOOL_OPTIONS: -javaagent:/joylive/live.jar
+    {{- end }}

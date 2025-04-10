@@ -36,7 +36,7 @@ serviceAccount:
 
 agent:
   envs:
-    JAVA_TOOL_OPTIONS: -javaagent:/joylive/live.jar
+    # Set environment variables to be injected into the pod.
   image:
     repository: ghcr.m.daocloud.io/jd-opensource/joylive-agent
     tag: v1.6.0
