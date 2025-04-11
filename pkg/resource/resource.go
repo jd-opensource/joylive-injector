@@ -73,18 +73,18 @@ func GetResource() *Resource {
 
 func (r *Resource) CreateOrUpdateConfigMap(ctx context.Context, namespace string, configMap *corev1.ConfigMap) error {
 	cm, err := r.ClientSet.CoreV1().ConfigMaps(namespace).Get(ctx, configMap.Name, metav1.GetOptions{})
-	if !errors2.IsNotFound(err) {
+	if err != nil && !errors2.IsNotFound(err) {
 		return err
 	}
 	if cm == nil || errors2.IsNotFound(err) {
 		// create
-		log.Info("create configMap", zap.String("name", configMap.Name), zap.String("namespace", namespace))
+		log.Debug("create configMap", zap.String("name", configMap.Name), zap.String("namespace", namespace))
 		_, err = r.ClientSet.CoreV1().ConfigMaps(namespace).Create(context.TODO(), configMap, metav1.CreateOptions{})
 		if err != nil {
 			return err
 		}
 	} else {
-		log.Info("update configMap", zap.String("name", configMap.Name), zap.String("namespace", namespace), zap.Any("data", configMap.Data))
+		log.Debug("update configMap", zap.String("name", configMap.Name), zap.String("namespace", namespace), zap.Any("data", configMap.Data))
 		cm.Data = configMap.Data
 		_, err = r.ClientSet.CoreV1().ConfigMaps(namespace).Update(context.TODO(), cm, metav1.UpdateOptions{})
 		if err != nil {

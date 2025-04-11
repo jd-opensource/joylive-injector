@@ -58,7 +58,7 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 		err := jsoniter.Unmarshal(request.Object.Raw, &deploy)
 		if err != nil {
 			errMsg := fmt.Sprintf("[mutation] /injection-deploy: failed to unmarshal object: %v", err)
-			log.Error(errMsg)
+			log.Errorf(errMsg)
 			return &admissionv1.AdmissionResponse{
 				Allowed: false,
 				Result: &metav1.Status{
@@ -67,6 +67,7 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 				},
 			}, nil
 		}
+		log.Infof("[mutation] /injection-deploy: create config map for this deployment: %s, namespace: %s", deploy.Name, deploy.Namespace)
 		err = createConfigMap(&deploy)
 		if err != nil {
 			errMsg := fmt.Sprintf("[mutation] /injection-deploy: failed to create configmap: %v", err)
@@ -112,7 +113,6 @@ func createConfigMap(deploy *appsv1.Deployment) error {
 		},
 		Data: configMapData,
 	}
-	//logger.Debugf("create configmap: %v", configMap)
 	err := rs.CreateOrUpdateConfigMap(context.Background(), deploy.Namespace, configMap)
 	if err != nil {
 		log.Errorf("create configmap %s in %s error: %v", deploy.Name, deploy.Namespace, err)
