@@ -12,6 +12,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
+	"os"
 	"path/filepath"
 	"sync"
 )
@@ -30,21 +31,29 @@ func initResource() *Resource {
 		globalRes = &Resource{}
 		var kubeconfig string
 		var config *rest.Config
-		if home := homedir.HomeDir(); home != "" {
-			kubeconfig = filepath.Join(home, ".kube", "config")
-			// Get a `rest.Config` using the local kubeconfig
-			config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
-			if err != nil {
-				log.Warn("failed to build restConfig in local: ", zap.Error(err))
+
+		kubeconfig = os.Getenv("KUBECONFIG")
+
+		if kubeconfig == "" {
+			if home := homedir.HomeDir(); home != "" {
+				kubeconfig = filepath.Join(home, ".kube", "config")
 			}
 		}
+
+		if kubeconfig != "" {
+			config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+			if err != nil {
+				log.Warn("failed to build restConfig from kubeconfig: ", zap.Error(err))
+			}
+		}
+
 		if config == nil {
 			config, err = rest.InClusterConfig()
 			if err != nil {
 				log.Fatalf("init k8s config error: %v", err)
 			}
 		}
-		// creates the clientset
+
 		globalRes.RestConfig = config
 		globalRes.ClientSet, err = kubernetes.NewForConfig(config)
 		if err != nil {
@@ -69,11 +78,13 @@ func (r *Resource) CreateOrUpdateConfigMap(ctx context.Context, namespace string
 	}
 	if cm == nil || errors2.IsNotFound(err) {
 		// create
+		log.Info("create configMap", zap.String("name", configMap.Name), zap.String("namespace", namespace))
 		_, err = r.ClientSet.CoreV1().ConfigMaps(namespace).Create(context.TODO(), configMap, metav1.CreateOptions{})
 		if err != nil {
 			return err
 		}
 	} else {
+		log.Info("update configMap", zap.String("name", configMap.Name), zap.String("namespace", namespace), zap.Any("data", configMap.Data))
 		cm.Data = configMap.Data
 		_, err = r.ClientSet.CoreV1().ConfigMaps(namespace).Update(context.TODO(), cm, metav1.UpdateOptions{})
 		if err != nil {

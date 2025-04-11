@@ -98,6 +98,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&config.Cert, "cert", "", "Admission Controller TLS cert")
 	rootCmd.PersistentFlags().StringVar(&config.Key, "key", "", "Admission Controller TLS cert key")
 	rootCmd.PersistentFlags().StringVar(&config.MatchLabels, "match-label", config.MatchLabels, "Match label")
+	//rootCmd.PersistentFlags().StringVar(&config.KubeConfig, "kubeconfig", config.KubeConfig, "Path to the kubeconfig file")
 
 	// admission config
 	rootCmd.PersistentFlags().StringVar(&config.InitContainerName, "init-container-name", "joylive-init-container", "Init container name")

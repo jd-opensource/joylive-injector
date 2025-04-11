@@ -1,5 +1,5 @@
 repo ?= hub.jdcloud.com/jmsf
-version:=1.2.2-$(shell git rev-parse --short HEAD)4
+version:=1.2.2-$(shell git rev-parse --short HEAD)
 
 ifeq (,$(shell go env GOBIN))
 GOBIN=$(shell go env GOPATH)/bin
