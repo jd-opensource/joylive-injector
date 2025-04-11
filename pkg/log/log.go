@@ -32,6 +32,11 @@ type Logger struct {
 
 // InitLog log instance init
 func InitLog() {
+	viper.AutomaticEnv()
+	err := viper.BindEnv("log.level", "LOG_LEVEL")
+	if err != nil {
+		return
+	}
 	viper.SetDefault("log.level", "info")
 	level := viper.GetString("log.level")
 	logLevel := InfoLevel

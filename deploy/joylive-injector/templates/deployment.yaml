@@ -26,7 +26,7 @@ spec:
                 topologyKey: "kubernetes.io/hostname"
       containers:
         - env:
-            - name: log.level
+            - name: LOG_LEVEL
               value: {{ .Values.logLevel }}
             - name: JOYLIVE_CONFIGMAP_NAME
               value: {{ .Values.configMapName }}
