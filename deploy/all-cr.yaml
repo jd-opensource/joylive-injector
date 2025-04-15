@@ -176,6 +176,7 @@ data:
           - mariadb
           - mongodb
           - nacos
+          - eureka
           - netty
           - okhttp
           - opengauss
@@ -394,6 +395,7 @@ data:
               - reactor.core.scheduler.BoundedElasticScheduler$$Lambda
               - org.springframework.cloud.commons.util.InetUtils$$Lambda$
               - com.alibaba.nacos.
+              - com.netflix.discovery.
               - com.jd.live.agent.shaded.
               - org.apache.catalina.core.ContainerBase$
               - org.apache.catalina.core.StandardServer$$Lambda$
@@ -420,6 +422,7 @@ data:
             profile: ${CONFIG_CENTER_PROFILE:${APPLICATION_SERVICE_GROUP}}
         registry:
           enabled: ${CONFIG_REGISTRY_ENABLED:false}
+          subscribeMode: ${CONFIG_REGISTRY_SUBSCRIBE_MODE:AUTO}
           host:
             enabled: ${CONFIG_HOST_SERVICE_ENABLED:true}
             services: ${CONFIG_HOST_SERVICES}
@@ -432,6 +435,7 @@ data:
               namespace: ${CONFIG_REGISTRY_NAMESPACE_FIRST:public}
               group: ${CONFIG_REGISTRY_GROUP_FIRST:${APPLICATION_SERVICE_GROUP}}
               groupEnabled: ${CONFIG_REGISTRY_GROUP_ENABLED:false}
+              denyEmptyEnabled: ${CONFIG_REGISTRY_DENY_EMPTY_ENABLED:false}
             - type: ${CONFIG_REGISTRY_TYPE_SECOND:nacos}
               mode: ${CONFIG_REGISTRY_MODE_SECOND:FULL}
               address: ${CONFIG_REGISTRY_ADDRESS_SECOND}
@@ -440,6 +444,7 @@ data:
               namespace: ${CONFIG_REGISTRY_NAMESPACE_SECOND:public}
               group: ${CONFIG_REGISTRY_GROUP_SECOND:${APPLICATION_SERVICE_GROUP}}
               groupEnabled: ${CONFIG_REGISTRY_GROUP_ENABLED:false}
+              denyEmptyEnabled: ${CONFIG_REGISTRY_DENY_EMPTY_ENABLED:false}
             - type: ${CONFIG_REGISTRY_TYPE_THIRD:nacos}
               mode: ${CONFIG_REGISTRY_MODE_THIRD:FULL}
               address: ${CONFIG_REGISTRY_ADDRESS_THIRD}
@@ -448,6 +453,7 @@ data:
               namespace: ${CONFIG_REGISTRY_NAMESPACE_THIRD:public}
               group: ${CONFIG_REGISTRY_GROUP_THIRD:${APPLICATION_SERVICE_GROUP}}
               groupEnabled: ${CONFIG_REGISTRY_GROUP_ENABLED:false}
+              denyEmptyEnabled: ${CONFIG_REGISTRY_DENY_EMPTY_ENABLED:false}
       counter:
         gateway: true
         service: true
@@ -727,7 +733,7 @@ spec:
                 topologyKey: "kubernetes.io/hostname"
       containers:
         - env:
-            - name: log.level
+            - name: LOG_LEVEL
               value: debug
             - name: JOYLIVE_CONFIGMAP_NAME
               value: joylive-injector-config
