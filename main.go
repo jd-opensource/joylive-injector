@@ -16,6 +16,7 @@ import (
 
 	"github.com/jd-opensource/joylive-injector/pkg/admission"
 	_ "github.com/jd-opensource/joylive-injector/pkg/mutation"
+	_ "github.com/jd-opensource/joylive-injector/pkg/watcher"
 
 	"github.com/jd-opensource/joylive-injector/pkg/config"
 

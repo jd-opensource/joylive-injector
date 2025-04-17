@@ -5,32 +5,34 @@ import (
 
 	v1 "github.com/jd-opensource/joylive-injector/client-go/apis/injector/v1"
 	"github.com/jd-opensource/joylive-injector/pkg/log"
-	"github.com/jd-opensource/joylive-injector/pkg/resource"
-	"go.uber.org/zap"
 )
 
 const (
-	AgentConfig           = "config.yaml"
-	InjectorConfigName    = "injector.yaml"
-	LogConfig             = "logback.xml"
-	BootConfig            = "bootstrap.properties"
-	ConfigMountPath       = "/joylive/config"
-	EmptyDirMountPath     = "/joylive"
-	InitEmptyDirMountPath = "/agent"
-	InitContainerCmd      = "/bin/sh"
-	InitContainerArgs     = "-c, cp -r /joylive/* /agent && chmod -R 777 /agent"
-	ConfigMapEnvName      = "JOYLIVE_CONFIGMAP_NAME"
-	NamespaceEnvName      = "JOYLIVE_NAMESPACE"
-	MatchLabelsEnvName    = "JOYLIVE_MATCH_ENV_LABELS"
-	DefaultNamespace      = "joylive"
-	AgentVersionLabel     = "x-live-version"
+	AgentConfig            = "config.yaml"
+	InjectorConfigName     = "injector.yaml"
+	LogConfig              = "logback.xml"
+	BootConfig             = "bootstrap.properties"
+	ConfigMountPath        = "/joylive/config"
+	EmptyDirMountPath      = "/joylive"
+	InitEmptyDirMountPath  = "/agent"
+	InitContainerCmd       = "/bin/sh"
+	InitContainerArgs      = "-c, cp -r /joylive/* /agent && chmod -R 777 /agent"
+	ConfigMapEnvName       = "JOYLIVE_CONFIGMAP_NAME"
+	NamespaceEnvName       = "JOYLIVE_NAMESPACE"
+	MatchLabelsEnvName     = "JOYLIVE_MATCH_ENV_LABELS"
+	ControlPlaneUrlEnvName = "JOYLIVE_CONTROL_PLANE_URL"
+	DefaultNamespace       = "joylive"
+	AgentVersionLabel      = "x-live-version"
+	ServiceSpaceLabel      = "jmsf.jd.com/space"
+	ApplicationLabel       = "jmsf.jd.com/application"
 )
 
 var (
-	Cert        string
-	Key         string
-	Addr        string
-	MatchLabels string
+	Cert            string
+	Key             string
+	Addr            string
+	MatchLabels     string
+	ControlPlaneUrl string
 )
 
 // injection_deploy config
@@ -47,30 +49,10 @@ var (
 )
 
 func init() {
-	// Start the ConfigMap listener and initialize the content
-	cmWatcher := NewConfigMapWatcher(resource.GetResource().ClientSet)
-	err := cmWatcher.Start()
-	if err != nil {
-		log.Fatal("start cmWatcher error", zap.Error(err))
-	}
-	err = cmWatcher.InitConfigMap(GetNamespace())
-	if err != nil {
-		log.Fatal("init cm error", zap.Error(err))
-	}
-
-	// Start the AgentVersion listener and initialize the content
-	avWatcher := NewAgentVersionWatcher(resource.GetResource().RestConfig)
-	err = avWatcher.Start()
-	if err != nil {
-		log.Fatal("start avWatcher error", zap.Error(err))
-	}
-	err = avWatcher.InitAgentVersion(GetNamespace())
-	if err != nil {
-		log.Fatal("init agentVersion error", zap.Error(err))
-	}
-
 	// Initialize the default matchLabels from environment variables
 	MatchLabels = os.Getenv(MatchLabelsEnvName)
+	// Initialize the default control plane url from environment variables
+	ControlPlaneUrl = os.Getenv(ControlPlaneUrlEnvName)
 }
 
 func GetNamespace() string {

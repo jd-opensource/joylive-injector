@@ -1,4 +1,4 @@
-package config
+package watcher
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 	clientset "github.com/jd-opensource/joylive-injector/client-go/clientset/versioned"
 	"github.com/jd-opensource/joylive-injector/client-go/informers/externalversions"
 	listerv1 "github.com/jd-opensource/joylive-injector/client-go/listers/injector/v1"
+	"github.com/jd-opensource/joylive-injector/pkg/config"
 	"github.com/jd-opensource/joylive-injector/pkg/log"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
@@ -120,7 +121,7 @@ func (w *AgentVersionWatcher) cacheAgentVersion(agentVersion *v1.AgentVersion) e
 	avSpec := string(avSpecBytes)
 	log.Info("Received AgentVersion update event, start updating local configuration.", zap.String("agentVersion", agentVersion.Name),
 		zap.String("agentVersionSpec", avSpec))
-	InjectorAgentVersion[agentVersion.Spec.Version] = agentVersion.Spec
+	config.InjectorAgentVersion[agentVersion.Spec.Version] = agentVersion.Spec
 	return nil
 }
 

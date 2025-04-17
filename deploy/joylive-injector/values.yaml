@@ -25,6 +25,7 @@ containerArgs:
   - --key=/etc/kubernetes/ssl/dac-key.pem
 
 matchEnvLabels: x-live, x-service
+controlPlaneUrl:
 
 imagePullSecrets: [ ]
 nameOverride: ""

@@ -1,8 +1,9 @@
-package config
+package watcher
 
 import (
 	"context"
 	"fmt"
+	"github.com/jd-opensource/joylive-injector/pkg/config"
 	"github.com/jd-opensource/joylive-injector/pkg/log"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
@@ -30,7 +31,7 @@ func NewConfigMapWatcher(kubeClient kubernetes.Interface) *ConfigMapWatcher {
 	factory := informers.NewSharedInformerFactoryWithOptions(
 		kubeClient,
 		time.Second*10,
-		informers.WithNamespace(GetNamespace()),
+		informers.WithNamespace(config.GetNamespace()),
 		informers.WithTweakListOptions(func(options *metav1.ListOptions) {
 			options.LabelSelector = labels.SelectorFromSet(map[string]string{
 				"app": "joylive-injector",
@@ -123,18 +124,18 @@ func (w *ConfigMapWatcher) cacheConfigMap(configMap *v1.ConfigMap) error {
 	cmDataString := string(cmDataBytes)
 	log.Info("Received ConfigMap update event, start updating local configuration.", zap.String("cm", configMap.Name),
 		zap.String("data", cmDataString))
-	if configMap.Name == os.Getenv(ConfigMapEnvName) {
-		DefaultInjectorConfigMap = configMap.Data
-		if data, ok := configMap.Data[InjectorConfigName]; ok {
-			c, err := GetAgentInjectConfig(data)
+	if configMap.Name == os.Getenv(config.ConfigMapEnvName) {
+		config.DefaultInjectorConfigMap = configMap.Data
+		if data, ok := configMap.Data[config.InjectorConfigName]; ok {
+			c, err := config.GetAgentInjectConfig(data)
 			if err != nil {
 				return err
 			}
-			DefaultInjectorConfig = c
-			delete(DefaultInjectorConfigMap, InjectorConfigName)
+			config.DefaultInjectorConfig = c
+			delete(config.DefaultInjectorConfigMap, config.InjectorConfigName)
 		}
 	} else {
-		InjectorConfigMaps[configMap.Name] = configMap.Data
+		config.InjectorConfigMaps[configMap.Name] = configMap.Data
 	}
 	return nil
 }

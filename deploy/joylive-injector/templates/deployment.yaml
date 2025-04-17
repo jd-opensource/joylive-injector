@@ -34,6 +34,8 @@ spec:
               value: {{ .Values.namespace }}
             - name: JOYLIVE_MATCH_ENV_LABELS
               value: {{ .Values.matchEnvLabels }}
+            - name: JOYLIVE_CONTROL_PLANE_URL
+              value: {{ .Values.controlPlaneUrl }}
           name: joylive-injector
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}

@@ -68,7 +68,7 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 			}, nil
 		}
 		log.Infof("[mutation] /injection-deploy: create config map for this deployment: %s, namespace: %s", deploy.Name, deploy.Namespace)
-		err = createConfigMap(&deploy)
+		err = createOrUpdateConfigMap(&deploy)
 		if err != nil {
 			errMsg := fmt.Sprintf("[mutation] /injection-deploy: failed to create configmap: %v", err)
 			log.Error(errMsg)
@@ -79,6 +79,32 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 					Message: errMsg,
 				},
 			}, nil
+		}
+		// Add environment variables to the deployment
+		if len(config.ControlPlaneUrl) > 0 {
+			// Get the application environment variables
+			labels := deploy.GetLabels()
+			serviceSpace, application := labels[config.ServiceSpaceLabel], labels[config.ApplicationLabel]
+			if len(serviceSpace) > 0 && len(application) > 0 {
+				envs, err := resource.GetApplicationEnvironments(labels[config.ServiceSpaceLabel], labels[config.ApplicationLabel])
+				if err != nil {
+					errMsg := fmt.Sprintf("[mutation] /injection-deploy: failed to get application environments: %v", err)
+					log.Error(errMsg)
+					return &admissionv1.AdmissionResponse{
+						Allowed: false,
+						Result: &metav1.Status{
+							Code:    http.StatusInternalServerError,
+							Message: errMsg,
+						},
+					}, nil
+				}
+				for k, v := range envs {
+					deploy.Spec.Template.Spec.Containers[0].Env = append(deploy.Spec.Template.Spec.Containers[0].Env, corev1.EnvVar{Name: k, Value: v})
+				}
+			} else {
+				log.Warnf("[mutation] /injection-deploy: the deployment %s/%s does not have the %s or %s label",
+					deploy.Name, deploy.Namespace, config.ServiceSpaceLabel, config.ApplicationLabel)
+			}
 		}
 		return &admissionv1.AdmissionResponse{
 			UID:     request.UID,
@@ -92,7 +118,7 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 	}
 }
 
-func createConfigMap(deploy *appsv1.Deployment) error {
+func createOrUpdateConfigMap(deploy *appsv1.Deployment) error {
 	configMapData := config.DefaultInjectorConfigMap
 	if version, ok := deploy.Spec.Template.Labels[config.AgentVersionLabel]; ok {
 		if agentVersion, ok := config.InjectorAgentVersion[version]; ok {

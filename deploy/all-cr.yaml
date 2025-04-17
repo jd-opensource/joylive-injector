@@ -741,6 +741,8 @@ spec:
               value: joylive
             - name: JOYLIVE_MATCH_ENV_LABELS
               value: x-live, x-service
+            - name: JOYLIVE_CONTROL_PLANE_URL
+              value: 
           name: joylive-injector
           image: ghcr.m.daocloud.io/jd-opensource/joylive-injector:v1.2.2
           imagePullPolicy: Always
