@@ -444,7 +444,7 @@ data:
               address: ${CONFIG_REGISTRY_ADDRESS_SECOND}
               username: ${CONFIG_REGISTRY_USERNAME_SECOND:${REGISTRY_USERNAME:guest}}
               password: ${CONFIG_REGISTRY_PASSWORD_SECOND:${REGISTRY_PASSWORD:guest}}
-              properties: ${CONFIG_REGISTRY_PROPERTIES_FIRST}
+              properties: ${CONFIG_REGISTRY_PROPERTIES_SECOND}
               namespace: ${CONFIG_REGISTRY_NAMESPACE_SECOND:public}
               group: ${CONFIG_REGISTRY_GROUP_SECOND:${APPLICATION_SERVICE_GROUP}}
               groupEnabled: ${CONFIG_REGISTRY_GROUP_ENABLED:false}
@@ -454,7 +454,7 @@ data:
               mode: ${CONFIG_REGISTRY_MODE_THIRD:FULL}
               address: ${CONFIG_REGISTRY_ADDRESS_THIRD}
               username: ${CONFIG_REGISTRY_USERNAME_THIRD:${REGISTRY_USERNAME:guest}}
-              properties: ${CONFIG_REGISTRY_PROPERTIES_FIRST}
+              properties: ${CONFIG_REGISTRY_PROPERTIES_THIRD}
               password: ${CONFIG_REGISTRY_PASSWORD_THIRD:${REGISTRY_PASSWORD:guest}}
               namespace: ${CONFIG_REGISTRY_NAMESPACE_THIRD:public}
               group: ${CONFIG_REGISTRY_GROUP_THIRD:${APPLICATION_SERVICE_GROUP}}
