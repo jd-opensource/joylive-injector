@@ -40,7 +40,7 @@ func TestGetApplicationEnvironments(t *testing.T) {
 }
 
 func TestGetApplicationEnvironments2(t *testing.T) {
-	config.ControlPlaneUrl = "http://localhost:8000"
+	config.ControlPlaneUrl = "http://localhost:8000/v1"
 
 	// 调用被测试函数
 	data, err := GetApplicationEnvironments("default1", "showcase-agent-a1")

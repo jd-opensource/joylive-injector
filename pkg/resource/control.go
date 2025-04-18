@@ -20,7 +20,7 @@ type ApplicationEnvResponse struct {
 
 func GetApplicationEnvironments(namespace, application string) (map[string]string, error) {
 	url := fmt.Sprintf(
-		"%s/v1/ns/%s/application/%s/environments",
+		"%s/ns/%s/application/%s/environments",
 		config.ControlPlaneUrl, namespace, application,
 	)
 	resp, err := http.Get(url)
