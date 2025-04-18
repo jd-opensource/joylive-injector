@@ -87,6 +87,9 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 			// Get the application environment variables
 			labels := deploy.GetLabels()
 			serviceSpace, application := labels[config.ServiceSpaceLabel], labels[config.ApplicationLabel]
+			if len(serviceSpace) == 0 || len(application) == 0 {
+				serviceSpace, application = labels["jmsf.jd.com/service-space"], labels["app.jdap.io/name"]
+			}
 			if len(serviceSpace) > 0 && len(application) > 0 {
 				envs, err := resource.GetApplicationEnvironments(serviceSpace, application)
 				if err != nil {
