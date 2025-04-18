@@ -2,6 +2,7 @@ package mutation
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/jd-opensource/joylive-injector/pkg/admission"
 	"github.com/jd-opensource/joylive-injector/pkg/config"
@@ -9,6 +10,7 @@ import (
 	"github.com/jd-opensource/joylive-injector/pkg/resource"
 	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
+	"gomodules.xyz/jsonpatch/v2"
 	admissionv1 "k8s.io/api/admission/v1"
 	apiv1 "k8s.io/api/admission/v1"
 	appsv1 "k8s.io/api/apps/v1"
@@ -98,11 +100,28 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 						},
 					}, nil
 				}
+				target := deploy.DeepCopy()
 				for k, v := range envs {
-					deploy.Spec.Template.Spec.Containers[0].Env = append(deploy.Spec.Template.Spec.Containers[0].Env, corev1.EnvVar{Name: k, Value: v})
+					target.Spec.Template.Spec.Containers[0].Env = append(target.Spec.Template.Spec.Containers[0].Env, corev1.EnvVar{Name: k, Value: v})
 				}
 				log.Infof("[mutation] /injection-deploy: add envs to deployment %s/%s, envs: %v, deploy's envs: %v",
-					deploy.Name, deploy.Namespace, envs, deploy.Spec.Template.Spec.Containers[0].Env)
+					deploy.Name, deploy.Namespace, envs, target.Spec.Template.Spec.Containers[0].Env)
+				patchStr, err := createDeployPatch(target, &deploy)
+				if err != nil {
+					return &admissionv1.AdmissionResponse{
+						UID:     request.UID,
+						Allowed: true,
+					}, nil
+				}
+				return &admissionv1.AdmissionResponse{
+					UID:     request.UID,
+					Allowed: true,
+					Patch:   patchStr,
+					PatchType: func() *admissionv1.PatchType {
+						pt := admissionv1.PatchTypeJSONPatch
+						return &pt
+					}(),
+				}, nil
 			} else {
 				log.Warnf("[mutation] /injection-deploy: the deployment %s/%s does not have the %s or %s label",
 					deploy.Name, deploy.Namespace, config.ServiceSpaceLabel, config.ApplicationLabel)
@@ -161,4 +180,17 @@ func deleteConfigMap(name, namespace string) error {
 		return err
 	}
 	return nil
+}
+
+func createDeployPatch(target *appsv1.Deployment, original *appsv1.Deployment) ([]byte, error) {
+	targetPod, err := json.Marshal(target)
+	originalPod, err := json.Marshal(original)
+	if err != nil {
+		return nil, err
+	}
+	p, err := jsonpatch.CreatePatch(originalPod, targetPod)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(p)
 }

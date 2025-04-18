@@ -86,7 +86,7 @@ func injectionPod(request *admissionv1.AdmissionRequest) (*admissionv1.Admission
 
 		log.Debug("[mutation] /injection-pod: add configmap volume finished")
 		// path
-		patchStr, err := createPatch(targetPod, &pod)
+		patchStr, err := createPodPatch(targetPod, &pod)
 		if err != nil {
 			return &admissionv1.AdmissionResponse{
 				UID:     request.UID,
@@ -367,7 +367,7 @@ func addPodVolume(targetPod *corev1.Pod, deploymentName string) []corev1.Volume 
 	return append(volumes, agentVolumes...)
 }
 
-func createPatch(target *corev1.Pod, original *corev1.Pod) ([]byte, error) {
+func createPodPatch(target *corev1.Pod, original *corev1.Pod) ([]byte, error) {
 	targetPod, err := json.Marshal(target)
 	originalPod, err := json.Marshal(original)
 	if err != nil {
