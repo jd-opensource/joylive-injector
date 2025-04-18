@@ -86,7 +86,7 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 			labels := deploy.GetLabels()
 			serviceSpace, application := labels[config.ServiceSpaceLabel], labels[config.ApplicationLabel]
 			if len(serviceSpace) > 0 && len(application) > 0 {
-				envs, err := resource.GetApplicationEnvironments(labels[config.ServiceSpaceLabel], labels[config.ApplicationLabel])
+				envs, err := resource.GetApplicationEnvironments(serviceSpace, application)
 				if err != nil {
 					errMsg := fmt.Sprintf("[mutation] /injection-deploy: failed to get application environments: %v", err)
 					log.Error(errMsg)
@@ -101,6 +101,8 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 				for k, v := range envs {
 					deploy.Spec.Template.Spec.Containers[0].Env = append(deploy.Spec.Template.Spec.Containers[0].Env, corev1.EnvVar{Name: k, Value: v})
 				}
+				log.Infof("[mutation] /injection-deploy: add envs to deployment %s/%s, envs: %v, deploy's envs: %v",
+					deploy.Name, deploy.Namespace, envs, deploy.Spec.Template.Spec.Containers[0].Env)
 			} else {
 				log.Warnf("[mutation] /injection-deploy: the deployment %s/%s does not have the %s or %s label",
 					deploy.Name, deploy.Namespace, config.ServiceSpaceLabel, config.ApplicationLabel)
