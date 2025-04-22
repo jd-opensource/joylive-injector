@@ -749,6 +749,8 @@ spec:
               value: x-live, x-service
             - name: JOYLIVE_CONTROL_PLANE_URL
               value: 
+            - name: JOYLIVE_CLUSTER_ID
+              value: 
           name: joylive-injector
           image: ghcr.m.daocloud.io/jd-opensource/joylive-injector:v1.2.2
           imagePullPolicy: Always
