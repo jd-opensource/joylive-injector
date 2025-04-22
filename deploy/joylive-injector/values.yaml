@@ -6,6 +6,8 @@ replicas: 2
 
 namespace: joylive
 
+clusterId:
+
 matchLabels:
   matchKey: x-live-enabled
   matchValue: '"true"'

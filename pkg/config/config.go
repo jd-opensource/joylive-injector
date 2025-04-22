@@ -21,6 +21,7 @@ const (
 	NamespaceEnvName       = "JOYLIVE_NAMESPACE"
 	MatchLabelsEnvName     = "JOYLIVE_MATCH_ENV_LABELS"
 	ControlPlaneUrlEnvName = "JOYLIVE_CONTROL_PLANE_URL"
+	ClusterIdEnvName       = "JOYLIVE_CLUSTER_ID"
 	DefaultNamespace       = "joylive"
 	AgentVersionLabel      = "x-live-version"
 	ServiceSpaceLabel      = "jmsf.jd.com/space"
@@ -33,6 +34,7 @@ var (
 	Addr            string
 	MatchLabels     string
 	ControlPlaneUrl string
+	ClusterId       string
 )
 
 // injection_deploy config
@@ -53,6 +55,8 @@ func init() {
 	MatchLabels = os.Getenv(MatchLabelsEnvName)
 	// Initialize the default control plane url from environment variables
 	ControlPlaneUrl = os.Getenv(ControlPlaneUrlEnvName)
+	// Initialize the default cluster id from environment variables
+	ClusterId = os.Getenv(ClusterIdEnvName)
 }
 
 func GetNamespace() string {

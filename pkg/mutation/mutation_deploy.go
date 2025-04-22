@@ -85,66 +85,56 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 		// Add environment variables to the deployment
 		if len(config.ControlPlaneUrl) > 0 {
 			// Get the application environment variables
-			labels := deploy.GetLabels()
-			serviceSpace, application := labels[config.ServiceSpaceLabel], labels[config.ApplicationLabel]
-			if len(serviceSpace) == 0 || len(application) == 0 {
-				serviceSpace, application = labels["jmsf.jd.com/service-space"], labels["app.jdap.io/name"]
+			envs, err := resource.GetApplicationEnvironments(deploy.GetLabels())
+			if err != nil {
+				errMsg := fmt.Sprintf("[mutation] /injection-deploy: failed to get application environments: %v", err)
+				log.Error(errMsg)
+				return &admissionv1.AdmissionResponse{
+					Allowed: false,
+					Result: &metav1.Status{
+						Code:    http.StatusInternalServerError,
+						Message: errMsg,
+					},
+				}, nil
 			}
-			if len(serviceSpace) > 0 && len(application) > 0 {
-				envs, err := resource.GetApplicationEnvironments(serviceSpace, application)
+			target := deploy.DeepCopy()
+			added := false
+			for k, v := range envs {
+				// Check if the environment variable already exists
+				exists := false
+				for _, env := range target.Spec.Template.Spec.Containers[0].Env {
+					if env.Name == k {
+						exists = true
+						break
+					}
+				}
+				// If it exists, skip adding it
+				if exists {
+					continue
+				}
+				// Add the environment variable
+				target.Spec.Template.Spec.Containers[0].Env = append(target.Spec.Template.Spec.Containers[0].Env, corev1.EnvVar{Name: k, Value: v})
+				added = true
+			}
+			log.Infof("[mutation] /injection-deploy: add envs to deployment %s/%s, envs: %v, deploy's envs: %v",
+				deploy.Name, deploy.Namespace, envs, target.Spec.Template.Spec.Containers[0].Env)
+			if added {
+				patchStr, err := createDeployPatch(target, &deploy)
 				if err != nil {
-					errMsg := fmt.Sprintf("[mutation] /injection-deploy: failed to get application environments: %v", err)
-					log.Error(errMsg)
-					return &admissionv1.AdmissionResponse{
-						Allowed: false,
-						Result: &metav1.Status{
-							Code:    http.StatusInternalServerError,
-							Message: errMsg,
-						},
-					}, nil
-				}
-				target := deploy.DeepCopy()
-				added := false
-				for k, v := range envs {
-					// Check if the environment variable already exists
-					exists := false
-					for _, env := range target.Spec.Template.Spec.Containers[0].Env {
-						if env.Name == k {
-							exists = true
-							break
-						}
-					}
-					// If it exists, skip adding it
-					if exists {
-						continue
-					}
-					// Add the environment variable
-					target.Spec.Template.Spec.Containers[0].Env = append(target.Spec.Template.Spec.Containers[0].Env, corev1.EnvVar{Name: k, Value: v})
-					added = true
-				}
-				log.Infof("[mutation] /injection-deploy: add envs to deployment %s/%s, envs: %v, deploy's envs: %v",
-					deploy.Name, deploy.Namespace, envs, target.Spec.Template.Spec.Containers[0].Env)
-				if added {
-					patchStr, err := createDeployPatch(target, &deploy)
-					if err != nil {
-						return &admissionv1.AdmissionResponse{
-							UID:     request.UID,
-							Allowed: true,
-						}, nil
-					}
 					return &admissionv1.AdmissionResponse{
 						UID:     request.UID,
 						Allowed: true,
-						Patch:   patchStr,
-						PatchType: func() *admissionv1.PatchType {
-							pt := admissionv1.PatchTypeJSONPatch
-							return &pt
-						}(),
 					}, nil
 				}
-			} else {
-				log.Warnf("[mutation] /injection-deploy: the deployment %s/%s does not have the %s or %s label",
-					deploy.Name, deploy.Namespace, config.ServiceSpaceLabel, config.ApplicationLabel)
+				return &admissionv1.AdmissionResponse{
+					UID:     request.UID,
+					Allowed: true,
+					Patch:   patchStr,
+					PatchType: func() *admissionv1.PatchType {
+						pt := admissionv1.PatchTypeJSONPatch
+						return &pt
+					}(),
+				}, nil
 			}
 		}
 		return &admissionv1.AdmissionResponse{
