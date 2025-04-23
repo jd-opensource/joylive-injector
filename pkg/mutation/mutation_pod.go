@@ -367,15 +367,18 @@ func addPodVolume(targetPod *corev1.Pod, deploymentName string) []corev1.Volume 
 	return append(volumes, agentVolumes...)
 }
 
-func createPodPatch(target *corev1.Pod, original *corev1.Pod) ([]byte, error) {
-	targetPod, err := json.Marshal(target)
-	originalPod, err := json.Marshal(original)
+func createPodPatch(target, original *corev1.Pod) ([]byte, error) {
+	targetJSON, err := json.Marshal(target)
 	if err != nil {
 		return nil, err
 	}
-	p, err := jsonpatch.CreatePatch(originalPod, targetPod)
+	originalJSON, err := json.Marshal(original)
 	if err != nil {
 		return nil, err
 	}
-	return json.Marshal(p)
+	patch, err := jsonpatch.CreatePatch(originalJSON, targetJSON)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(patch)
 }

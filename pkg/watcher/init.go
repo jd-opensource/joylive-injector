@@ -1,6 +1,8 @@
 package watcher
 
 import (
+	"sync"
+
 	"github.com/jd-opensource/joylive-injector/pkg/config"
 	"github.com/jd-opensource/joylive-injector/pkg/log"
 	"github.com/jd-opensource/joylive-injector/pkg/resource"
@@ -8,25 +10,50 @@ import (
 )
 
 func init() {
-	// Start the ConfigMap listener and initialize the content
-	cmWatcher := NewConfigMapWatcher(resource.GetResource().ClientSet)
-	err := cmWatcher.Start()
-	if err != nil {
-		log.Fatal("start cmWatcher error", zap.Error(err))
-	}
-	err = cmWatcher.InitConfigMap(config.GetNamespace())
-	if err != nil {
-		log.Fatal("init cm error", zap.Error(err))
-	}
+	var wg sync.WaitGroup
+	var fatalErr error
+	var once sync.Once
 
-	// Start the AgentVersion listener and initialize the content
-	avWatcher := NewAgentVersionWatcher(resource.GetResource().RestConfig)
-	err = avWatcher.Start()
-	if err != nil {
-		log.Fatal("start avWatcher error", zap.Error(err))
-	}
-	err = avWatcher.InitAgentVersion(config.GetNamespace())
-	if err != nil {
-		log.Fatal("init agentVersion error", zap.Error(err))
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		cmWatcher := NewConfigMapWatcher(resource.GetResource().ClientSet)
+		err := cmWatcher.Start()
+		if err != nil {
+			once.Do(func() {
+				fatalErr = err
+			})
+			return
+		}
+		err = cmWatcher.InitConfigMap(config.GetNamespace())
+		if err != nil {
+			once.Do(func() {
+				fatalErr = err
+			})
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		avWatcher := NewAgentVersionWatcher(resource.GetResource().RestConfig)
+		err := avWatcher.Start()
+		if err != nil {
+			once.Do(func() {
+				fatalErr = err
+			})
+			return
+		}
+		err = avWatcher.InitAgentVersion(config.GetNamespace())
+		if err != nil {
+			once.Do(func() {
+				fatalErr = err
+			})
+		}
+	}()
+
+	wg.Wait()
+	if fatalErr != nil {
+		log.Fatal("watcher init error", zap.Error(fatalErr))
 	}
 }

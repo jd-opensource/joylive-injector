@@ -192,15 +192,18 @@ func deleteConfigMap(name, namespace string) error {
 	return nil
 }
 
-func createDeployPatch(target *appsv1.Deployment, original *appsv1.Deployment) ([]byte, error) {
-	targetPod, err := json.Marshal(target)
-	originalPod, err := json.Marshal(original)
+func createDeployPatch(target, original *appsv1.Deployment) ([]byte, error) {
+	targetJSON, err := json.Marshal(target)
 	if err != nil {
 		return nil, err
 	}
-	p, err := jsonpatch.CreatePatch(originalPod, targetPod)
+	originalJSON, err := json.Marshal(original)
 	if err != nil {
 		return nil, err
 	}
-	return json.Marshal(p)
+	patch, err := jsonpatch.CreatePatch(originalJSON, targetJSON)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(patch)
 }
