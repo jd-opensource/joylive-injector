@@ -16,12 +16,12 @@ func init() {
 
 	wg.Add(2)
 
-	resource := resource.GetResource()
+	rs := resource.GetResource()
 	namespace := config.GetNamespace()
 
 	go func() {
 		defer wg.Done()
-		cmWatcher := NewConfigMapWatcher(resource.ClientSet)
+		cmWatcher := NewConfigMapWatcher(rs.ClientSet)
 		err := cmWatcher.Start()
 		if err != nil {
 			once.Do(func() {
@@ -39,7 +39,7 @@ func init() {
 
 	go func() {
 		defer wg.Done()
-		avWatcher := NewAgentVersionWatcher(resource.RestConfig)
+		avWatcher := NewAgentVersionWatcher(rs.RestConfig)
 		err := avWatcher.Start()
 		if err != nil {
 			once.Do(func() {
