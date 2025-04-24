@@ -25,7 +25,9 @@ const (
 	DefaultNamespace       = "joylive"
 	AgentVersionLabel      = "x-live-version"
 	ServiceSpaceLabel      = "jmsf.jd.com/space"
+	JdapServiceSpaceLabel  = "jmsf.jd.com/service-space"
 	ApplicationLabel       = "jmsf.jd.com/application"
+	JdapApplicationLabel   = "app.jdap.io/name"
 )
 
 var (
