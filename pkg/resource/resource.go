@@ -79,14 +79,14 @@ func (r *Resource) CreateOrUpdateConfigMap(ctx context.Context, namespace string
 	if cm == nil || errors2.IsNotFound(err) {
 		// create
 		log.Debug("create configMap", zap.String("name", configMap.Name), zap.String("namespace", namespace))
-		_, err = r.ClientSet.CoreV1().ConfigMaps(namespace).Create(context.TODO(), configMap, metav1.CreateOptions{})
+		_, err = r.ClientSet.CoreV1().ConfigMaps(namespace).Create(ctx, configMap, metav1.CreateOptions{})
 		if err != nil {
 			return err
 		}
 	} else {
 		log.Debug("update configMap", zap.String("name", configMap.Name), zap.String("namespace", namespace), zap.Any("data", configMap.Data))
 		cm.Data = configMap.Data
-		_, err = r.ClientSet.CoreV1().ConfigMaps(namespace).Update(context.TODO(), cm, metav1.UpdateOptions{})
+		_, err = r.ClientSet.CoreV1().ConfigMaps(namespace).Update(ctx, cm, metav1.UpdateOptions{})
 		if err != nil {
 			return err
 		}
