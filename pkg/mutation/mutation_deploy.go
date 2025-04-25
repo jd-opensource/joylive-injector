@@ -82,66 +82,77 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 				},
 			}, nil
 		}
-		// Add environment variables to the deployment
-		if len(config.ControlPlaneUrl) > 0 {
-			// Get the application environment variables
-			envs, err := resource.GetApplicationEnvironments(deploy.GetLabels())
-			if err != nil {
-				errMsg := fmt.Sprintf("[mutation] /injection-deploy: failed to get application environments: %v", err)
-				log.Error(errMsg)
-				return &admissionv1.AdmissionResponse{
-					Allowed: false,
-					Result: &metav1.Status{
-						Code:    http.StatusInternalServerError,
-						Message: errMsg,
-					},
-				}, nil
-			}
-			target := deploy.DeepCopy()
-			added := false
-			for k, v := range envs {
-				// Check if the environment variable already exists
-				exists := false
-				for _, env := range target.Spec.Template.Spec.Containers[0].Env {
-					if env.Name == k {
-						exists = true
-						break
-					}
-				}
-				// If it exists, skip adding it
-				if exists {
-					continue
-				}
-				// Add the environment variable
-				target.Spec.Template.Spec.Containers[0].Env = append(target.Spec.Template.Spec.Containers[0].Env, corev1.EnvVar{Name: k, Value: v})
-				added = true
-			}
-			log.Infof("[mutation] /injection-deploy: add envs to deployment %s/%s, envs: %v, deploy's envs: %v",
-				deploy.Name, deploy.Namespace, envs, target.Spec.Template.Spec.Containers[0].Env)
-			if added {
-				patchStr, err := createDeployPatch(target, &deploy)
-				if err != nil {
-					return &admissionv1.AdmissionResponse{
-						UID:     request.UID,
-						Allowed: true,
-					}, nil
-				}
-				return &admissionv1.AdmissionResponse{
-					UID:     request.UID,
-					Allowed: true,
-					Patch:   patchStr,
-					PatchType: func() *admissionv1.PatchType {
-						pt := admissionv1.PatchTypeJSONPatch
-						return &pt
-					}(),
-				}, nil
-			}
+		if len(config.ControlPlaneUrl) == 0 {
+			return &admissionv1.AdmissionResponse{
+				UID:     request.UID,
+				Allowed: true,
+			}, nil
+		} else {
+			return AddApplicationEnvironments(request, deploy)
 		}
+	default:
 		return &admissionv1.AdmissionResponse{
 			UID:     request.UID,
 			Allowed: true,
 		}, nil
-	default:
+	}
+}
+
+func AddApplicationEnvironments(request *apiv1.AdmissionRequest, deploy appsv1.Deployment) (*apiv1.AdmissionResponse, error) {
+	// Get the application environment variables
+	envs, err := resource.GetApplicationEnvironments(deploy.GetLabels())
+	if err != nil {
+		errMsg := fmt.Sprintf("[mutation] /injection-deploy: failed to get application environments: %v", err)
+		log.Error(errMsg)
+		return &admissionv1.AdmissionResponse{
+			Allowed: false,
+			Result: &metav1.Status{
+				Code:    http.StatusInternalServerError,
+				Message: errMsg,
+			},
+		}, err
+	}
+	target := deploy.DeepCopy()
+	added := false
+	for k, v := range envs {
+		// Check if the environment variable already exists
+		exists := false
+		for _, env := range target.Spec.Template.Spec.Containers[0].Env {
+			if env.Name == k {
+				exists = true
+				break
+			}
+		}
+		// If it exists, skip adding it
+		if exists {
+			continue
+		}
+		// Add the environment variable
+		target.Spec.Template.Spec.Containers[0].Env = append(target.Spec.Template.Spec.Containers[0].Env, corev1.EnvVar{Name: k, Value: v})
+		added = true
+	}
+	log.Infof("[mutation] /injection-deploy: add envs to deployment %s/%s, envs: %v, deploy's envs: %v",
+		deploy.Name, deploy.Namespace, envs, target.Spec.Template.Spec.Containers[0].Env)
+	if added {
+		patchStr, err := createDeployPatch(target, &deploy)
+		if err != nil {
+			log.Errorf("[mutation] /injection-deploy: failed to create patch: %v", err)
+			return &admissionv1.AdmissionResponse{
+				UID:     request.UID,
+				Allowed: true,
+			}, nil
+		}
+		return &admissionv1.AdmissionResponse{
+			UID:     request.UID,
+			Allowed: true,
+			Patch:   patchStr,
+			PatchType: func() *admissionv1.PatchType {
+				pt := admissionv1.PatchTypeJSONPatch
+				return &pt
+			}(),
+		}, nil
+	} else {
+		log.Infof("[mutation] /injection-deploy: no envs to add to deployment %s/%s", deploy.Name, deploy.Namespace)
 		return &admissionv1.AdmissionResponse{
 			UID:     request.UID,
 			Allowed: true,
