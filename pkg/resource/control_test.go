@@ -28,8 +28,14 @@ func TestGetApplicationEnvironments(t *testing.T) {
 	config.ControlPlaneUrl = mockServer.URL
 	defer func() { config.ControlPlaneUrl = originalURL }()
 
+	// 设置测试数据
+	labels := map[string]string{
+		config.ServiceSpaceLabel: "test-namespace",
+		config.ApplicationLabel:  "test-application",
+	}
+
 	// 调用被测试函数
-	data, err := GetApplicationEnvironments("test-namespace", "test-application")
+	data, err := GetApplicationEnvironments(labels)
 
 	// 验证结果
 	assert.NoError(t, err)
@@ -42,8 +48,14 @@ func TestGetApplicationEnvironments(t *testing.T) {
 func TestGetApplicationEnvironments2(t *testing.T) {
 	config.ControlPlaneUrl = "http://localhost:8000/v1"
 
+	// 设置测试数据
+	labels := map[string]string{
+		config.ServiceSpaceLabel: "test-namespace",
+		config.ApplicationLabel:  "test-application",
+	}
+
 	// 调用被测试函数
-	data, err := GetApplicationEnvironments("default1", "showcase-agent-a1")
+	data, err := GetApplicationEnvironments(labels)
 
 	// 验证结果
 	assert.NoError(t, err)
