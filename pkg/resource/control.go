@@ -58,6 +58,17 @@ func GetApplicationEnvironments(labels map[string]string) (map[string]string, er
 		envMaps["APPLICATION_NAME"] = application
 		envMaps["APPLICATION_SERVICE_NAMESPACE"] = serviceSpace
 	}
+
+	if group, ok := labels[config.ServiceGroupLabel]; ok {
+		envMaps["APPLICATION_SERVICE_GROUP"] = group
+	} else {
+		envMaps["APPLICATION_SERVICE_GROUP"] = "default"
+	}
+
+	if service, ok := labels[config.ServiceNameLabel]; ok {
+		envMaps["APPLICATION_SERVICE_NAME"] = service
+	}
+
 	envMaps["APPLICATION_LOCATION_CLUSTER"] = config.ClusterId
 
 	return envMaps, nil

@@ -87,11 +87,12 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 		added := false
 		// Check if the x-live-enabled label exists in deploy's spec.template.metadata.labels; if not, add it.
 		if _, ok := deploy.Spec.Template.Labels[config.WebHookMatchKey]; !ok {
+			log.Infof("[mutation] /injection-deploy: add label %s to deployment %s/%s", config.WebHookMatchKey, deploy.Name, deploy.Namespace)
 			target.Spec.Template.Labels[config.WebHookMatchKey] = config.WebHookMatchValue
 			added = true
 		}
 
-		if len(config.ControlPlaneUrl) != 0 {
+		if len(config.ControlPlaneUrl) == 0 {
 			return &admissionv1.AdmissionResponse{
 				UID:     request.UID,
 				Allowed: true,

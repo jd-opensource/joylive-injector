@@ -24,6 +24,8 @@ const (
 	ClusterIdEnvName       = "JOYLIVE_CLUSTER_ID"
 	DefaultNamespace       = "joylive"
 	AgentVersionLabel      = "x-live-version"
+	ServiceNameLabel       = "jmsf.jd.com/name"
+	ServiceGroupLabel      = "jmsf.jd.com/group"
 	ServiceSpaceLabel      = "jmsf.jd.com/space"
 	JdapServiceSpaceLabel  = "jmsf.jd.com/service-space"
 	ApplicationLabel       = "jmsf.jd.com/application"
