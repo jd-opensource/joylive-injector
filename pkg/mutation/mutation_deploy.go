@@ -202,7 +202,6 @@ func createOrUpdateConfigMap(deploy *appsv1.Deployment) error {
 
 func deleteConfigMap(name, namespace string) error {
 	rs := resource.GetResource()
-	log.Debug("delete configmap")
 	err := rs.DeleteConfigMap(context.Background(), namespace, name+"-live-configmap")
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -211,6 +210,7 @@ func deleteConfigMap(name, namespace string) error {
 		log.Errorf("delete configmap %s in %s error: %v", name, namespace, err)
 		return err
 	}
+	log.Info("deleted configmap", zap.String("name", name), zap.String("namespace", namespace))
 	return nil
 }
 
