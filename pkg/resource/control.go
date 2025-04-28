@@ -19,9 +19,13 @@ type ApplicationEnvResponse struct {
 }
 
 func GetApplicationEnvironments(labels map[string]string) (map[string]string, error) {
-	serviceSpace, application := labels[config.ServiceSpaceLabel], labels[config.ApplicationLabel]
-	if len(serviceSpace) == 0 || len(application) == 0 {
-		serviceSpace, application = labels[config.JdapServiceSpaceLabel], labels[config.JdapApplicationLabel]
+	serviceSpace := labels[config.ServiceSpaceLabel]
+	application := labels[config.ApplicationLabel]
+	if len(serviceSpace) == 0 {
+		serviceSpace = labels[config.JdapServiceSpaceLabel]
+	}
+	if len(application) == 0 {
+		application = labels[config.JdapApplicationLabel]
 	}
 	envMaps := make(map[string]string)
 	if len(serviceSpace) != 0 && len(application) != 0 {

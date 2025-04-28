@@ -28,7 +28,7 @@ const (
 	ServiceGroupLabel      = "jmsf.jd.com/group"
 	ServiceSpaceLabel      = "jmsf.jd.com/space"
 	JdapServiceSpaceLabel  = "jmsf.jd.com/service-space"
-	ApplicationLabel       = "jmsf.jd.com/application"
+	ApplicationLabel       = "jmsf.jd.com/app"
 	JdapApplicationLabel   = "app.jdap.io/name"
 	WebHookMatchKeyEnv     = "JOYLIVE_MATCH_KEY"
 	WebHookMatchValueEnv   = "JOYLIVE_MATCH_VALUE"
