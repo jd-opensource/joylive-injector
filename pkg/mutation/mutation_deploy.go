@@ -82,13 +82,57 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 				},
 			}, nil
 		}
-		if len(config.ControlPlaneUrl) == 0 {
+
+		target := deploy.DeepCopy()
+		added := false
+		// Check if the x-live-enabled label exists in deploy's spec.template.metadata.labels; if not, add it.
+		if _, ok := deploy.Spec.Template.Labels[config.WebHookMatchKey]; !ok {
+			target.Spec.Template.Labels[config.WebHookMatchKey] = config.WebHookMatchValue
+			added = true
+		}
+
+		if len(config.ControlPlaneUrl) != 0 {
 			return &admissionv1.AdmissionResponse{
 				UID:     request.UID,
 				Allowed: true,
 			}, nil
 		} else {
-			return AddApplicationEnvironments(request, deploy)
+			err := AddApplicationEnvironments(deploy, target, added)
+			if err != nil {
+				errMsg := fmt.Sprintf("[mutation] /injection-deploy: failed to get application environments: %v", err)
+				return &admissionv1.AdmissionResponse{
+					Allowed: false,
+					Result: &metav1.Status{
+						Code:    http.StatusInternalServerError,
+						Message: errMsg,
+					},
+				}, err
+			}
+		}
+		if !added {
+			log.Infof("[mutation] /injection-deploy: no envs to add to deployment %s/%s", deploy.Name, deploy.Namespace)
+			return &admissionv1.AdmissionResponse{
+				UID:     request.UID,
+				Allowed: true,
+			}, nil
+		} else {
+			patchStr, err := createDeployPatch(target, &deploy)
+			if err != nil {
+				log.Errorf("[mutation] /injection-deploy: failed to create patch: %v", err)
+				return &admissionv1.AdmissionResponse{
+					UID:     request.UID,
+					Allowed: true,
+				}, nil
+			}
+			return &admissionv1.AdmissionResponse{
+				UID:     request.UID,
+				Allowed: true,
+				Patch:   patchStr,
+				PatchType: func() *admissionv1.PatchType {
+					pt := admissionv1.PatchTypeJSONPatch
+					return &pt
+				}(),
+			}, nil
 		}
 	default:
 		return &admissionv1.AdmissionResponse{
@@ -98,22 +142,12 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 	}
 }
 
-func AddApplicationEnvironments(request *apiv1.AdmissionRequest, deploy appsv1.Deployment) (*apiv1.AdmissionResponse, error) {
+func AddApplicationEnvironments(source appsv1.Deployment, target *appsv1.Deployment, added bool) error {
 	// Get the application environment variables
-	envs, err := resource.GetApplicationEnvironments(deploy.GetLabels())
+	envs, err := resource.GetApplicationEnvironments(source.GetLabels())
 	if err != nil {
-		errMsg := fmt.Sprintf("[mutation] /injection-deploy: failed to get application environments: %v", err)
-		log.Error(errMsg)
-		return &admissionv1.AdmissionResponse{
-			Allowed: false,
-			Result: &metav1.Status{
-				Code:    http.StatusInternalServerError,
-				Message: errMsg,
-			},
-		}, err
+		return err
 	}
-	target := deploy.DeepCopy()
-	added := false
 	for k, v := range envs {
 		// Check if the environment variable already exists
 		exists := false
@@ -132,32 +166,8 @@ func AddApplicationEnvironments(request *apiv1.AdmissionRequest, deploy appsv1.D
 		added = true
 	}
 	log.Infof("[mutation] /injection-deploy: add envs to deployment %s/%s, envs: %v, deploy's envs: %v",
-		deploy.Name, deploy.Namespace, envs, target.Spec.Template.Spec.Containers[0].Env)
-	if added {
-		patchStr, err := createDeployPatch(target, &deploy)
-		if err != nil {
-			log.Errorf("[mutation] /injection-deploy: failed to create patch: %v", err)
-			return &admissionv1.AdmissionResponse{
-				UID:     request.UID,
-				Allowed: true,
-			}, nil
-		}
-		return &admissionv1.AdmissionResponse{
-			UID:     request.UID,
-			Allowed: true,
-			Patch:   patchStr,
-			PatchType: func() *admissionv1.PatchType {
-				pt := admissionv1.PatchTypeJSONPatch
-				return &pt
-			}(),
-		}, nil
-	} else {
-		log.Infof("[mutation] /injection-deploy: no envs to add to deployment %s/%s", deploy.Name, deploy.Namespace)
-		return &admissionv1.AdmissionResponse{
-			UID:     request.UID,
-			Allowed: true,
-		}, nil
-	}
+		source.Name, source.Namespace, envs, target.Spec.Template.Spec.Containers[0].Env)
+	return nil
 }
 
 func createOrUpdateConfigMap(deploy *appsv1.Deployment) error {

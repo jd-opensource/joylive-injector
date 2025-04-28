@@ -751,6 +751,10 @@ spec:
               value: 
             - name: JOYLIVE_CLUSTER_ID
               value: 
+            - name: JOYLIVE_MATCH_KEY
+              value: x-live-enabled
+            - name: JOYLIVE_MATCH_VALUE
+              value: "true"
           name: joylive-injector
           image: ghcr.m.daocloud.io/jd-opensource/joylive-injector:v1.2.2
           imagePullPolicy: Always

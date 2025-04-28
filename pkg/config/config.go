@@ -28,15 +28,19 @@ const (
 	JdapServiceSpaceLabel  = "jmsf.jd.com/service-space"
 	ApplicationLabel       = "jmsf.jd.com/application"
 	JdapApplicationLabel   = "app.jdap.io/name"
+	WebHookMatchKeyEnv     = "JOYLIVE_MATCH_KEY"
+	WebHookMatchValueEnv   = "JOYLIVE_MATCH_VALUE"
 )
 
 var (
-	Cert            string
-	Key             string
-	Addr            string
-	MatchLabels     string
-	ControlPlaneUrl string
-	ClusterId       string
+	Cert              string
+	Key               string
+	Addr              string
+	MatchLabels       string
+	ControlPlaneUrl   string
+	ClusterId         string
+	WebHookMatchKey   string
+	WebHookMatchValue string
 )
 
 // injection_deploy config
@@ -59,6 +63,8 @@ func init() {
 	ControlPlaneUrl = os.Getenv(ControlPlaneUrlEnvName)
 	// Initialize the default cluster id from environment variables
 	ClusterId = os.Getenv(ClusterIdEnvName)
+	WebHookMatchKey = os.Getenv(WebHookMatchKeyEnv)
+	WebHookMatchValue = os.Getenv(WebHookMatchValueEnv)
 }
 
 func GetNamespace() string {
