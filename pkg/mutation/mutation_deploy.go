@@ -98,7 +98,7 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 				Allowed: true,
 			}, nil
 		} else {
-			err := AddApplicationEnvironments(deploy, target, added)
+			added, err = AddApplicationEnvironments(deploy, target)
 			if err != nil {
 				errMsg := fmt.Sprintf("[mutation] /injection-deploy: failed to get application environments: %v", err)
 				return &admissionv1.AdmissionResponse{
@@ -143,11 +143,12 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 	}
 }
 
-func AddApplicationEnvironments(source appsv1.Deployment, target *appsv1.Deployment, added bool) error {
+func AddApplicationEnvironments(source appsv1.Deployment, target *appsv1.Deployment) (bool, error) {
+	added := false
 	// Get the application environment variables
 	envs, err := resource.GetApplicationEnvironments(source.GetLabels())
 	if err != nil {
-		return err
+		return added, err
 	}
 	for k, v := range envs {
 		// Check if the environment variable already exists
@@ -168,7 +169,7 @@ func AddApplicationEnvironments(source appsv1.Deployment, target *appsv1.Deploym
 	}
 	log.Infof("[mutation] /injection-deploy: add envs to deployment %s/%s, envs: %v, deploy's envs: %v",
 		source.Name, source.Namespace, envs, target.Spec.Template.Spec.Containers[0].Env)
-	return nil
+	return added, nil
 }
 
 func createOrUpdateConfigMap(deploy *appsv1.Deployment) error {
