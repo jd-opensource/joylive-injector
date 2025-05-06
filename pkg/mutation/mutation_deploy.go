@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/jd-opensource/joylive-injector/pkg/admission"
+	"github.com/jd-opensource/joylive-injector/pkg/apm"
 	"github.com/jd-opensource/joylive-injector/pkg/config"
 	"github.com/jd-opensource/joylive-injector/pkg/log"
 	"github.com/jd-opensource/joylive-injector/pkg/resource"
@@ -85,11 +86,38 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 
 		target := deploy.DeepCopy()
 		added := false
-		// Check if the x-live-enabled label exists in deploy's spec.template.metadata.labels; if not, add it.
-		if _, ok := deploy.Spec.Template.Labels[config.WebHookMatchKey]; !ok {
-			log.Infof("[mutation] /injection-deploy: add label %s to deployment %s/%s", config.WebHookMatchKey, deploy.Name, deploy.Namespace)
-			target.Spec.Template.Labels[config.WebHookMatchKey] = config.WebHookMatchValue
+
+		if enhanceType, ok := deploy.Labels[config.EnhanceTypeLabel]; ok && enhanceType == config.EnhanceTypeSidecar {
+			log.Infof("[mutation] /injection-deploy: add label %s to deployment %s/%s", config.SidecarEnhanceLabel, deploy.Name, deploy.Namespace)
+			target.Spec.Template.Labels[config.SidecarEnhanceLabel] = "true"
 			added = true
+		} else {
+			// Check if the x-live-enabled label exists in deploy's spec.template.metadata.labels; if not, add it.
+			if _, ok := deploy.Spec.Template.Labels[config.WebHookMatchKey]; !ok {
+				log.Infof("[mutation] /injection-deploy: add label %s to deployment %s/%s", config.WebHookMatchKey, deploy.Name, deploy.Namespace)
+				target.Spec.Template.Labels[config.WebHookMatchKey] = config.WebHookMatchValue
+				added = true
+			}
+		}
+
+		// Apm labels append
+		if apmType, ok := deploy.Labels[config.ApmTypeLabel]; ok {
+			if appender, ok := apm.AppenderTypes[apmType]; ok {
+				added, err = appender.Modify(context.Background(), target)
+				if err != nil {
+					errMsg := fmt.Sprintf("[mutation] /injection-deploy: failed to modify deployment: %v", err)
+					log.Error(errMsg)
+					return &admissionv1.AdmissionResponse{
+						Allowed: false,
+						Result: &metav1.Status{
+							Code:    http.StatusInternalServerError,
+							Message: errMsg,
+						},
+					}, nil
+				}
+			} else {
+				log.Warnf("[mutation] /injection-deploy: unknown apm type %s", apmType)
+			}
 		}
 
 		if len(config.ControlPlaneUrl) == 0 {
