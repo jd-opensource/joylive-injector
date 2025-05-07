@@ -34,6 +34,7 @@ const (
 	EnhanceTypeSidecar     = "sidecar"
 	SidecarEnhanceLabel    = "sidecar.istio.io/inject"
 	ApmTypeLabel           = "jmsf.jd.com/apm"
+	TenantLabel            = "jmsf.jd.com/tenant"
 	JdapApplicationLabel   = "app.jdap.io/name"
 	WebHookMatchKeyEnv     = "JOYLIVE_MATCH_KEY"
 	WebHookMatchValueEnv   = "JOYLIVE_MATCH_VALUE"

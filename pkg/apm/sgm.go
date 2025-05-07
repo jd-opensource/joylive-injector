@@ -37,7 +37,7 @@ func (s *SgmAppender) Modify(ctx context.Context, target *v1.Deployment) (bool, 
 		added = true
 	}
 	if _, ok := target.Spec.Template.Labels["sgm.jd.com/tenant"]; !ok {
-		target.Spec.Template.Labels["sgm.jd.com/tenant"] = target.Labels["sgm.jd.com/tenant"]
+		target.Spec.Template.Labels["sgm.jd.com/tenant"] = target.Labels[config.TenantLabel]
 		added = true
 	}
 	return added, nil
