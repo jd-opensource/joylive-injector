@@ -90,12 +90,18 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 		if enhanceType, ok := deploy.Labels[config.EnhanceTypeLabel]; ok && enhanceType == config.EnhanceTypeSidecar {
 			log.Infof("[mutation] /injection-deploy: add label %s to deployment %s/%s", config.SidecarEnhanceLabel, deploy.Name, deploy.Namespace)
 			target.Spec.Template.Labels[config.SidecarEnhanceLabel] = "true"
+			target.Spec.Template.Labels[config.ApplicationLabel] = target.Labels[config.ApplicationLabel]
+			target.Spec.Template.Labels[config.ServiceNameLabel] = target.Labels[config.ServiceNameLabel]
+			target.Spec.Template.Labels[config.ServiceGroupLabel] = target.Labels[config.ServiceGroupLabel]
 			added = true
 		} else {
 			// Check if the x-live-enabled label exists in deploy's spec.template.metadata.labels; if not, add it.
 			if _, ok := deploy.Spec.Template.Labels[config.WebHookMatchKey]; !ok {
 				log.Infof("[mutation] /injection-deploy: add label %s to deployment %s/%s", config.WebHookMatchKey, deploy.Name, deploy.Namespace)
 				target.Spec.Template.Labels[config.WebHookMatchKey] = config.WebHookMatchValue
+				target.Spec.Template.Labels[config.ApplicationLabel] = target.Labels[config.ApplicationLabel]
+				target.Spec.Template.Labels[config.ServiceNameLabel] = target.Labels[config.ServiceNameLabel]
+				target.Spec.Template.Labels[config.ServiceGroupLabel] = target.Labels[config.ServiceGroupLabel]
 				added = true
 			}
 		}
