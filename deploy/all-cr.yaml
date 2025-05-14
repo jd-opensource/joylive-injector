@@ -107,7 +107,7 @@ data:
     app.location.region=${APPLICATION_LOCATION_REGION:}
     app.location.zone=${APPLICATION_LOCATION_ZONE:}
     app.location.cluster=${APPLICATION_LOCATION_CLUSTER:}
-    app.location.liveSpaceId=${APPLICATION_LOCATION_LIVESPACE_ID:${CONFIG_LIVESPACE_ID}}
+    app.location.liveSpaceId=${APPLICATION_LOCATION_LIVESPACE_ID:${CONFIG_LIVESPACE_ID:}}
     app.location.unitRuleId=${APPLICATION_LOCATION_UNIT_RULE_ID}
     app.location.unit=${APPLICATION_LOCATION_UNIT:}
     app.location.cell=${APPLICATION_LOCATION_CELL:${NODE_CELL:}}
@@ -422,6 +422,7 @@ data:
             profile: ${CONFIG_CENTER_PROFILE:${APPLICATION_SERVICE_GROUP}}
         registry:
           enabled: ${CONFIG_REGISTRY_ENABLED:false}
+          registerAppServiceEnabled: ${REGISTER_APP_SERVICE_ENABLED:${CONFIG_REGISTRY_ENABLED:false}}
           subscribeMode: ${CONFIG_REGISTRY_SUBSCRIBE_MODE:AUTO}
           host:
             enabled: ${CONFIG_HOST_SERVICE_ENABLED:true}
