@@ -63,6 +63,10 @@ func GetApplicationEnvironments(labels map[string]string) (map[string]string, er
 		envMaps["APPLICATION_SERVICE_NAMESPACE"] = serviceSpace
 	}
 
+	if v, ok := labels[config.RegisterTypeLabel]; ok {
+		envMaps["CONFIG_REGISTRY_ENABLED"] = v
+	}
+
 	if group, ok := labels[config.ServiceGroupLabel]; ok {
 		envMaps["APPLICATION_SERVICE_GROUP"] = group
 	} else {

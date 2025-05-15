@@ -30,6 +30,7 @@ const (
 	JdapServiceSpaceLabel  = "jmsf.jd.com/service-space"
 	ApplicationLabel       = "jmsf.jd.com/app"
 	EnhanceTypeLabel       = "jmsf.jd.com/enhance"
+	RegisterTypeLabel      = "jmsf.jd.com/register"
 	EnhanceTypeAgent       = "agent"
 	EnhanceTypeSidecar     = "sidecar"
 	SidecarEnhanceLabel    = "sidecar.istio.io/inject"
