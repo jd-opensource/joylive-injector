@@ -102,8 +102,8 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 		if target.Spec.Template.Labels == nil {
 			target.Spec.Template.Labels = make(map[string]string)
 		}
-
-		if enhanceType, ok := deploy.Labels[config.EnhanceTypeLabel]; ok && enhanceType == config.EnhanceTypeSidecar {
+		enhanceType, enhanceTypeExist := deploy.Labels[config.EnhanceTypeLabel]
+		if enhanceTypeExist && enhanceType == config.EnhanceTypeSidecar {
 			log.Infof("[mutation] /injection-deploy: add label %s to deployment %s/%s", config.SidecarEnhanceLabel, deploy.Name, deploy.Namespace)
 			target.Spec.Template.Labels[config.SidecarEnhanceLabel] = "true"
 			target.Spec.Template.Labels[config.ApplicationLabel] = target.Labels[config.ApplicationLabel]
@@ -142,12 +142,7 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 			}
 		}
 
-		if len(config.ControlPlaneUrl) == 0 {
-			return &admissionv1.AdmissionResponse{
-				UID:     request.UID,
-				Allowed: true,
-			}, nil
-		} else {
+		if len(config.ControlPlaneUrl) != 0 && enhanceType == config.EnhanceTypeAgent {
 			added, err = AddApplicationEnvironments(deploy, target)
 			if err != nil {
 				errMsg := fmt.Sprintf("[mutation] /injection-deploy: failed to get application environments: %v", err)
