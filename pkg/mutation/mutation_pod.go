@@ -66,6 +66,15 @@ func injectionPod(request *admissionv1.AdmissionRequest) (*admissionv1.Admission
 
 		envs := makePodEnvs(&pod)
 		targetPod := pod.DeepCopy()
+
+		if pod.Labels == nil {
+			pod.Labels = make(map[string]string)
+		}
+
+		if targetPod.Labels == nil {
+			targetPod.Labels = make(map[string]string)
+		}
+
 		rs := resource.GetResource()
 		deploymentName, err := rs.GetDeploymentName(&pod, request.Namespace)
 		if err != nil {

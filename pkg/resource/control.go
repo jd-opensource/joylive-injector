@@ -30,12 +30,11 @@ func GetApplicationEnvironments(labels map[string]string) (map[string]string, er
 	envMaps := make(map[string]string)
 	if len(serviceSpace) != 0 && len(application) != 0 {
 		url := fmt.Sprintf(
-			"%s/ns/%s/application/%s/environments",
-			config.ControlPlaneUrl, serviceSpace, application,
+			"%s/ns/%s/application/%s/environments", config.ControlPlaneUrl, serviceSpace, application,
 		)
 		resp, err := http.Get(url)
 		if err != nil {
-			return nil, err
+			return nil, nil
 		}
 		defer resp.Body.Close()
 

@@ -87,6 +87,22 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 		target := deploy.DeepCopy()
 		added := false
 
+		if deploy.Labels == nil {
+			deploy.Labels = make(map[string]string)
+		}
+
+		if deploy.Spec.Template.Labels == nil {
+			deploy.Spec.Template.Labels = make(map[string]string)
+		}
+
+		if target.Labels == nil {
+			target.Labels = make(map[string]string)
+		}
+
+		if target.Spec.Template.Labels == nil {
+			target.Spec.Template.Labels = make(map[string]string)
+		}
+
 		if enhanceType, ok := deploy.Labels[config.EnhanceTypeLabel]; ok && enhanceType == config.EnhanceTypeSidecar {
 			log.Infof("[mutation] /injection-deploy: add label %s to deployment %s/%s", config.SidecarEnhanceLabel, deploy.Name, deploy.Namespace)
 			target.Spec.Template.Labels[config.SidecarEnhanceLabel] = "true"
