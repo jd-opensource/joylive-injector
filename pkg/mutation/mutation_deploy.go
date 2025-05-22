@@ -102,6 +102,8 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 		if target.Spec.Template.Labels == nil {
 			target.Spec.Template.Labels = make(map[string]string)
 		}
+
+		// Apply different label processing for different application enhancement types.
 		enhanceType, enhanceTypeExist := deploy.Labels[config.EnhanceTypeLabel]
 		if enhanceTypeExist && enhanceType == config.EnhanceTypeSidecar {
 			log.Infof("[mutation] /injection-deploy: add label %s to deployment %s/%s", config.SidecarEnhanceLabel, deploy.Name, deploy.Namespace)
