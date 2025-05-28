@@ -6,7 +6,7 @@ replicas: 2
 
 namespace: joylive
 
-clusterId:
+clusterId: ""
 
 matchLabels:
   matchKey: x-live-enabled
@@ -27,7 +27,7 @@ containerArgs:
   - --key=/etc/kubernetes/ssl/dac-key.pem
 
 matchEnvLabels: x-live, x-service
-controlPlaneUrl:
+controlPlaneUrl: ""
 
 imagePullSecrets: [ ]
 nameOverride: ""
@@ -38,7 +38,7 @@ serviceAccount:
   name: joylive-injector
 
 agent:
-  envs:
+  envs: { }
     # Set environment variables to be injected into the pod.
   image:
     repository: ghcr.m.daocloud.io/jd-opensource/joylive-agent
@@ -50,8 +50,8 @@ agent:
       headers: ${CONFIG_LIVE_SPACE_API_HEADERS}
       # for multilive-openapi
       jdcloud:
-        accessKey:
-        secretKey:
+        accessKey: ""
+        secretKey: ""
     lane:
       type: file
       url: http://api.jmsf.local:8080/v1
@@ -70,14 +70,14 @@ agent:
     service:
       localFirstMode: CELL
   location:
-    cloud:
-    region:
-    zone:
-    cluster:
-    liveSpaceId:
-    unitRuleId:
-    unit:
-    cell:
+    cloud: ""
+    region: ""
+    zone: ""
+    cluster: ""
+    liveSpaceId: ""
+    unitRuleId: ""
+    unit: ""
+    cell: ""
     laneSpaceId: default
     lane: base
 otel:
