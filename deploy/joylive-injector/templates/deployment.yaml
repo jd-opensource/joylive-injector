@@ -13,6 +13,9 @@ spec:
     metadata:
       labels:
         app: {{ include "joylive-injector.name" . }}
+        {{- range $key, $val := .Values.podLabels }}
+        {{ $key }}: "{{ $val }}"
+        {{- end }}
     spec:
       serviceAccountName: {{ include "joylive-injector.serviceAccountName" . }}
       affinity:

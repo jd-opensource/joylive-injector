@@ -85,6 +85,9 @@ spec:
       labels:
         app: opentelemetry
         component: otel-collector
+        {{- range $key, $val := .Values.podLabels }}
+        {{ $key }}: "{{ $val }}"
+        {{- end }}
     spec:
       containers:
         - command:

@@ -12,6 +12,9 @@ matchLabels:
   matchKey: x-live-enabled
   matchValue: '"true"'
 
+# Additional labels to apply on the pod level for monitoring and logging configuration.
+podLabels: {}
+
 image:
   repository: ghcr.m.daocloud.io/jd-opensource/joylive-injector
   pullPolicy: Always
