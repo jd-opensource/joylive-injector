@@ -15,7 +15,6 @@ import (
 	listerv1 "k8s.io/client-go/listers/core/v1"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
-	"os"
 	"reflect"
 	"time"
 )
@@ -87,6 +86,23 @@ func (w *ConfigMapWatcher) Start() error {
 					log.Error("failed on configmap DeleteFunc", zap.Error(err))
 					return
 				}
+				// 解析出 name
+				var name string
+				//var namespace string
+				if cm, ok := obj.(*v1.ConfigMap); ok {
+					name = cm.Name
+					//namespace = cm.Namespace
+				} else if tombstone, ok := obj.(cache.DeletedFinalStateUnknown); ok {
+					if cm, ok := tombstone.Obj.(*v1.ConfigMap); ok {
+						name = cm.Name
+						//namespace = cm.Namespace
+					}
+				}
+
+				if name == config.RuleConfigMapName {
+					config.InjectorRules = map[string]*config.InjectorRule{}
+					log.Info("injector rules configmap deleted, cleared InjectorRules", zap.String("cm", key))
+				}
 				log.Warn("configMap deleted", zap.String("cm", key))
 			},
 		}
@@ -125,10 +141,8 @@ func (w *ConfigMapWatcher) cacheConfigMap(configMap *v1.ConfigMap) error {
 	log.Info("Received ConfigMap update event, start updating local configuration.", zap.String("cm", configMap.Name),
 		zap.String("data", cmDataString))
 
-	defaultConfigMapName := os.Getenv(config.DefaultConfigMapEnvName)
-	ruleConfigMapName := os.Getenv(config.RuleConfigMapEnvName)
 	switch configMap.Name {
-	case defaultConfigMapName:
+	case config.ConfigMapName:
 		config.DefaultInjectorConfigMap = make(map[string]string, len(configMap.Data))
 		for k, v := range configMap.Data {
 			config.DefaultInjectorConfigMap[k] = v
@@ -141,7 +155,7 @@ func (w *ConfigMapWatcher) cacheConfigMap(configMap *v1.ConfigMap) error {
 			config.DefaultInjectorConfig = c
 			delete(config.DefaultInjectorConfigMap, config.InjectorConfigName)
 		}
-	case ruleConfigMapName:
+	case config.RuleConfigMapName:
 		rules := make(map[string]*config.InjectorRule, len(configMap.Data))
 		for key, value := range configMap.Data {
 			rule := &config.InjectorRule{}

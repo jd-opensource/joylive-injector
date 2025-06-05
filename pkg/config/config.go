@@ -52,6 +52,8 @@ var (
 	ClusterId         string
 	WebHookMatchKey   string
 	WebHookMatchValue string
+	ConfigMapName     = "joylive-injector-config"
+	RuleConfigMapName = "joylive-injector-rules"
 )
 
 // injection_deploy config
@@ -77,6 +79,8 @@ func init() {
 	ClusterId = os.Getenv(ClusterIdEnvName)
 	WebHookMatchKey = os.Getenv(WebHookMatchKeyEnv)
 	WebHookMatchValue = os.Getenv(WebHookMatchValueEnv)
+	ConfigMapName = os.Getenv(DefaultConfigMapEnvName)
+	RuleConfigMapName = os.Getenv(RuleConfigMapEnvName)
 }
 
 func GetNamespace() string {
