@@ -25,3 +25,9 @@ func GetAgentInjectConfig(yamlData string) (*AgentInjectorConfig, error) {
 	}
 	return &config, nil
 }
+
+type InjectorRule struct {
+	MatchLabels map[string]string `yaml:"matchLabels"`
+	Envs        map[string]string `yaml:"envs"`
+	Labels      map[string]string `yaml:"labels"`
+}

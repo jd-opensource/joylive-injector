@@ -75,6 +75,37 @@ func injectionPod(request *admissionv1.AdmissionRequest) (*admissionv1.Admission
 			targetPod.Labels = make(map[string]string)
 		}
 
+		addEnvs, addLabels := matchRule(pod.Labels)
+		if len(addEnvs) > 0 {
+			log.Infof("[mutation] /injection-pod: add envs %v to pod %s/%s by injector rule", addEnvs, pod.Name, pod.Namespace)
+			for k, v := range addEnvs {
+				// Check if the environment variable already exists
+				exists := false
+				for _, env := range pod.Spec.Containers[0].Env {
+					if env.Name == k {
+						exists = true
+						break
+					}
+				}
+				// If it exists, skip adding it
+				if exists {
+					continue
+				}
+				// Add the environment variable
+				targetPod.Spec.Containers[0].Env = append(targetPod.Spec.Containers[0].Env, corev1.EnvVar{Name: k, Value: v})
+			}
+		}
+
+		if len(addLabels) > 0 {
+			log.Infof("[mutation] /injection-pod: add labels %v to pod %s/%s by injector rule", addLabels, pod.Name, pod.Namespace)
+			for k, v := range addLabels {
+				// Check if the label already exists
+				if _, exists := targetPod.Labels[k]; !exists {
+					targetPod.Labels[k] = v
+				}
+			}
+		}
+
 		rs := resource.GetResource()
 		deploymentName, err := rs.GetDeploymentName(&pod, request.Namespace)
 		if err != nil {
@@ -390,4 +421,31 @@ func createPodPatch(target, original *corev1.Pod) ([]byte, error) {
 		return nil, err
 	}
 	return json.Marshal(patch)
+}
+
+func matchRule(labels map[string]string) (map[string]string, map[string]string) {
+	mergedEnvs := make(map[string]string)
+	mergedLabels := make(map[string]string)
+	for _, rule := range config.InjectorRules {
+		if isMatch(rule.MatchLabels, labels) {
+			// Merge Envs
+			for k, v := range rule.Envs {
+				mergedEnvs[k] = v
+			}
+			// Merge Labels
+			for k, v := range rule.Labels {
+				mergedLabels[k] = v
+			}
+		}
+	}
+	return mergedEnvs, mergedLabels
+}
+
+func isMatch(ruleLabels, labels map[string]string) bool {
+	for k, v := range ruleLabels {
+		if labels[k] != v {
+			return false
+		}
+	}
+	return true
 }

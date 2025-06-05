@@ -755,6 +755,8 @@ spec:
               value: debug
             - name: JOYLIVE_CONFIGMAP_NAME
               value: joylive-injector-config
+            - name: JOYLIVE_RULE_CONFIGMAP_NAME
+              value: joylive-injector-rules
             - name: JOYLIVE_NAMESPACE
               value: joylive
             - name: JOYLIVE_MATCH_ENV_LABELS

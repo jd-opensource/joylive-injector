@@ -22,6 +22,7 @@ image:
   tag: v1.2.2
 
 configMapName: joylive-injector-config
+ruleConfigMapName: joylive-injector-rules
 
 logLevel: debug
 

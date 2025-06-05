@@ -33,6 +33,8 @@ spec:
               value: {{ .Values.logLevel }}
             - name: JOYLIVE_CONFIGMAP_NAME
               value: {{ .Values.configMapName }}
+            - name: JOYLIVE_RULE_CONFIGMAP_NAME
+              value: {{ .Values.ruleConfigMapName }}
             - name: JOYLIVE_NAMESPACE
               value: {{ .Values.namespace }}
             - name: JOYLIVE_MATCH_ENV_LABELS

@@ -124,17 +124,37 @@ func (w *ConfigMapWatcher) cacheConfigMap(configMap *v1.ConfigMap) error {
 	cmDataString := string(cmDataBytes)
 	log.Info("Received ConfigMap update event, start updating local configuration.", zap.String("cm", configMap.Name),
 		zap.String("data", cmDataString))
-	if configMap.Name == os.Getenv(config.ConfigMapEnvName) {
-		config.DefaultInjectorConfigMap = configMap.Data
+
+	defaultConfigMapName := os.Getenv(config.DefaultConfigMapEnvName)
+	ruleConfigMapName := os.Getenv(config.RuleConfigMapEnvName)
+	switch configMap.Name {
+	case defaultConfigMapName:
+		config.DefaultInjectorConfigMap = make(map[string]string, len(configMap.Data))
+		for k, v := range configMap.Data {
+			config.DefaultInjectorConfigMap[k] = v
+		}
 		if data, ok := configMap.Data[config.InjectorConfigName]; ok {
 			c, err := config.GetAgentInjectConfig(data)
 			if err != nil {
-				return err
+				return fmt.Errorf("parse injector config error: %w", err)
 			}
 			config.DefaultInjectorConfig = c
 			delete(config.DefaultInjectorConfigMap, config.InjectorConfigName)
 		}
-	} else {
+	case ruleConfigMapName:
+		rules := make(map[string]*config.InjectorRule, len(configMap.Data))
+		for key, value := range configMap.Data {
+			rule := &config.InjectorRule{}
+			if err := yaml.Unmarshal([]byte(value), rule); err != nil {
+				return fmt.Errorf("unmarshal rule %s error: %w", key, err)
+			}
+			rules[key] = rule
+		}
+		config.InjectorRules = rules
+	default:
+		if config.InjectorConfigMaps == nil {
+			config.InjectorConfigMaps = make(map[string]map[string]string)
+		}
 		config.InjectorConfigMaps[configMap.Name] = configMap.Data
 	}
 	return nil
