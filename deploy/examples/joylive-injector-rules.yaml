@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: joylive-injector-rules
+  namespace: joylive
+  labels:
+    app: joylive-injector
+data:
+  default: |
+    matchLabels:
+    envs:
+      APPLICATION_LOCATION_CLUSTER: beijing01-slave
+    labels:
+
+  rule1: |
+    matchLabels:
+      app: nginx
+      env: prod
+    envs:
+      LOG_LEVEL: info
+      TIMEZONE: UTC
+    labels:
+      team: ops
+      tier: frontend
+
+  rule2: |
+    matchLabels:
+      app: joylive-demo-springboot2021-provider
+    envs:
+      APPLICATION_LOCATION_LANE: cn-gray
+      APPLICATION_SERVICE_NAMESPACE: deno-sys
+      CONFIG_REGISTRY_ADDRESS_FIRST: 11.50.139.254:30520?grpc.port=31520
+      REGISTRY_NAMESPACE: deno-sys
+      CONFIG_LANE_ENABLED: "true"
+      CONFIG_FLOW_CONTROL_ENABLED: "true"
+      APPLICATION_NAME: deno-sys-service-provider
+      APPLICATION_SERVICE_GROUP: default
+      APPLICATION_SERVICE_NAME: service-provider
+      LIVE_LOG_APPENDER: CONSOLE_APPENDER
+      CONFIG_REGISTRY_ENABLED: "true"
+      REGISTRY_EXTERNAL_HTTP_PORT: "30520"
+      REGISTRY_EXTERNAL_GRPC_PORT: "31520"
+      REGISTRY_EXTERNAL_HOST: 11.50.139.254
+      REGISTRY_USERNAME: nacos
+      REGISTRY_PASSWORD: nacos
+      x-live-enabled: "true"
+    labels:
+      team: dev
+      project: alpha
