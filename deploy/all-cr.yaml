@@ -943,7 +943,7 @@ metadata:
     integration: tpaas-jmsf-otel
     inputType: integrations
     release: brolly
-  name: tpaas-jmsf-otel
+  name: tpaas-jmsf-otel-slave
   namespace: brolly
 spec:
   endpoints:
