@@ -131,7 +131,7 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 		// Apm labels append
 		if apmType, ok := deploy.Labels[config.ApmTypeLabel]; ok {
 			if appender, ok := apm.AppenderTypes[apmType]; ok {
-				added, err = appender.Modify(context.Background(), target)
+				addedApm, err := appender.Modify(context.Background(), target)
 				if err != nil {
 					errMsg := fmt.Sprintf("[mutation] /injection-deploy: failed to modify deployment: %v", err)
 					log.Error(errMsg)
@@ -143,13 +143,16 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 						},
 					}, nil
 				}
+				if addedApm {
+					added = true
+				}
 			} else {
 				log.Warnf("[mutation] /injection-deploy: unknown apm type %s", apmType)
 			}
 		}
 
 		if len(config.ControlPlaneUrl) != 0 && enhanceType == config.EnhanceTypeAgent {
-			added, err = AddApplicationEnvironments(deploy, target)
+			addedEnv, err := AddApplicationEnvironments(deploy, target)
 			if err != nil {
 				errMsg := fmt.Sprintf("[mutation] /injection-deploy: failed to get application environments: %v", err)
 				return &admissionv1.AdmissionResponse{
@@ -159,6 +162,9 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 						Message: errMsg,
 					},
 				}, err
+			}
+			if addedEnv {
+				added = true
 			}
 		}
 		if !added {
