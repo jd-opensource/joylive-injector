@@ -279,5 +279,7 @@ func createDeployPatch(target, original *appsv1.Deployment) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Infof("[mutation] /injection-deploy: create patch for deployment %s/%s, patch: %v",
+		target.Name, target.Namespace, patch)
 	return json.Marshal(patch)
 }
