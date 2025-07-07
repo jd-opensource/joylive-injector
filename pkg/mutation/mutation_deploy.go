@@ -111,6 +111,10 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 			target.Spec.Template.Labels[config.ApplicationLabel] = target.Labels[config.ApplicationLabel]
 			target.Spec.Template.Labels[config.ServiceNameLabel] = target.Labels[config.ServiceNameLabel]
 			target.Spec.Template.Labels[config.ServiceGroupLabel] = target.Labels[config.ServiceGroupLabel]
+			if _, ok := target.Spec.Template.Labels[config.WebHookMatchKey]; ok {
+				// remove
+				delete(target.Spec.Template.Labels, config.WebHookMatchKey)
+			}
 			added = true
 		} else {
 			// Check if the x-live-enabled label exists in deploy's spec.template.metadata.labels; if not, add it.
