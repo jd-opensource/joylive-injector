@@ -19,7 +19,7 @@ image:
   repository: ghcr.m.daocloud.io/jd-opensource/joylive-injector
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: v1.2.2
+  tag: v1.2.3
 
 configMapName: joylive-injector-config
 ruleConfigMapName: joylive-injector-rules
