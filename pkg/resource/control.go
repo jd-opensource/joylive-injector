@@ -3,9 +3,10 @@ package resource
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/jd-opensource/joylive-injector/pkg/config"
 	"io"
 	"net/http"
+
+	"github.com/jd-opensource/joylive-injector/pkg/config"
 )
 
 type Response struct {

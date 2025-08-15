@@ -857,7 +857,7 @@ spec:
             - name: JOYLIVE_MATCH_VALUE
               value: "true"
           name: joylive-injector
-          image: ghcr.m.daocloud.io/jd-opensource/joylive-injector:v1.2.3
+          image: ghcr.m.daocloud.io/jd-opensource/joylive-injector:v1.2.4
           imagePullPolicy: Always
           args:
             - --cert=/etc/kubernetes/ssl/dac.pem
