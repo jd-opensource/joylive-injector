@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"github.com/jd-opensource/joylive-injector/pkg/admission"
 	"github.com/jd-opensource/joylive-injector/pkg/apm"
 	"github.com/jd-opensource/joylive-injector/pkg/config"
@@ -18,7 +20,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"net/http"
 )
 
 func init() {
@@ -67,6 +68,16 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 				Result: &metav1.Status{
 					Code:    http.StatusBadRequest,
 					Message: errMsg,
+				},
+			}, nil
+		}
+		if whmv, ok := deploy.Labels[config.WebHookMatchKey]; !ok || whmv != config.WebHookMatchValue {
+			log.Infof("[mutation] /injection-deploy: deployment: %s, namespace: %s does not match the webhook, skip", deploy.Name, deploy.Namespace)
+			return &admissionv1.AdmissionResponse{
+				Allowed: true,
+				Result: &metav1.Status{
+					Code:    http.StatusOK,
+					Message: "success",
 				},
 			}, nil
 		}
