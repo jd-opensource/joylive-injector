@@ -23,6 +23,7 @@ webhooks:
     sideEffects: None
     timeoutSeconds: 5
     failurePolicy: Fail
+    matchPolicy: Exact
     objectSelector:
       matchLabels: {{ include "joylive-injector.matchLabels" . | nindent 8 }}
   - name: "joylive-injector-pod.joylive.io"
@@ -44,5 +45,6 @@ webhooks:
     sideEffects: None
     timeoutSeconds: 5
     failurePolicy: Fail
+    matchPolicy: Exact
     objectSelector:
       matchLabels: {{ include "joylive-injector.matchLabels" . | nindent 8 }}

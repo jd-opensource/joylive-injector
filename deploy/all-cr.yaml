@@ -982,6 +982,7 @@ webhooks:
     sideEffects: None
     timeoutSeconds: 5
     failurePolicy: Fail
+    matchPolicy: Exact
     objectSelector:
       matchLabels: 
         x-live-enabled : "true"
@@ -1004,6 +1005,7 @@ webhooks:
     sideEffects: None
     timeoutSeconds: 5
     failurePolicy: Fail
+    matchPolicy: Exact
     objectSelector:
       matchLabels: 
         x-live-enabled : "true"
