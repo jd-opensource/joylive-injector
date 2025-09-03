@@ -238,7 +238,13 @@ func addPodInitContainer(targetPod *corev1.Pod, _ []corev1.EnvVar, deploymentNam
 				agentVersion = v.Version
 				log.Info("[mutation] injection-pod: Inject the specified version to pod",
 					zap.String("pod", targetPod.Name), zap.String("version", agentVersion))
+			} else {
+				log.Warnf("[mutation] injection-pod: The specified version %s is not enabled or the configuration information is missing, using the default version %s",
+					av, config.DefaultInjectorConfig.AgentConfig.Version)
 			}
+		} else {
+			log.Warnf("[mutation] injection-pod: The specified version %s does not exist, using the default version %s",
+				av, config.DefaultInjectorConfig.AgentConfig.Version)
 		}
 	}
 	agentInitContainer := &corev1.Container{

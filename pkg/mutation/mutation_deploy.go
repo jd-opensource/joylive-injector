@@ -242,14 +242,24 @@ func AddApplicationEnvironments(source appsv1.Deployment, target *appsv1.Deploym
 
 func createOrUpdateConfigMap(deploy *appsv1.Deployment) error {
 	configMapData := config.DefaultInjectorConfigMap
-	if version, ok := deploy.Spec.Template.Labels[config.AgentVersionLabel]; ok {
+	// Prefer version from pod template labels, fallback to deployment labels.
+	version, ok := deploy.Spec.Template.Labels[config.AgentVersionLabel]
+	if !ok {
+		version = deploy.Labels[config.AgentVersionLabel]
+	}
+
+	if version != "" {
 		if agentVersion, ok := config.InjectorAgentVersion[version]; ok {
 			cmd, configExists := config.InjectorConfigMaps[agentVersion.ConfigMapName]
 			if agentVersion.Enable && configExists {
 				configMapData = cmd
-				log.Info("[mutation] injection-deploy: Inject the specified version of configMap",
+				log.Info("[mutation] injection-deploy: Injecting specified version of ConfigMap",
 					zap.String("deployment", deploy.Name), zap.String("version", version),
 					zap.String("cmName", agentVersion.ConfigMapName))
+				// Ensure the pod template has the agent version label.
+				deploy.Spec.Template.Labels[config.AgentVersionLabel] = version
+			} else {
+				log.Warnf("[mutation] injection-deploy: Specified agent version '%s' for deployment '%s' is not enabled or its config is missing. Using default.", version, deploy.Name)
 			}
 		}
 	}
