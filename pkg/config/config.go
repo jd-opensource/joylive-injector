@@ -22,6 +22,7 @@ const (
 	NamespaceEnvName        = "JOYLIVE_NAMESPACE"
 	MatchLabelsEnvName      = "JOYLIVE_MATCH_ENV_LABELS"
 	ControlPlaneUrlEnvName  = "JOYLIVE_CONTROL_PLANE_URL"
+	FilterSensitiveEnvName  = "JOYLIVE_FILTER_SENSITIVE"
 	ClusterIdEnvName        = "JOYLIVE_CLUSTER_ID"
 	DefaultNamespace        = "joylive"
 	AgentVersionLabel       = "x-live-version"
@@ -49,6 +50,7 @@ var (
 	Addr              string
 	MatchLabels       string
 	ControlPlaneUrl   string
+	FilterSensitive   string
 	ClusterId         string
 	WebHookMatchKey   string
 	WebHookMatchValue string
@@ -75,6 +77,8 @@ func init() {
 	MatchLabels = os.Getenv(MatchLabelsEnvName)
 	// Initialize the default control plane url from environment variables
 	ControlPlaneUrl = os.Getenv(ControlPlaneUrlEnvName)
+	// Initialize the switch for filter sensitive from environment variables
+	FilterSensitive = os.Getenv(FilterSensitiveEnvName)
 	// Initialize the default cluster id from environment variables
 	ClusterId = os.Getenv(ClusterIdEnvName)
 	WebHookMatchKey = os.Getenv(WebHookMatchKeyEnv)

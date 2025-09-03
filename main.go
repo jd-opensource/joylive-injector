@@ -113,6 +113,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&config.Key, "key", "", "Admission Controller TLS cert key")
 	rootCmd.PersistentFlags().StringVar(&config.MatchLabels, "match-label", config.MatchLabels, "Match label")
 	rootCmd.PersistentFlags().StringVar(&config.ControlPlaneUrl, "control-plane-url", config.ControlPlaneUrl, "Control Plane URL")
+	rootCmd.PersistentFlags().StringVar(&config.FilterSensitive, "filter-sensitive", config.FilterSensitive, "Filter Sensitive Switch")
 	rootCmd.PersistentFlags().StringVar(&config.ClusterId, "cluster-id", config.ClusterId, "Cluster ID")
 	//rootCmd.PersistentFlags().StringVar(&config.KubeConfig, "kubeconfig", config.KubeConfig, "Path to the kubeconfig file")
 

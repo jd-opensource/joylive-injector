@@ -58,9 +58,11 @@ func GetApplicationEnvironments(labels map[string]string) (map[string]string, er
 			return nil, response.Error
 		}
 		for key, value := range response.Data {
-			// Filter out keys ending with "USERNAME" and "PASSWORD" to enhance security.
-			if strings.HasSuffix(key, "USERNAME") || strings.HasSuffix(key, "PASSWORD") {
-				continue
+			if len(config.FilterSensitive) != 0 && config.FilterSensitive == "true" {
+				// Filter out keys ending with "USERNAME" and "PASSWORD" to enhance security.
+				if strings.HasSuffix(key, "USERNAME") || strings.HasSuffix(key, "PASSWORD") {
+					continue
+				}
 			}
 			envMaps[key] = value
 		}

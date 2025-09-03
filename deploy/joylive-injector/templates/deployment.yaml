@@ -41,6 +41,8 @@ spec:
               value: {{ .Values.matchEnvLabels }}
             - name: JOYLIVE_CONTROL_PLANE_URL
               value: {{ .Values.controlPlaneUrl }}
+            - name: JOYLIVE_FILTER_SENSITIVE
+              value: {{ .Values.filterSensitive }}
             - name: JOYLIVE_CLUSTER_ID
               value: {{ .Values.clusterId }}
             - name: JOYLIVE_MATCH_KEY
