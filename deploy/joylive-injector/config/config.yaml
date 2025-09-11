@@ -33,6 +33,8 @@ agent:
       com.jd.live.agent.core.util.http.HttpUtils:
         - java.net.URI
   timer:
+    tickTime: ${CONFIG_TIMER_TICK_TIME:100}
+    ticks: ${CONFIG_TIMER_TICKS:512}
     workerThreads: ${CONFIG_TIMER_WORKER_THREADS:4}
   publisher:
     configs:
@@ -207,6 +209,7 @@ agent:
         type: SmoothBursty
         cleanInterval: 30000
         expireTime: 60000
+        configs: ${CONFIG_RATE_LIMITER_CONFIG:}
       loadLimiter:
         cpuUsage: ${CONFIG_MAX_CPU_USAGE:}
         loadUsage: ${CONFIG_MAX_LOAD_USAGE:}
@@ -222,20 +225,26 @@ agent:
     mq:
       liveMode: ${CONFIG_LIVE_MQ_MODE:ISOLATION_CLUSTER}
       laneMode: ${CONFIG_LANE_MQ_MODE:SHARED}
-      groupExpression: ${CONFIG_MQ_GROUP_EXPRESSION:${group}${'_lane_'lane}}
+      groupExpression: ${CONFIG_MQ_GROUP_EXPRESSION:${group}${_!lane}}
       topics:
     db:
       accessMode: ${CONFIG_DB_ACCESS_MODE:READ_WRITE}
     live:
       fallbackLocationIfNoSpace: ${CONFIG_FALLBACK_LOCATION_IF_NO_SPACE:false}
+      hostEnabled: ${CONFIG_LIVE_HOST_ENABLED:false}
+      hostExpression: ${CONFIG_LIVE_HOST_EXPRESSION}
+      hosts: ${CONFIG_LIVE_HOSTS}
     lane:
       fallbackLocationIfNoSpace: ${CONFIG_FALLBACK_LOCATION_IF_NO_SPACE:false}
+      hostEnabled: ${CONFIG_LANE_HOST_ENABLED:false}
+      hostExpression: ${CONFIG_LANE_HOST_EXPRESSION}
+      hosts: ${CONFIG_LANE_HOSTS}
     router:
       spring:
         discovery:
           disables: ${CONFIG_SPRING_DISCOVERY_DISABLES}
-      phevos:
-        groupExpression: ${unit}-${cell}-${group}
+        gateway:
+          pathFilters: ${CONFIG_SPRING_GATEWAY_PATH_FILTERS}
     transmission:
       type: ${CONFIG_TRANSMISSION_TYPE:live}
       autoDetect: ${CONFIG_TRANSMISSION_AUTO_DETECT:NONE}
@@ -259,8 +268,8 @@ agent:
           - org.apache.tomcat.util.threads.ThreadPoolExecutor
           - org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor
           - org.apache.tomcat.util.threads.InlineExecutorService
+          - org.apache.juli.AsyncFileHandler$LoggerExecutorService
           - javax.management.NotificationBroadcasterSupport$1
-          - com.netflix.stats.distribution.DataPublisher$PublishThreadFactory
           - com.alibaba.druid.pool.DruidAbstractDataSource$SynchronousExecutor
         excludeTasks:
           - com.jd.live.agent.core.thread.NamedThreadFactory
@@ -276,15 +285,18 @@ agent:
           - io.sermant.implement.service.xds.handler.XdsHandler.NamedThreadFactory
           - io.sermant.discovery.factory.RealmServiceThreadFactory
           - org.apache.skywalking.apm.agent.core.boot.DefaultNamedThreadFactory
+          - com.netflix.stats.distribution.DataPublisher$PublishThreadFactory
           - sun.rmi.runtime.RuntimeUtil$1
           - sun.rmi.transport.tcp.TCPTransport$1
           - sun.rmi.transport.DGCImpl$1
           - sun.rmi.transport.DGCAckHandler$1
           - org.apache.tomcat.util.threads.TaskThreadFactory
+          - org.apache.juli.FileHandler$ThreadFactory
+          - com.tongweb.container.startup.HostConfig$DeployWar
+          - sun.nio.fs.PollingWatchService$PollingWatchKey$1
         excludeExecutorPrefixes:
           - com.jd.live.agent.shaded.
           - com.netflix.hystrix.util.HystrixTimer$ScheduledExecutor$
-          - com.netflix.stats.distribution.DataPublisher$PublishThreadFactory$
           - com.alibaba.nacos.
         excludeTaskPrefixes:
           - reactor.core.scheduler.BoundedElasticScheduler$$Lambda
