@@ -10,7 +10,7 @@ clusterId: ""
 
 matchLabels:
   matchKey: x-live-enabled
-  matchValue: '"true"'
+  matchValue: "true"
 
 # Additional labels to apply on the pod level for monitoring and logging configuration.
 podLabels: {}

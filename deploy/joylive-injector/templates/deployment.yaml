@@ -30,25 +30,25 @@ spec:
       containers:
         - env:
             - name: LOG_LEVEL
-              value: {{ .Values.logLevel }}
+              value: "{{ .Values.logLevel }}"
             - name: JOYLIVE_CONFIGMAP_NAME
-              value: {{ .Values.configMapName }}
+              value: "{{ .Values.configMapName }}"
             - name: JOYLIVE_RULE_CONFIGMAP_NAME
-              value: {{ .Values.ruleConfigMapName }}
+              value: "{{ .Values.ruleConfigMapName }}"
             - name: JOYLIVE_NAMESPACE
-              value: {{ .Values.namespace }}
+              value: "{{ .Values.namespace }}"
             - name: JOYLIVE_MATCH_ENV_LABELS
-              value: {{ .Values.matchEnvLabels }}
+              value: "{{ .Values.matchEnvLabels }}"
             - name: JOYLIVE_CONTROL_PLANE_URL
-              value: {{ .Values.controlPlaneUrl }}
+              value: "{{ .Values.controlPlaneUrl }}"
             - name: JOYLIVE_FILTER_SENSITIVE
-              value: {{ .Values.filterSensitive }}
+              value: "{{ .Values.filterSensitive }}"
             - name: JOYLIVE_CLUSTER_ID
-              value: {{ .Values.clusterId }}
+              value: "{{ .Values.clusterId }}"
             - name: JOYLIVE_MATCH_KEY
-              value: {{ .Values.matchLabels.matchKey}}
+              value: "{{ .Values.matchLabels.matchKey}}"
             - name: JOYLIVE_MATCH_VALUE
-              value: {{ .Values.matchLabels.matchValue }}
+              value: "{{ .Values.matchLabels.matchValue }}"
           name: joylive-injector
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}

@@ -847,23 +847,23 @@ spec:
       containers:
         - env:
             - name: LOG_LEVEL
-              value: debug
+              value: "debug"
             - name: JOYLIVE_CONFIGMAP_NAME
-              value: joylive-injector-config
+              value: "joylive-injector-config"
             - name: JOYLIVE_RULE_CONFIGMAP_NAME
-              value: joylive-injector-rules
+              value: "joylive-injector-rules"
             - name: JOYLIVE_NAMESPACE
-              value: joylive
+              value: "joylive"
             - name: JOYLIVE_MATCH_ENV_LABELS
-              value: x-live, x-service
+              value: "x-live, x-service"
             - name: JOYLIVE_CONTROL_PLANE_URL
-              value: 
+              value: ""
             - name: JOYLIVE_FILTER_SENSITIVE
-              value: enabled
+              value: "enabled"
             - name: JOYLIVE_CLUSTER_ID
-              value: 
+              value: ""
             - name: JOYLIVE_MATCH_KEY
-              value: x-live-enabled
+              value: "x-live-enabled"
             - name: JOYLIVE_MATCH_VALUE
               value: "true"
           name: joylive-injector
@@ -999,7 +999,7 @@ webhooks:
     failurePolicy: Fail
     objectSelector:
       matchLabels: 
-        x-live-enabled : "true"
+        x-live-enabled : true
   - name: "joylive-injector-pod.joylive.io"
     rules:
       - apiGroups: [ "" ]
@@ -1020,7 +1020,7 @@ webhooks:
     failurePolicy: Fail
     objectSelector:
       matchLabels: 
-        x-live-enabled : "true"
+        x-live-enabled : true
 ---
 # Source: joylive-injector/templates/servicemonitor.yaml
 apiVersion: monitoring.coreos.com/v1
