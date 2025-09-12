@@ -859,7 +859,7 @@ spec:
             - name: JOYLIVE_CONTROL_PLANE_URL
               value: ""
             - name: JOYLIVE_FILTER_SENSITIVE
-              value: "enabled"
+              value: "true"
             - name: JOYLIVE_CLUSTER_ID
               value: ""
             - name: JOYLIVE_MATCH_KEY

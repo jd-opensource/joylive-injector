@@ -32,7 +32,7 @@ containerArgs:
 
 matchEnvLabels: x-live, x-service
 controlPlaneUrl: ""
-filterSensitive: "enabled" # enabled or disabled
+filterSensitive: "true"
 
 imagePullSecrets: [ ]
 nameOverride: ""
