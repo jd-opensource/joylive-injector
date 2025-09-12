@@ -16,7 +16,6 @@
 - 支持注入指定版本`joylive-agent`及对应配置。
 
 ## 使用方式
-
 因证书签名已按照命名空间为`joylive`预生成，所以须指定安装到对应命名空间。 执行命令：
 ```bash
 helm repo add joylive https://jd-opensource.github.io/joylive-helm-charts
