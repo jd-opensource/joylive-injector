@@ -55,7 +55,7 @@ app: {{ .Chart.Name }}
 Match labels
 */}}
 {{- define "joylive-injector.matchLabels" -}}
-{{ .Values.matchLabels.matchKey}} : {{ .Values.matchLabels.matchValue }}
+{{ .Values.matchLabels.matchKey}} : "{{ .Values.matchLabels.matchValue }}"
 {{- end }}
 
 {{/*

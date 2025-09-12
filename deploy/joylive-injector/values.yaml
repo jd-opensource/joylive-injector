@@ -9,7 +9,7 @@ namespace: joylive
 clusterId: ""
 
 matchLabels:
-  matchKey: x-live-enabled
+  matchKey: "x-live-enabled"
   matchValue: "true"
 
 # Additional labels to apply on the pod level for monitoring and logging configuration.

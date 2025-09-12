@@ -999,7 +999,7 @@ webhooks:
     failurePolicy: Fail
     objectSelector:
       matchLabels: 
-        x-live-enabled : true
+        x-live-enabled : "true"
   - name: "joylive-injector-pod.joylive.io"
     rules:
       - apiGroups: [ "" ]
@@ -1020,7 +1020,7 @@ webhooks:
     failurePolicy: Fail
     objectSelector:
       matchLabels: 
-        x-live-enabled : true
+        x-live-enabled : "true"
 ---
 # Source: joylive-injector/templates/servicemonitor.yaml
 apiVersion: monitoring.coreos.com/v1
