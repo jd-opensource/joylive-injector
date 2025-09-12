@@ -58,7 +58,7 @@ func GetApplicationEnvironments(labels map[string]string) (map[string]string, er
 			return nil, response.Error
 		}
 		for key, value := range response.Data {
-			if len(config.FilterSensitive) != 0 && config.FilterSensitive == "true" {
+			if len(config.FilterSensitive) != 0 && config.FilterSensitive == "enabled" {
 				// Filter out keys ending with "USERNAME" and "PASSWORD" to enhance security.
 				if strings.HasSuffix(key, "USERNAME") || strings.HasSuffix(key, "PASSWORD") {
 					continue
