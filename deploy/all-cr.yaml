@@ -405,6 +405,8 @@ data:
             gateway:
               pathFilters: ${CONFIG_SPRING_GATEWAY_PATH_FILTERS}
               pathFilterPrefixes: ${CONFIG_SPRING_GATEWAY_PATH_FILTER_PREFIXES}
+            phevos:
+              groupExpression: ${unit}-${cell}-${group}
         transmission:
           type: ${CONFIG_TRANSMISSION_TYPE:live}
           autoDetect: ${CONFIG_TRANSMISSION_AUTO_DETECT:NONE}
@@ -536,8 +538,8 @@ data:
             command: ${CONFIG_PROBE_ZOOKEEPER_COMMAND:srvr}
             response: ${CONFIG_PROBE_ZOOKEEPER_RESPONSE:}
           nacos:
-            paths: ${CONFIG_PROBE_NACOS_PATH:/nacos/v1/console/health/liveness;/v3/console/health/readiness;/nacos/health}
-            responses: ${CONFIG_PROBE_NACOS_RESPONSE:OK;SUCCESS}
+            paths: ${CONFIG_PROBE_NACOS_PATH:nacos/v1/ns/operator/metrics?onlyStatus=true}
+            responses: ${CONFIG_PROBE_NACOS_RESPONSE:UP}
         redis:
           command:
             manage: ${CONFIG_REDIS_MANAGE_COMMANDS:ACL,AUTH,AUTH2,HELLO,PING,QUIT,SELECT,SWAPDB,DBSIZE,FLUSHDB,FLUSHALL,TIME,CONFIG,INFO,SHUTDOWN,MONITOR,SLAVEOF,REPLICAOF,CLIENT,ASKING,READONLY,READWRITE,CLUSTER,SENTINEL,MODULE,LASTSAVE,SAVE,BGSAVE,BGREWRITEAOF,ROLE,FAILOVER,SLOWLOG,LOLWUT,COMMAND,RESET,LATENCY,WAIT,WAITAOF,MULTI,DISCARD,WATCH,UNWATCH}
