@@ -84,7 +84,7 @@ func GetApplicationEnvironments(labels map[string]string) (map[string]string, er
 		envMaps["APPLICATION_SERVICE_NAME"] = service
 	}
 
-	envMaps["APPLICATION_LOCATION_CLUSTER"] = config.ClusterId
+	//envMaps["APPLICATION_LOCATION_CLUSTER"] = config.ClusterId
 
 	if swimlane, ok := labels[config.SwimLaneLabel]; ok {
 		envMaps["CONFIG_LANE_ENABLED"] = "true"
