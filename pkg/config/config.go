@@ -33,6 +33,7 @@ const (
 	ApplicationLabel        = "jmsf.jd.com/app"
 	EnhanceTypeLabel        = "jmsf.jd.com/enhance"
 	RegisterTypeLabel       = "jmsf.jd.com/register"
+	ConfigureTypeLabel      = "jmsf.jd.com/configure"
 	EnhanceTypeAgent        = "agent"
 	EnhanceTypeSidecar      = "sidecar"
 	SidecarEnhanceLabel     = "sidecar.istio.io/inject"
