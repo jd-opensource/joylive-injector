@@ -255,6 +255,10 @@ func addPodInitContainer(targetPod *corev1.Pod, _ []corev1.EnvVar, deploymentNam
 		Env: func(envMap map[string]string) []corev1.EnvVar {
 			envVars := make([]corev1.EnvVar, 0, len(envMap))
 			for key, value := range envMap {
+				if key == "JAVA_TOOL_OPTIONS" {
+					v := getEnv(targetPod.Spec.Containers, key)
+					value = value + " " + v
+				}
 				envVars = append(envVars, corev1.EnvVar{Name: key, Value: value})
 			}
 			return envVars
@@ -287,6 +291,19 @@ func addPodInitContainer(targetPod *corev1.Pod, _ []corev1.EnvVar, deploymentNam
 
 	initContainers = append(initContainers, *agentInitContainer)
 	return initContainers
+}
+
+func getEnv(containers []corev1.Container, key string) string {
+	for _, container := range containers {
+		if container.Env != nil && len(container.Env) > 0 {
+			for _, envVar := range container.Env {
+				if envVar.Name == key {
+					return envVar.Value
+				}
+			}
+		}
+	}
+	return ""
 }
 
 func modifyPodContainer(targetPod *corev1.Pod, envs []corev1.EnvVar, deploymentName string) []corev1.Container {
