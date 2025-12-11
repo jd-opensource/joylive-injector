@@ -3,6 +3,8 @@ package mutation
 import (
 	"encoding/json"
 	"fmt"
+	"istio.io/api/annotation"
+	"istio.io/api/label"
 	"net/http"
 	"strings"
 
@@ -75,35 +77,11 @@ func injectionPod(request *admissionv1.AdmissionRequest) (*admissionv1.Admission
 			targetPod.Labels = make(map[string]string)
 		}
 
-		addEnvs, addLabels := matchRule(pod.Labels)
-		if len(addEnvs) > 0 {
-			log.Infof("[mutation] /injection-pod: add envs %v to pod %s/%s by injector rule", addEnvs, pod.Name, pod.Namespace)
-			for k, v := range addEnvs {
-				// Check if the environment variable already exists
-				exists := false
-				for _, env := range pod.Spec.Containers[0].Env {
-					if env.Name == k {
-						exists = true
-						break
-					}
-				}
-				// If it exists, skip adding it
-				if exists {
-					continue
-				}
-				// Add the environment variable
-				targetPod.Spec.Containers[0].Env = append(targetPod.Spec.Containers[0].Env, corev1.EnvVar{Name: k, Value: v})
-			}
-		}
-
-		if len(addLabels) > 0 {
-			log.Infof("[mutation] /injection-pod: add labels %v to pod %s/%s by injector rule", addLabels, pod.Name, pod.Namespace)
-			for k, v := range addLabels {
-				// Check if the label already exists
-				if _, exists := targetPod.Labels[k]; !exists {
-					targetPod.Labels[k] = v
-				}
-			}
+		if len(targetPod.Spec.Containers) == 0 {
+			return &admissionv1.AdmissionResponse{
+				UID:     request.UID,
+				Allowed: true,
+			}, nil
 		}
 
 		rs := resource.GetResource()
@@ -120,11 +98,59 @@ func injectionPod(request *admissionv1.AdmissionRequest) (*admissionv1.Admission
 			}, nil
 		}
 
-		targetPod.Spec.InitContainers = addPodInitContainer(targetPod, envs, deploymentName)
-		targetPod.Spec.Containers = modifyPodContainer(targetPod, envs, deploymentName)
-		targetPod.Spec.Volumes = addPodVolume(targetPod, deploymentName)
+		// Apply different label processing for different application enhancement types.
+		enhanceType, enhanceTypeExist := pod.Labels[config.EnhanceTypeLabel]
+		sidecarInjectValue, sidecarInjectExist := pod.Labels[config.SidecarEnhanceLabel]
+		if enhanceTypeExist && enhanceType == config.EnhanceTypeSidecar || (sidecarInjectExist && sidecarInjectValue == "true") {
+			err := injectSidecarOption(targetPod, deploymentName)
+			if err != nil {
+				errMsg := fmt.Sprintf("[mutation] /injection-pod: failed to add istio config by pod: %v", err)
+				log.Error(errMsg)
+				return &admissionv1.AdmissionResponse{
+					UID:     request.UID,
+					Allowed: true,
+				}, nil
+			}
+		} else {
+			// 默认执行agent
+			addEnvs, addLabels := matchRule(pod.Labels)
+			if len(addEnvs) > 0 {
+				log.Infof("[mutation] /injection-pod: add envs %v to pod %s/%s by injector rule", addEnvs, pod.Name, pod.Namespace)
+				for k, v := range addEnvs {
+					// Check if the environment variable already exists
+					exists := false
+					for _, env := range pod.Spec.Containers[0].Env {
+						if env.Name == k {
+							exists = true
+							break
+						}
+					}
+					// If it exists, skip adding it
+					if exists {
+						continue
+					}
+					// Add the environment variable
+					targetPod.Spec.Containers[0].Env = append(targetPod.Spec.Containers[0].Env, corev1.EnvVar{Name: k, Value: v})
+				}
+			}
 
-		log.Debug("[mutation] /injection-pod: add configmap volume finished")
+			if len(addLabels) > 0 {
+				log.Infof("[mutation] /injection-pod: add labels %v to pod %s/%s by injector rule", addLabels, pod.Name, pod.Namespace)
+				for k, v := range addLabels {
+					// Check if the label already exists
+					if _, exists := targetPod.Labels[k]; !exists {
+						targetPod.Labels[k] = v
+					}
+				}
+			}
+
+			targetPod.Spec.InitContainers = addPodInitContainer(targetPod, envs, deploymentName)
+			targetPod.Spec.Containers = modifyPodContainer(targetPod, envs, deploymentName)
+			targetPod.Spec.Volumes = addPodVolume(targetPod, deploymentName)
+
+			log.Debug("[mutation] /injection-pod: add configmap volume finished")
+		}
+
 		// path
 		patchStr, err := createPodPatch(targetPod, &pod)
 		if err != nil {
@@ -471,4 +497,107 @@ func isMatch(ruleLabels, labels map[string]string) bool {
 		}
 	}
 	return true
+}
+func injectSidecarOption(targetPod *corev1.Pod, deploymentName string) error {
+	// Check if the pod is a sidecar pod
+	log.Debugf("[mutation] /injection-pod: EnableSidecarSetting: %s ", config.EnableSidecarSetting)
+
+	if config.EnableSidecarSetting == "true" && injectIstioRequired(targetPod.ObjectMeta) {
+		// If it is a sidecar pod, check if the sidecar pod is already injected
+		log.Debugf("[mutation] /injection-pod: injectIstioRequired")
+
+		alreadyInjected := false
+		if targetPod.Annotations != nil {
+			_, alreadyInjected = targetPod.Annotations[annotation.SidecarStatus.Name]
+		}
+
+		if !alreadyInjected {
+			// inject option
+			err := AddPodConfigs(targetPod, deploymentName)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	log.Debug("[mutation] /injection-pod: add sidecar setting finished")
+	return nil
+}
+
+func injectIstioRequired(metadata metav1.ObjectMeta) bool {
+	var objectSelector string
+	var inject bool
+
+	annos := metadata.GetAnnotations()
+	labels := metadata.GetLabels()
+	if annos != nil {
+		objectSelector = annos[annotation.SidecarInject.Name]
+	}
+	if labels != nil {
+		if lbl, labelPresent := metadata.GetLabels()[label.SidecarInject.Name]; labelPresent {
+			// The label is the new API; if both are present we prefer the label
+			objectSelector = lbl
+		}
+	}
+	switch strings.ToLower(objectSelector) {
+	case "y", "yes", "true", "on":
+		inject = true
+	}
+
+	return inject
+}
+
+func AddPodConfigs(targetPod *corev1.Pod, deploymentName string) error {
+	// Get the pod config
+	settings, err := resource.GetSidecarConfig(*targetPod, deploymentName)
+	if err != nil {
+		return err
+	}
+	log.Debugf("[mutation] /injection-pod: settings: %v", settings)
+
+	if len(settings.Envs) > 0 {
+		envs := targetPod.Spec.Containers[0].Env
+		// remove the envs that are already set, the value on the pod will prevail.
+		for _, env := range envs {
+			if _, ok := settings.Envs[env.Name]; ok {
+				delete(settings.Envs, env.Name)
+			}
+		}
+		for k, v := range settings.Envs {
+			envs = append(envs, corev1.EnvVar{
+				Name:  k,
+				Value: v,
+			})
+		}
+		targetPod.Spec.Containers[0].Env = envs
+	}
+	if len(settings.Labels) > 0 {
+		labels := targetPod.Labels
+		if labels == nil {
+			labels = make(map[string]string)
+		}
+		for k, v := range settings.Labels {
+			if _, ok := labels[k]; !ok {
+				labels[k] = v
+			}
+		}
+		targetPod.Labels = labels
+	}
+
+	if len(settings.Annotations) > 0 {
+		annotations := targetPod.Annotations
+		if annotations == nil {
+			annotations = make(map[string]string)
+		}
+		for k, v := range settings.Annotations {
+			if _, ok := annotations[k]; !ok {
+				annotations[k] = v
+			}
+		}
+		targetPod.Annotations = annotations
+	}
+
+	log.Infof("[mutation] /injection-pod: add istio config to pod %s/%s, labels: %v,envs: %v,annotation: %v",
+		targetPod.Name, targetPod.Namespace, targetPod.Labels, targetPod.Spec.Containers[0].Env, targetPod.Annotations)
+
+	return nil
 }
