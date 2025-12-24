@@ -11,7 +11,8 @@ clusterId: ""
 matchLabels:
   matchKey: "x-live-enabled"
   matchValue: "true"
-
+sidecarSetting:
+  enable: true
 # Additional labels to apply on the pod level for monitoring and logging configuration.
 podLabels: {}
 
@@ -37,6 +38,7 @@ filterSensitive: "true"
 imagePullSecrets: [ ]
 nameOverride: ""
 fullnameOverride: ""
+nameSuffix: "c-"
 
 serviceAccount:
   create: true

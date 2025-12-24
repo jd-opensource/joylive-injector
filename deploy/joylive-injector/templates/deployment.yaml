@@ -49,6 +49,8 @@ spec:
               value: "{{ .Values.matchLabels.matchKey}}"
             - name: JOYLIVE_MATCH_VALUE
               value: "{{ .Values.matchLabels.matchValue }}"
+            - name: JOYLIVE_SIDECAR_SETTING_ENABLE
+              value: "{{ .Values.sidecarSetting.enable }}"
           name: joylive-injector
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}

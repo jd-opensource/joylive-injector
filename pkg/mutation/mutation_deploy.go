@@ -122,9 +122,9 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 			target.Spec.Template.Labels[config.ApplicationLabel] = target.Labels[config.ApplicationLabel]
 			target.Spec.Template.Labels[config.ServiceNameLabel] = target.Labels[config.ServiceNameLabel]
 			target.Spec.Template.Labels[config.ServiceGroupLabel] = target.Labels[config.ServiceGroupLabel]
-			if _, ok := target.Spec.Template.Labels[config.WebHookMatchKey]; ok {
-				// remove
-				delete(target.Spec.Template.Labels, config.WebHookMatchKey)
+			target.Spec.Template.Labels[config.JdapServiceSpaceLabel] = target.Labels[config.JdapServiceSpaceLabel]
+			if _, ok := target.Spec.Template.Labels[config.WebHookMatchKey]; !ok {
+				target.Spec.Template.Labels[config.WebHookMatchKey] = config.WebHookMatchValue
 			}
 			added = true
 		} else {
