@@ -126,6 +126,9 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 			if _, ok := target.Spec.Template.Labels[config.WebHookMatchKey]; !ok {
 				target.Spec.Template.Labels[config.WebHookMatchKey] = config.WebHookMatchValue
 			}
+			if value, ok := target.Labels[config.SwimLaneLabel]; ok {
+				target.Spec.Template.Labels[config.SwimLaneLabel] = value
+			}
 			added = true
 		} else {
 			// Check if the x-live-enabled label exists in deploy's spec.template.metadata.labels; if not, add it.
