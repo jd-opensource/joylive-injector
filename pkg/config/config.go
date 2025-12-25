@@ -44,6 +44,7 @@ const (
 	WebHookMatchKeyEnv      = "JOYLIVE_MATCH_KEY"
 	WebHookMatchValueEnv    = "JOYLIVE_MATCH_VALUE"
 	EnableSidecarSettingEnv = "JOYLIVE_SIDECAR_SETTING_ENABLE"
+	ConfigCenterEnabledEnv  = "CONFIG_CENTER_ENABLED"
 )
 
 var (
