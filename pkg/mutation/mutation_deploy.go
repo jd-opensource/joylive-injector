@@ -128,6 +128,8 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 			}
 			if value, ok := target.Labels[config.SwimLaneLabel]; ok {
 				target.Spec.Template.Labels[config.SwimLaneLabel] = value
+			} else {
+				target.Spec.Template.Labels[config.SwimLaneLabel] = config.BaseSwimlaneCode
 			}
 			added = true
 		} else {

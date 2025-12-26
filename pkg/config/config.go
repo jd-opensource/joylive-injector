@@ -60,6 +60,7 @@ var (
 	EnableSidecarSetting string
 	ConfigMapName        = "joylive-injector-config"
 	RuleConfigMapName    = "joylive-injector-rules"
+	BaseSwimlaneCode     = "base"
 )
 
 // injection_deploy config

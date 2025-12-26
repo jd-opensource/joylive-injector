@@ -3,11 +3,12 @@ package resource
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/jd-opensource/joylive-injector/pkg/log"
 	"io"
-	corev1 "k8s.io/api/core/v1"
 	"net/http"
 	"strings"
+
+	"github.com/jd-opensource/joylive-injector/pkg/log"
+	corev1 "k8s.io/api/core/v1"
 
 	"github.com/jd-opensource/joylive-injector/pkg/config"
 )
@@ -103,9 +104,11 @@ func GetApplicationEnvironments(labels map[string]string) (map[string]string, er
 
 	//envMaps["APPLICATION_LOCATION_CLUSTER"] = config.ClusterId
 
+	envMaps["CONFIG_LANE_ENABLED"] = "true"
 	if swimlane, ok := labels[config.SwimLaneLabel]; ok {
-		envMaps["CONFIG_LANE_ENABLED"] = "true"
 		envMaps["APPLICATION_LOCATION_LANE"] = swimlane
+	} else {
+		envMaps["APPLICATION_LOCATION_LANE"] = config.BaseSwimlaneCode
 	}
 
 	return envMaps, nil
