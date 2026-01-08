@@ -43,20 +43,24 @@ const (
 	JdapApplicationLabel    = "app.jdap.io/name"
 	WebHookMatchKeyEnv      = "JOYLIVE_MATCH_KEY"
 	WebHookMatchValueEnv    = "JOYLIVE_MATCH_VALUE"
+	EnableSidecarSettingEnv = "JOYLIVE_SIDECAR_SETTING_ENABLE"
+	ConfigCenterEnabledEnv  = "CONFIG_CENTER_ENABLED"
 )
 
 var (
-	Cert              string
-	Key               string
-	Addr              string
-	MatchLabels       string
-	ControlPlaneUrl   string
-	FilterSensitive   string
-	ClusterId         string
-	WebHookMatchKey   string
-	WebHookMatchValue string
-	ConfigMapName     = "joylive-injector-config"
-	RuleConfigMapName = "joylive-injector-rules"
+	Cert                 string
+	Key                  string
+	Addr                 string
+	MatchLabels          string
+	ControlPlaneUrl      string
+	FilterSensitive      string
+	ClusterId            string
+	WebHookMatchKey      string
+	WebHookMatchValue    string
+	EnableSidecarSetting string
+	ConfigMapName        = "joylive-injector-config"
+	RuleConfigMapName    = "joylive-injector-rules"
+	BaseSwimlaneCode     = "base"
 )
 
 // injection_deploy config
@@ -86,6 +90,7 @@ func init() {
 	WebHookMatchValue = os.Getenv(WebHookMatchValueEnv)
 	ConfigMapName = os.Getenv(DefaultConfigMapEnvName)
 	RuleConfigMapName = os.Getenv(RuleConfigMapEnvName)
+	EnableSidecarSetting = os.Getenv(EnableSidecarSettingEnv)
 }
 
 func GetNamespace() string {

@@ -122,9 +122,14 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 			target.Spec.Template.Labels[config.ApplicationLabel] = target.Labels[config.ApplicationLabel]
 			target.Spec.Template.Labels[config.ServiceNameLabel] = target.Labels[config.ServiceNameLabel]
 			target.Spec.Template.Labels[config.ServiceGroupLabel] = target.Labels[config.ServiceGroupLabel]
-			if _, ok := target.Spec.Template.Labels[config.WebHookMatchKey]; ok {
-				// remove
-				delete(target.Spec.Template.Labels, config.WebHookMatchKey)
+			target.Spec.Template.Labels[config.JdapServiceSpaceLabel] = target.Labels[config.JdapServiceSpaceLabel]
+			if _, ok := target.Spec.Template.Labels[config.WebHookMatchKey]; !ok {
+				target.Spec.Template.Labels[config.WebHookMatchKey] = config.WebHookMatchValue
+			}
+			if value, ok := target.Labels[config.SwimLaneLabel]; ok {
+				target.Spec.Template.Labels[config.SwimLaneLabel] = value
+			} else {
+				target.Spec.Template.Labels[config.SwimLaneLabel] = config.BaseSwimlaneCode
 			}
 			added = true
 		} else {
@@ -174,6 +179,14 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 					},
 				}, err
 			}
+
+			if _, ok := deploy.GetLabels()[config.ConfigureTypeLabel]; !ok {
+				// Remove CONFIG_CENTER_ENABLED environment variable if exists
+				if len(target.Spec.Template.Spec.Containers) > 0 {
+					target.Spec.Template.Spec.Containers[0].Env = removeEnvVar(target.Spec.Template.Spec.Containers[0].Env, config.ConfigCenterEnabledEnv)
+				}
+			}
+
 			if addedEnv {
 				added = true
 			}
@@ -291,6 +304,17 @@ func deleteConfigMap(name, namespace string) error {
 	}
 	log.Info("deleted configmap", zap.String("name", name), zap.String("namespace", namespace))
 	return nil
+}
+
+// removeEnvVar removes environment variables with the specified name from the slice
+func removeEnvVar(envs []corev1.EnvVar, name string) []corev1.EnvVar {
+	result := make([]corev1.EnvVar, 0, len(envs))
+	for _, env := range envs {
+		if env.Name != name {
+			result = append(result, env)
+		}
+	}
+	return result
 }
 
 func createDeployPatch(target, original *appsv1.Deployment) ([]byte, error) {
