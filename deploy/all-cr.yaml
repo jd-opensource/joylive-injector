@@ -185,6 +185,7 @@ data:
         addOpens:
           com.jd.live.agent.bootstrap.util.type.FieldAccessorFactory:
             - java.util.Map
+            - java.net.URI
             - jdk.internal.misc.Unsafe
             - sun.misc.Unsafe
           com.jd.live.agent.governance.invoke.Invocation:
@@ -893,6 +894,8 @@ spec:
               value: "x-live-enabled"
             - name: JOYLIVE_MATCH_VALUE
               value: "true"
+            - name: JOYLIVE_SIDECAR_SETTING_ENABLE
+              value: "true"
           name: joylive-injector
           image: ghcr.m.daocloud.io/jd-opensource/joylive-injector:v1.2.4
           imagePullPolicy: Always
@@ -1004,7 +1007,7 @@ spec:
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
-  name: joylive-injector
+  name: c-joylive-injector
 webhooks:
   - name: "joylive-injector-deployment.joylive.io"
     rules:
