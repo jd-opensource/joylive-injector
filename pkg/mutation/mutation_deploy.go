@@ -183,7 +183,11 @@ func injectionDeploy(request *admissionv1.AdmissionRequest) (*admissionv1.Admiss
 			if _, ok := deploy.GetLabels()[config.ConfigureTypeLabel]; !ok {
 				// Remove CONFIG_CENTER_ENABLED environment variable if exists
 				if len(target.Spec.Template.Spec.Containers) > 0 {
-					target.Spec.Template.Spec.Containers[0].Env = removeEnvVar(target.Spec.Template.Spec.Containers[0].Env, config.ConfigCenterEnabledEnv)
+					removeEnv := false
+					target.Spec.Template.Spec.Containers[0].Env, removeEnv = removeEnvVar(target.Spec.Template.Spec.Containers[0].Env, config.ConfigCenterEnabledEnv)
+					if removeEnv && !addedEnv {
+						addedEnv = true
+					}
 				}
 			}
 
@@ -307,14 +311,17 @@ func deleteConfigMap(name, namespace string) error {
 }
 
 // removeEnvVar removes environment variables with the specified name from the slice
-func removeEnvVar(envs []corev1.EnvVar, name string) []corev1.EnvVar {
+func removeEnvVar(envs []corev1.EnvVar, name string) ([]corev1.EnvVar, bool) {
 	result := make([]corev1.EnvVar, 0, len(envs))
+	removed := false
 	for _, env := range envs {
 		if env.Name != name {
 			result = append(result, env)
+		} else {
+			removed = true
 		}
 	}
-	return result
+	return result, removed
 }
 
 func createDeployPatch(target, original *appsv1.Deployment) ([]byte, error) {
