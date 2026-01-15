@@ -309,7 +309,7 @@ data:
         timeout: 5000
       switch:
         govern:
-          mq: ${CONFIG_LIVE_MQ_ENABLED:false}
+          mq: ${CONFIG_MQ_ENABLED:false}
           dubbo: true
           grpc: true
           sofarpc: true
@@ -354,7 +354,6 @@ data:
         shutdownWaitTime: ${CONFIG_SHUTDOWN_WAIT_TIME:10000}
         service:
           localFirst: ${CONFIG_LOCAL_FIRST:true}
-          localFirstMode: ${CONFIG_LOCAL_FIRST_MODE:CELL}
           cellFailoverThresholds: ${CELL_FAILOVER_THRESHOLDS}
           serviceGroups: ${CONFIG_SERVICE_GROUPS:}
           serviceGroupOpen: ${CONFIG_SERVICE_GROUP_OPEN:true}
@@ -397,8 +396,9 @@ data:
         mq:
           liveMode: ${CONFIG_LIVE_MQ_MODE:ISOLATION_CLUSTER}
           laneMode: ${CONFIG_LANE_MQ_MODE:SHARED}
-          groupExpression: ${CONFIG_MQ_GROUP_EXPRESSION:${group}${_!lane}}
-          topics:
+          groupEnabled: ${CONFIG_MQ_GROUP_ENABLED:true}
+          groupExpression: ${CONFIG_MQ_GROUP_EXPRESSION}
+          topics: ${CONFIG_MQ_TOPICS}
         db:
           accessMode: ${CONFIG_DB_ACCESS_MODE:READ_WRITE}
         live:
@@ -563,17 +563,16 @@ data:
         enabled: ${CONFIG_EXPORTER_ENABLED:true}
         type: ${CONFIG_EXPORTER_TYPE:${CONFIG_COUNTER_EXPORTER_TYPE:otlp.grpc}}
         endpoint: ${CONFIG_EXPORTER_ENDPOINT:${CONFIG_COUNTER_EXPORTER_ENDPOINT:http://otel-collector.joylive.svc:4317}}
-        timeout: 5000
-        readerInterval: 1000
+        port: ${CONFIG_EXPORTER_PORT:${CONFIG_COUNTER_EXPORTER_PORT:9494}}
+        timeout: ${CONFIG_EXPORTER_TIMEOUT:5000}
+        readerInterval: ${CONFIG_EXPORTER_READER_INTERVAL:60000}
         traffic:
           enabled: ${CONFIG_EXPORTER_TRAFFIC_ENABLED:true}
-          gatewayEnabled: true
-          serviceEnabled: true
-        document:
-          enabled: ${CONFIG_EXPORTER_DOCUMENT_ENABLED:false}
+          gatewayEnabled: ${CONFIG_EXPORTER_GATEWAY_ENABLED:true}
+          serviceEnabled: ${CONFIG_EXPORTER_SERVICE_ENABLED:true}
         exception:
           enabled: ${CONFIG_EXPORTER_EXCEPTION_ENABLED:true}
-          maxDepth: 20
+          maxDepth: ${CONFIG_EXPORTER_EXCEPTION_MAX_DEPTH:20}
           stackTracePrefixes:
             - java.
             - javax.
