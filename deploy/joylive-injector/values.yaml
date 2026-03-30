@@ -73,9 +73,6 @@ agent:
     lane: false
     flowcontrol: false
     configCenter: false
-  governance:
-    service:
-      localFirstMode: CELL
   location:
     cloud: ""
     region: ""
