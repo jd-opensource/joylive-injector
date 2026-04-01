@@ -84,6 +84,21 @@ agent:
     cell: ""
     laneSpaceId: default
     lane: base
+  registry:
+    first:
+      type: nacos
+      role: SECONDARY
+      mode: FULL
+      address: ""
+      username: ""
+      password: ""
+    second:
+      type: nacos
+      role: SECONDARY
+      mode: FULL
+      address: ""
+      username: ""
+      password: ""
 otel:
   replicas: 2
   image:

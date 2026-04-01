@@ -366,23 +366,23 @@ agent:
         enabled: ${CONFIG_HOST_SERVICE_ENABLED:true}
         services: ${CONFIG_HOST_SERVICES}
       clusters:
-        - type: ${CONFIG_REGISTRY_TYPE_FIRST:nacos}
-          role: ${CONFIG_REGISTRY_ROLE_FIRST:SECONDARY}
-          mode: ${CONFIG_REGISTRY_MODE_FIRST:FULL}
-          address: ${CONFIG_REGISTRY_ADDRESS_FIRST:${REGISTRY_EXTERNAL_HOST:${REGISTRY_INTERNAL_HOST}}:${REGISTRY_EXTERNAL_HTTP_PORT:${REGISTRY_INTERNAL_HTTP_PORT:8848}}}
-          username: ${CONFIG_REGISTRY_USERNAME_FIRST:${REGISTRY_USERNAME:}}
-          password: ${CONFIG_REGISTRY_PASSWORD_FIRST:${REGISTRY_PASSWORD:}}
+        - type: ${CONFIG_REGISTRY_TYPE_FIRST:{{ .Values.agent.registry.first.type }}}
+          role: ${CONFIG_REGISTRY_ROLE_FIRST:{{ .Values.agent.registry.first.role }}}
+          mode: ${CONFIG_REGISTRY_MODE_FIRST:{{ .Values.agent.registry.first.mode }}}
+          address: ${CONFIG_REGISTRY_ADDRESS_FIRST:${REGISTRY_EXTERNAL_HOST:${REGISTRY_INTERNAL_HOST}}:${REGISTRY_EXTERNAL_HTTP_PORT:${REGISTRY_INTERNAL_HTTP_PORT}:{{ .Values.agent.registry.first.address }}}}
+          username: ${CONFIG_REGISTRY_USERNAME_FIRST:${REGISTRY_USERNAME:{{ .Values.agent.registry.first.username }}}}
+          password: ${CONFIG_REGISTRY_PASSWORD_FIRST:${REGISTRY_PASSWORD:{{ .Values.agent.registry.first.password }}}}
           properties: ${CONFIG_REGISTRY_PROPERTIES_FIRST}
           namespace: ${CONFIG_REGISTRY_NAMESPACE_FIRST:${REGISTRY_NAMESPACE:public}}
           group: ${CONFIG_REGISTRY_GROUP_FIRST}
           groupEnabled: ${CONFIG_REGISTRY_GROUP_ENABLED:true}
           denyEmptyEnabled: ${CONFIG_REGISTRY_DENY_EMPTY_ENABLED:false}
-        - type: ${CONFIG_REGISTRY_TYPE_SECOND:nacos}
-          role: ${CONFIG_REGISTRY_ROLE_SECOND:SECONDARY}
-          mode: ${CONFIG_REGISTRY_MODE_SECOND:FULL}
-          address: ${CONFIG_REGISTRY_ADDRESS_SECOND}
-          username: ${CONFIG_REGISTRY_USERNAME_SECOND:${REGISTRY_USERNAME:}}
-          password: ${CONFIG_REGISTRY_PASSWORD_SECOND:${REGISTRY_PASSWORD:}}
+        - type: ${CONFIG_REGISTRY_TYPE_SECOND:{{ .Values.agent.registry.second.type }}}
+          role: ${CONFIG_REGISTRY_ROLE_SECOND:{{ .Values.agent.registry.second.role }}}
+          mode: ${CONFIG_REGISTRY_MODE_SECOND:{{ .Values.agent.registry.second.mode }}}
+          address: ${CONFIG_REGISTRY_ADDRESS_SECOND:{{ .Values.agent.registry.second.address }}}
+          username: ${CONFIG_REGISTRY_USERNAME_SECOND:${REGISTRY_USERNAME:{{ .Values.agent.registry.second.username }}}}
+          password: ${CONFIG_REGISTRY_PASSWORD_SECOND:${REGISTRY_PASSWORD:{{ .Values.agent.registry.second.password }}}}
           properties: ${CONFIG_REGISTRY_PROPERTIES_SECOND}
           namespace: ${CONFIG_REGISTRY_NAMESPACE_SECOND:${REGISTRY_NAMESPACE:public}}
           group: ${CONFIG_REGISTRY_GROUP_SECOND}
