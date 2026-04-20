@@ -1,0 +1,129 @@
+# joylive-injector RBAC 权限配置
+# 命名空间: joylive
+# 用途: 生成kubeconfig, 在集群外部通过此SA安装和管理joylive-injector组件
+# 策略: joylive命名空间独享授予全部权限; 集群级别覆盖安装+运行所需的全部权限
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: joylive
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: joylive-injector
+  namespace: joylive
+---
+# ServiceAccount Token (K8s 1.24+不再自动创建, 需手动声明, 用于生成kubeconfig)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: joylive-injector
+  namespace: joylive
+  annotations:
+    kubernetes.io/service-account.name: joylive-injector
+type: kubernetes.io/service-account-token
+---
+# ============================================================
+# joylive 命名空间全部权限 (独享空间, 覆盖所有命名空间内资源)
+# ============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: joylive-injector
+  namespace: joylive
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: joylive-injector
+  namespace: joylive
+subjects:
+  - kind: ServiceAccount
+    name: joylive-injector
+    namespace: joylive
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: joylive-injector
+---
+# ============================================================
+# 集群级别权限 (安装 + 运行 所需的全部跨命名空间/集群级权限)
+# ============================================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: joylive-injector
+rules:
+  # --- 安装阶段: Helm install/upgrade 创建集群级资源 ---
+  # 命名空间管理 (创建joylive命名空间)
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  # RBAC管理 (安装时创建ClusterRole/ClusterRoleBinding/Role/RoleBinding)
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["clusterroles", "clusterrolebindings", "roles", "rolebindings"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # MutatingWebhookConfiguration (安装时创建webhook配置)
+  - apiGroups: ["admissionregistration.k8s.io"]
+    resources: ["mutatingwebhookconfigurations"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # CRD定义 (安装时创建agentversions CRD)
+  - apiGroups: ["apiextensions.k8s.io"]
+    resources: ["customresourcedefinitions"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # ServiceMonitor (Prometheus监控配置, 可能安装到其他命名空间)
+  - apiGroups: ["monitoring.coreos.com"]
+    resources: ["servicemonitors"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+  # --- 运行阶段: webhook拦截和agent注入 (跨命名空间) ---
+  # pods (拦截pod创建, 注入init container和agent)
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  # deployments (拦截CREATE/UPDATE/DELETE, 注入标签和环境变量)
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch", "update", "patch"]
+  # replicasets (通过pod ownerReferences反查所属Deployment)
+  - apiGroups: ["apps"]
+    resources: ["replicasets"]
+    verbs: ["get", "list", "watch"]
+  # nodes (获取节点zone拓扑, 注入NODE_ZONES环境变量)
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list", "watch"]
+  # configmaps (跨命名空间为目标应用创建/更新/删除 {deploy}-live-configmap)
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # events (跨命名空间记录事件)
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  # services (otel-collector等跨命名空间服务)
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # CRD实例: agentversions (全集群watch agent版本配置)
+  - apiGroups: ["injector.joylive.io"]
+    resources: ["agentversions", "agentversions/status", "agentversions/finalizers"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: joylive-injector
+subjects:
+  - kind: ServiceAccount
+    name: joylive-injector
+    namespace: joylive
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: joylive-injector
