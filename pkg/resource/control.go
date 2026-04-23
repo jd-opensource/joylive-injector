@@ -43,10 +43,13 @@ func GetApplicationEnvironments(labels map[string]string) (map[string]string, er
 	if len(application) == 0 {
 		application = labels[config.JdapApplicationLabel]
 	}
+	serviceName := labels[config.ServiceNameLabel]
+	group := labels[config.ServiceGroupLabel]
 	envMaps := make(map[string]string)
 	if len(serviceSpace) != 0 && len(application) != 0 {
 		url := fmt.Sprintf(
-			"%s/ns/%s/application/%s/environments", config.ControlPlaneUrl, serviceSpace, application,
+			"%s/ns/%s/application/%s/environments?serviceName=%s&group=%s",
+			config.ControlPlaneUrl, serviceSpace, application, serviceName, group,
 		)
 		resp, err := http.Get(url)
 		if err != nil {
