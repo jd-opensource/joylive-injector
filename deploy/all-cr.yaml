@@ -479,6 +479,7 @@ data:
               - com.jd.live.agent.shaded.
               - com.netflix.hystrix.util.HystrixTimer$ScheduledExecutor$
               - com.alibaba.nacos.
+              - io.netty.
             excludeTaskPrefixes:
               - reactor.core.scheduler.BoundedElasticScheduler$$Lambda
               - org.springframework.cloud.commons.util.InetUtils$$Lambda$
@@ -491,6 +492,7 @@ data:
               - com.netflix.hystrix.util.HystrixTimer$
               - com.netflix.servo.util.ExpiringCache$
               - com.zaxxer.hikari.pool.HikariPool$
+              - io.netty.
         configCenter:
           enabled: ${CONFIG_CENTER_ENABLED:false}
           type: ${CONFIG_CENTER_TYPE:nacos}
